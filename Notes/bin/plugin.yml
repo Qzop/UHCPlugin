@@ -1,0 +1,9 @@
+name: PlayerNotes
+author: Qzop (Fair)
+version: 1.0
+main: notes.mainPackage.Main
+description: Notes plugin - Allows staff with permission to write notes on players and see the notes on the players.
+
+commands:
+   notes:
+      description: Allows staff to add/get/remove notes to specific players as well as view the notes made on players.

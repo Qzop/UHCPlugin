@@ -1,0 +1,15 @@
+name: ChatPlugin
+author: Qzop (Fair)
+version: 1.0
+main: chat.mainPackage.Main
+description: Chat plugin - Handles all chat issues such as staffchat, voting polls, chat formats etc.
+
+commands:
+   sc:
+      description: Allows staff to customize staff chat to their liking like turning staffchat on or off.
+   gc:
+      description: Allows staff to turn global chat on and off.
+   poll:
+      description: Allows staff to start a poll in chat for players to answer.
+   vote:
+      description: Allows players to vote during a poll.
