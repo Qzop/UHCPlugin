@@ -1,5 +1,6 @@
 package core.mainPackage;
 
+import core.Config.ConfigEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -20,8 +21,10 @@ public class Main extends JavaPlugin implements Listener
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "---------------------------");
 		
 		this.getServer().getPluginManager().registerEvents(this, this);
+		this.getServer().getPluginManager().registerEvents(new ConfigEvent(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
+		getCommand(command.config).setExecutor(command);
 	}
 	
 	public void onDisable()

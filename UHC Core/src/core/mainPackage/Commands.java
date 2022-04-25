@@ -1,5 +1,6 @@
 package core.mainPackage;
 
+import core.Config.ConfigInventory;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -18,8 +19,10 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	public static boolean teams = false;
 	
 	private Scatter scat = new Scatter();
+	private ConfigInventory inv = new ConfigInventory();
 	
 	String uhc = "uhc";
+	String config = "config";
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -56,6 +59,36 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 			else
 			{
 				p.sendMessage(ChatColor.RED + "No permission.");
+			}
+		}
+		else if(label.equalsIgnoreCase(config))
+		{
+			if(args.length == 0)
+			{
+				inv.createConfig(p);
+			}
+			else if(args.length == 1)
+			{
+				if(args[0].equals("admin"))
+				{
+					if(p.hasPermission("Config.admin"))
+					{
+						inv.createConfigAdmin(p);
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "No Permission.");
+					}
+				}
+				else
+				{
+					p.sendMessage(ChatColor.RED + "'" + args[0] + "' is an invalid argument!");
+					p.sendMessage(ChatColor.RED + "Usage: /config (admin)");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "Usage: /config (admin)");
 			}
 		}
 		
