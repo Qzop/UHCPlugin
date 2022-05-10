@@ -1,6 +1,9 @@
 package core.mainPackage;
 
 import core.Config.ConfigInventory;
+import core.HostsMods.HostsMods;
+import core.Teams.TeamManager;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -20,9 +23,14 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	
 	private Scatter scat = new Scatter();
 	private ConfigInventory inv = new ConfigInventory();
+	private HostsMods hosts = new HostsMods();
+	private TeamManager tm = new TeamManager();
 	
 	String uhc = "uhc";
 	String config = "config";
+	String host = "host";
+	String mod = "mod";
+	String team = "team";
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -35,7 +43,7 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 			{
 				if(args.length == 0)
 				{
-					p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "UHC Commands: \n"
+					p.sendMessage(Scatter.UHCprefix + " " + ChatColor.GOLD + ChatColor.BOLD + "UHC Commands: \n"
 							+ ChatColor.AQUA + "- /uhc start \n - /uhc stop" );
 					
 				}
@@ -48,7 +56,7 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 					}
 					else if(args[0].equals("stop"))
 					{
-						
+
 					}
 					else 
 					{
@@ -89,6 +97,139 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 			else
 			{
 				p.sendMessage(ChatColor.RED + "Usage: /config (admin)");
+			}
+		}
+		else if(label.equalsIgnoreCase(mod))
+		{
+			if(p.hasPermission("uhc.mod"))
+			{
+				if(args.length == 2)
+				{
+					if(args[0].equals("add"))
+					{
+						Player target = Bukkit.getPlayer(args[1]);
+
+						if(target != null)
+						{
+							hosts.setMod(target);
+						}
+						else
+						{
+							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
+						}
+					}
+					else
+					{
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Invalid argument '" + args[0] + "'.");
+					}
+				}
+				else if(args[0].equals("remove"))
+				{
+					Player target = Bukkit.getPlayer(args[1]);
+
+					if(target != null)
+					{
+						hosts.removeMod(target);
+					}
+					else
+					{
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
+					}
+				}
+				else
+				{
+					p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Usage: /mod (add/remove) (player)");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No Permission.");
+			}
+		}
+		else if(label.equalsIgnoreCase(host))
+		{
+			if(p.hasPermission("uhc.host"))
+			{
+				if(args.length == 2)
+				{
+					if(args[0].equals("add"))
+					{
+						Player target = Bukkit.getPlayer(args[1]);
+
+						if(target != null)
+						{
+							hosts.setHost(target);
+						}
+						else
+						{
+							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
+						}
+					}
+					else if(args[0].equals("remove"))
+					{
+						Player target = Bukkit.getPlayer(args[1]);
+
+						if(target != null)
+						{
+							hosts.removeHost(target);
+						}
+						else
+						{
+							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
+						}
+					}
+					else
+					{
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Invalid argument '" + args[0] + "'.");
+					}
+
+				}
+				else
+				{
+					p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Usage: /host (add/remove) (player)");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No Permission.");
+			}
+		}
+		else if(label.equalsIgnoreCase(team))
+		{
+			if(args.length == 1)
+			{
+				if(args[0].equals("create"))
+				{
+					tm.createTeam(p);
+				}
+				else
+				{
+					p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + "Invalid argument '" + args[0] + "'.");
+				}
+			}
+			else if(args.length == 2)
+			{
+				if(args[0].equals("invite"))
+				{
+					Player target = Bukkit.getPlayer(args[1]);
+
+					if(target != null)
+					{
+						tm.invitePlayer(p, target);
+					}
+					else
+					{
+						p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + "That player does not exist!");
+					}
+				}
+				else
+				{
+					p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + "Invalid argument '" + args[0] + "'.");
+				}
+			}
+			else
+			{
+				p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " Usage: /team (create) \n Usage: /team (invite) (player)");
 			}
 		}
 		

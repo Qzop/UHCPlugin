@@ -3,6 +3,9 @@ package core.Scatter;
 import java.util.ArrayList;
 import java.util.Random;
 
+import core.Config.ConfigInventory;
+import core.ConfigVariables.Horses;
+import core.HostsMods.HostsMods;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,7 +20,8 @@ import core.mainPackage.Main;
 import net.md_5.bungee.api.ChatColor;
 
 public class Scatter implements Listener
-{	
+{
+	private Horses horse = new Horses();
 	public static String UHCprefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + ChatColor.BOLD + "UHC" + ChatColor.GRAY + "]";
 	Main plugin = Main.getPlugin(Main.class);
 	
@@ -28,14 +32,22 @@ public class Scatter implements Listener
 
 		ArrayList<Location> locations = new ArrayList<Location>();
 		World world = Bukkit.getWorld("uhcworld");
-		
+
+		if(!ConfigInventory.horses)
+		{
+			horse.killCurrentHorses();
+		}
+
 		for(Player p : Bukkit.getOnlinePlayers())
 		{
 			if(Commands.ffa == true)
 			{
 				// Make sure to add if and else statements for hosts and mods.
-				
-				ffa.add(p);
+
+				if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
+				{
+					ffa.add(p);
+				}
 			}
 			else if(Commands.teams == true)
 			{

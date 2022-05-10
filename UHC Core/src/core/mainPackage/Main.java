@@ -1,6 +1,10 @@
 package core.mainPackage;
 
 import core.Config.ConfigEvent;
+import core.ConfigVariables.AppleRate;
+import core.ConfigVariables.Horses;
+import core.ConfigVariables.Portals;
+import core.ConfigVariables.SpeedStrength;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -22,9 +26,16 @@ public class Main extends JavaPlugin implements Listener
 		
 		this.getServer().getPluginManager().registerEvents(this, this);
 		this.getServer().getPluginManager().registerEvents(new ConfigEvent(), this);
+		this.getServer().getPluginManager().registerEvents(new AppleRate(), this);
+		this.getServer().getPluginManager().registerEvents(new Horses(), this);
+		this.getServer().getPluginManager().registerEvents(new SpeedStrength(), this);
+		this.getServer().getPluginManager().registerEvents(new Portals(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
 		getCommand(command.config).setExecutor(command);
+		getCommand(command.host).setExecutor(command);
+		getCommand(command.mod).setExecutor(command);
+		getCommand(command.team).setExecutor(command);
 	}
 	
 	public void onDisable()
