@@ -38,6 +38,7 @@ public class HostsMods
         else
         {
             mods.add(p.getUniqueId());
+            p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Mod.");
         }
     }
 

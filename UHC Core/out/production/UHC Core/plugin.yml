@@ -15,3 +15,5 @@ commands:
        description: Allows a player to set themselves as mod.
    team:
        description: Allows players to create teams and add players to their team.
+   test:
+       description: For developers.

@@ -1,5 +1,6 @@
 package core.Config;
 
+import core.mainPackage.Commands;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

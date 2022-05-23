@@ -3,7 +3,10 @@ package core.mainPackage;
 import core.Config.ConfigInventory;
 import core.HostsMods.HostsMods;
 import core.Teams.TeamManager;
+import net.md_5.bungee.api.chat.ClickEvent;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -14,12 +17,13 @@ import core.Scatter.Scatter;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_8_R3.CommandExecute;
 
+import static core.Scatter.Scatter.started;
+
 public class Commands extends CommandExecute implements Listener, CommandExecutor
 {
 	// LIST OF ALL BOOLEANS USED:
 	public static boolean scatter = false;
-	public static boolean ffa = true;
-	public static boolean teams = false;
+	public static boolean chat = false;
 	
 	private Scatter scat = new Scatter();
 	private ConfigInventory inv = new ConfigInventory();
@@ -31,6 +35,7 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	String host = "host";
 	String mod = "mod";
 	String team = "team";
+	String test = "test";
 	
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
@@ -51,7 +56,9 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 				{
 					if(args[0].equals("start"))
 					{
+						chat = true;
 						scatter = true;
+						Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.RED + " Chat is now disabled.");
 						scat.onStart();
 					}
 					else if(args[0].equals("stop"))
@@ -202,35 +209,136 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 				{
 					tm.createTeam(p);
 				}
-				else
+				else if(args[0].equals("list"))
 				{
-					p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + "Invalid argument '" + args[0] + "'.");
+					tm.teamList(p);
 				}
-			}
-			else if(args.length == 2)
-			{
-				if(args[0].equals("invite"))
+				else if(args[0].equals("disband"))
 				{
-					Player target = Bukkit.getPlayer(args[1]);
-
-					if(target != null)
+					if(!scatter && !started)
 					{
-						tm.invitePlayer(p, target);
+						tm.disbandTeam(p);
 					}
 					else
 					{
-						p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + "That player does not exist!");
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You cannot use that command now!");
+					}
+				}
+				else if(args[0].equals("invite"))
+				{
+					p.sendMessage(ChatColor.RED + "Usage: /team invite (player)");
+				}
+				else if(args[0].equals("remove"))
+				{
+					p.sendMessage(ChatColor.RED + "Usage: /team remove (player)");
+				}
+				else
+				{
+					p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " Invalid argument '" + args[0] + "'.");
+				}
+			}
+			else if(args.length >= 2)
+			{
+				if(args[0].equals("invite"))
+				{
+					if(!scatter && !started)
+					{
+						Player target = Bukkit.getPlayer(args[1]);
+
+						if(target != null)
+						{
+							if(target.getUniqueId().equals(p.getUniqueId()))
+							{
+								p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " You cannot invite yourself to a team!");
+							}
+							else
+							{
+								tm.invitePlayer(p, target);
+							}
+						}
+						else
+						{
+							p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " That player does not exist!");
+						}
+					}
+					else
+					{
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You cannot use that command now!");
+					}
+				}
+				else if(args[0].equals("accept"))
+				{
+					if(!scatter && !started)
+					{
+						if(tm.pendingInv.containsKey(p.getUniqueId()))
+						{
+							tm.addPlayer(p);
+						}
+						else
+						{
+							p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " You do not currently have an invite!");
+						}
+					}
+					else
+					{
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You cannot use that command now!");
+					}
+				}
+				else if(args[0].equals("remove"))
+				{
+					if(!scatter && !started)
+					{
+						Player target = Bukkit.getPlayer(args[1]);
+
+						if(target != null)
+						{
+							tm.removePlayer(p, target);
+						}
+						else
+						{
+							OfflinePlayer targ = Bukkit.getOfflinePlayer(args[1]);
+
+							if(targ.getName().equals(args[1]))
+							{
+								tm.removeOfflinePlayer(p, targ);
+							}
+							else
+							{
+								p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " Player '" + args[1] + "' does not exist!");
+							}
+						}
+					}
+					else
+					{
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You cannot use that command now!");
+					}
+				}
+				else if(args[0].equals("list"))
+				{
+					Player t = Bukkit.getPlayer(args[1]);
+
+					if(t == null)
+					{
+						p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " Player '" + args[1] + "' does not exist!");
+					}
+					else
+					{
+						tm.teamListTarg(p, t);
 					}
 				}
 				else
 				{
-					p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + "Invalid argument '" + args[0] + "'.");
+					p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " Invalid argument '" + args[0] + "'.");
 				}
 			}
 			else
 			{
-				p.sendMessage(TeamManager.Teamprefix + ChatColor.RED + " Usage: /team (create) \n Usage: /team (invite) (player)");
+				p.sendMessage(ChatColor.RED + "Usage: /team (create/disband) \nUsage: /team (invite/remove/list) (player)");
 			}
+		}
+		else if(label.equalsIgnoreCase(test))
+		{
+			// stuff to test in here
 		}
 		
 		return false;
