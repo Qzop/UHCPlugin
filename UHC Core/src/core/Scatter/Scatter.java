@@ -28,6 +28,8 @@ public class Scatter implements Listener
 	public static boolean started = false;
 	private ArrayList<Player> ffa = new ArrayList<Player>();
 	private ChatEvent chat = new ChatEvent();
+	public static int ffaScattered = 0;
+	public static int teamsScattered = 0;
 	
 	public void onStart()
 	{
@@ -220,6 +222,7 @@ public class Scatter implements Listener
 					else
 					{
 						ffa.get(index).teleport(locations.get(index));
+						ffaScattered++;
 					}
 
 					index++;
@@ -337,6 +340,8 @@ public class Scatter implements Listener
 							{
 								teammate.teleport(locations.get(index));
 							}
+
+							teamsScattered++;
 						}
 					}
 
