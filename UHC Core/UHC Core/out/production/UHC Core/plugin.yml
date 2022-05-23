@@ -1,0 +1,19 @@
+name: UHCcore
+author: Qzop (Fair) and TheenComputers
+version: 1.0
+main: core.mainPackage.Main
+description: UHCcore - handles all UHC gamemode sided stuff.
+
+commands:
+   uhc:
+       description: Allows staff to start and stop the uhc.
+   config:
+       description: Allows players to view config settings and allows staff to change config settings.
+   host:
+       description: Allows a player to set themselves as host.
+   mod:
+       description: Allows a player to set themselves as mod.
+   team:
+       description: Allows players to create teams and add players to their team.
+   test:
+       description: For developers.
