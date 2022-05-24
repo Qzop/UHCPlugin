@@ -162,7 +162,7 @@ public class TeamManager implements Listener
                                 comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/team accept " + p.getName()));
                                 comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Accept " + p.getDisplayName() + "'s Invite!").create()));
                                 target.spigot().sendMessage(pref, comp, comp1);
-                                p.sendMessage(Teamprefix + ChatColor.GREEN + " You have invited " + ChatColor.LIGHT_PURPLE + target.getName() + ChatColor.GREEN + " to your team!");
+                                p.sendMessage(Teamprefix + ChatColor.GREEN + " You have invited " + ChatColor.LIGHT_PURPLE + target.getName() + " to your team!");
                                 pendingInv.put(target.getUniqueId(), p.getUniqueId());
 
                                 new BukkitRunnable()
@@ -171,15 +171,10 @@ public class TeamManager implements Listener
 
                                     public void run()
                                     {
-                                        if (seconds == 0 && pendingInv.containsKey(target.getUniqueId()))
+                                        if (seconds == 0)
                                         {
                                             target.sendMessage(Teamprefix + ChatColor.RED + " Your invite from " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getName() + ChatColor.RED + " has expired.");
                                             pendingInv.remove(target.getUniqueId());
-                                            cancel();
-                                        }
-
-                                        if(!pendingInv.containsKey(target.getUniqueId()))
-                                        {
                                             cancel();
                                         }
 
@@ -244,7 +239,7 @@ public class TeamManager implements Listener
                                     comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/team accept " + p.getName()));
                                     comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Accept " + p.getDisplayName() + "'s Invite!").create()));
                                     target.spigot().sendMessage(pref, comp, comp1);
-                                    p.sendMessage(Teamprefix + ChatColor.GREEN + " You have invited " + ChatColor.LIGHT_PURPLE + target.getName() + ChatColor.GREEN +  " to your team!");
+                                    p.sendMessage(Teamprefix + ChatColor.GREEN + " You have invited " + ChatColor.LIGHT_PURPLE + target.getName() + " to your team!");
                                     pendingInv.put(target.getUniqueId(), p.getUniqueId());
 
                                     new BukkitRunnable()
@@ -253,15 +248,10 @@ public class TeamManager implements Listener
 
                                         public void run()
                                         {
-                                            if (seconds == 0 && pendingInv.containsKey(target.getUniqueId()))
+                                            if (seconds == 0)
                                             {
                                                 target.sendMessage(Teamprefix + ChatColor.RED + " Your invite from " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getName() + ChatColor.RED + " has expired.");
                                                 pendingInv.remove(target.getUniqueId());
-                                                cancel();
-                                            }
-
-                                            if(!pendingInv.containsKey(target.getUniqueId()))
-                                            {
                                                 cancel();
                                             }
 
@@ -325,7 +315,7 @@ public class TeamManager implements Listener
 
         if(teams.containsKey(temp))
         {
-            p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + " Team List:");
+            p.sendMessage(Teamprefix + ChatColor.GOLD + ChatColor.BOLD + " Team List:");
             p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(temp).getDisplayName());
 
             for(UUID uuid : teams.get(temp))
