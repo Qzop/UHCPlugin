@@ -37,6 +37,7 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	String mod = "mod";
 	String team = "team";
 	String help = "helpop";
+	String tele = "tp";
 	String test = "test";
 	
 	@Override
@@ -355,6 +356,53 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 				}
 
 				h.onHelp(p, message);
+			}
+		}
+		else if(label.equalsIgnoreCase(tele))
+		{
+			if(p.hasPermission("uhc.tp"))
+			{
+				if(args.length == 0 || args.length > 2)
+				{
+					p.sendMessage(ChatColor.RED + "Usage: /tp (player) (player)");
+				}
+				else if(args.length == 1)
+				{
+					Player target = Bukkit.getPlayer(args[0]);
+
+					if(target == null)
+					{
+						p.sendMessage(ChatColor.RED + "That player is not online!");
+					}
+					else
+					{
+						p.teleport(target);
+						p.sendMessage(ChatColor.GREEN + "Teleported to " + target.getDisplayName() + ".");
+					}
+				}
+				else if(args.length == 2)
+				{
+					Player targ1 = Bukkit.getPlayer(args[0]);
+					Player targ2 = Bukkit.getPlayer(args[1]);
+
+					if(targ1 == null)
+					{
+						p.sendMessage(ChatColor.RED + "Player '" + args[0] + "' is not online!");
+					}
+					else if(targ2 == null)
+					{
+						p.sendMessage(ChatColor.RED + "Player '" + args[1] + "' is not online!");
+					}
+					else
+					{
+						targ1.teleport(targ2);
+						p.sendMessage(ChatColor.GREEN + "Successfully teleported '" + targ1.getName() + "' to '" + targ2.getName() + "'.");
+					}
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No permission.");
 			}
 		}
 		else if(label.equalsIgnoreCase(test))

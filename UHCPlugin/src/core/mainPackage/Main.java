@@ -46,6 +46,7 @@ public class Main extends JavaPlugin implements Listener
 		getCommand(command.team).setExecutor(command);
 		getCommand(command.test).setExecutor(command);
 		getCommand(command.help).setExecutor(command);
+		getCommand(command.tele).setExecutor(command);
 	}
 	
 	public void onDisable()

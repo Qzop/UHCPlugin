@@ -17,5 +17,7 @@ commands:
        description: Allows players to create teams and add players to their team.
    helpop:
        description: Allows players to send messages privately to staff.
+   tp:
+       description: Allows staff to teleport to players.
    test:
        description: For developers.
