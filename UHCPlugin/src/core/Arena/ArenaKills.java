@@ -41,7 +41,8 @@ public class ArenaKills implements Listener
 
         if(PracticeArena.playersInArena.contains(p.getUniqueId()))
         {
-            e.setRespawnLocation(world.getSpawnLocation());
+            e.setRespawnLocation(world.getBlockAt(0, 100, 0).getLocation());
+            p.spigot().respawn();
         }
     }
 }

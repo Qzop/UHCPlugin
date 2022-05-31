@@ -6,6 +6,7 @@ import core.mainPackage.Commands;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -56,15 +57,26 @@ public class Lobby implements Listener
                 else
                 {
                     String name = "";
+                    Player h = Bukkit.getPlayer(HostsMods.hosts.get(0));
 
-                    if(Bukkit.getPlayer(HostsMods.hosts.get(0)).getDisplayName().length() > 12)
+                    if(h == null)
                     {
-                        name += Bukkit.getPlayer(HostsMods.hosts.get(0)).getDisplayName().substring(0, 8);
+                        OfflinePlayer host1 = Bukkit.getOfflinePlayer(HostsMods.hosts.get(0));
+
+                        name+= host1.getName().substring(0,8);
                         host.setSuffix("" + ChatColor.YELLOW + name + "...");
                     }
                     else
                     {
-                        host.setSuffix("" + ChatColor.YELLOW + Bukkit.getPlayer(HostsMods.hosts.get(0)).getDisplayName());
+                        if(h.getDisplayName().length() > 12)
+                        {
+                            name += h.getDisplayName().substring(0, 8);
+                            host.setSuffix("" + ChatColor.YELLOW + name + "...");
+                        }
+                        else
+                        {
+                            host.setSuffix("" + ChatColor.YELLOW + h.getDisplayName());
+                        }
                     }
                 }
 
