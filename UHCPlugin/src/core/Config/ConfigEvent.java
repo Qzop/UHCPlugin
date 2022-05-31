@@ -921,6 +921,33 @@ public class ConfigEvent implements Listener
                     }
                 }
             }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "LateScatter: " + ChatColor.AQUA + ChatColor.BOLD + ConfigInventory.latescatter + " Minutes"))
+            {
+                if(click == ClickType.LEFT)
+                {
+                    if(ConfigInventory.latescatter != 30)
+                    {
+                        ConfigInventory.latescatter += 5;
+
+                        for(Player player : Bukkit.getOnlinePlayers())
+                        {
+                            player.sendMessage(Confprefix + ChatColor.YELLOW + " LateScatter period is until " + ChatColor.AQUA + ChatColor.BOLD + ConfigInventory.latescatter + " Minutes.");
+                        }
+                    }
+                }
+                else if(click == ClickType.RIGHT)
+                {
+                    if(ConfigInventory.latescatter != 10)
+                    {
+                        ConfigInventory.latescatter -= 5;
+
+                        for(Player player : Bukkit.getOnlinePlayers())
+                        {
+                            player.sendMessage(Confprefix + ChatColor.YELLOW + " LateScatter period is until " + ChatColor.AQUA + ChatColor.BOLD + ConfigInventory.latescatter + " Minutes.");
+                        }
+                    }
+                }
+            }
         }
     }
 }

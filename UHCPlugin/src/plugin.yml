@@ -21,3 +21,6 @@ commands:
        description: Allows staff to teleport to players.
    test:
        description: For developers.
+   arena:
+       description: Allows Players to join the practice arena.
+       aliases: [a]

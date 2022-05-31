@@ -52,6 +52,7 @@ public class ConfigInventory implements Listener
     public static int finalHeal = 10;
     public static int gracePeriod = 20;
     public static int meetUp = 45;
+    public static int latescatter = 20;
 
     public void createConfig(Player p)
     {
@@ -406,6 +407,11 @@ public class ConfigInventory implements Listener
                 }
                 strII.setItemMeta(str2meta);
 
+                ItemStack lateScat = new ItemStack(Material.WATCH, 1, (byte) 0);
+                ItemMeta latemeta = lateScat.getItemMeta();
+                latemeta.setDisplayName(ChatColor.GOLD + "LateScatter: " + ChatColor.AQUA + ChatColor.BOLD + latescatter + " Minutes");
+                lateScat.setItemMeta(latemeta);
+
                 i.setItem(0, filler);
                 i.setItem(1, filler);
                 i.setItem(2, filler);
@@ -455,6 +461,7 @@ public class ConfigInventory implements Listener
                 i.setItem(46, cross);
                 i.setItem(47, pearl);
                 i.setItem(48, nether);
+                i.setItem(49, lateScat);
                 i.setItem(53, filler);
                 i.setItem(54, filler);
                 i.setItem(55, filler);
@@ -465,6 +472,11 @@ public class ConfigInventory implements Listener
                 i.setItem(60, filler);
                 i.setItem(61, filler);
                 i.setItem(62, filler);
+
+                if(!p.getInventory().equals(i))
+                {
+                    cancel();
+                }
             }
         }.runTaskTimer(plugin, 0, 1);
 
@@ -881,6 +893,13 @@ public class ConfigInventory implements Listener
                 str2meta.setLore(str2lore);
                 strII.setItemMeta(str2meta);
 
+                ItemStack lateScat = new ItemStack(Material.WATCH, 1, (byte) 0);
+                ItemMeta latemeta = lateScat.getItemMeta();
+                latemeta.setDisplayName(ChatColor.GOLD + "LateScatter: " + ChatColor.AQUA + ChatColor.BOLD + latescatter + " Minutes");
+                List<String> latelore = Arrays.asList("" + ChatColor.AQUA + ChatColor.BOLD + "LeftClick to Increase, RightClick to Decrease.");
+                latemeta.setLore(latelore);
+                lateScat.setItemMeta(latemeta);
+
                 i.setItem(0, filler);
                 i.setItem(1, filler);
                 i.setItem(2, filler);
@@ -930,6 +949,7 @@ public class ConfigInventory implements Listener
                 i.setItem(46, cross);
                 i.setItem(47, pearl);
                 i.setItem(48, nether);
+                i.setItem(49, lateScat);
                 i.setItem(53, filler);
                 i.setItem(54, filler);
                 i.setItem(55, filler);
@@ -940,6 +960,12 @@ public class ConfigInventory implements Listener
                 i.setItem(60, filler);
                 i.setItem(61, filler);
                 i.setItem(62, filler);
+
+                if(!p.getInventory().equals(i))
+                {
+                    cancel();
+                }
+
             }
 
         }.runTaskTimer(plugin, 0, 1);

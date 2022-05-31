@@ -23,13 +23,6 @@ import java.util.UUID;
 public class TeamManager implements Listener
 {
     public static String Teamprefix = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Team" + ChatColor.GRAY + "]";
-    public static String devPrefix = ChatColor.GRAY + "[" + ChatColor.GOLD + ChatColor.BOLD + "Dev" + ChatColor.GRAY + "] ";
-    public static String ownerPrefix = ChatColor.GRAY + "[" + ChatColor.DARK_RED + ChatColor.BOLD + "Owner" + ChatColor.GRAY + "] ";
-    public static String adminPrefix = ChatColor.GRAY + "[" + ChatColor.RED + "Admin" + ChatColor.GRAY + "] ";
-    public static String srmodPrefix = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "SrMod" + ChatColor.GRAY + "] ";
-    public static String modPrefix = ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] ";
-    public static String trialPrefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + "Trial" + ChatColor.GRAY + "] ";
-
     public static ArrayList<UUID> keys = new ArrayList<UUID>();
     public static HashMap<UUID, ArrayList<UUID>> teams = new HashMap<UUID, ArrayList<UUID>>();
     public HashMap<UUID, UUID> pendingInv = new HashMap<UUID, UUID>();
@@ -367,48 +360,47 @@ public class TeamManager implements Listener
         }
     }
 
-    @EventHandler
-    public void onChatTeams(AsyncPlayerChatEvent e)
+    public boolean findTeam(Player p)
     {
-        Player p = e.getPlayer();
-        String message = e.getMessage();
-
-        if(keys.contains(p.getUniqueId()))
+        if(teams.containsKey(p.getUniqueId()))
+        {
+            return true;
+        }
+        else
         {
             for(int i = 0; i < keys.size(); i++)
             {
-                if(keys.get(i) == p.getUniqueId())
+                if(teams.get(keys.get(i)).contains(p.getUniqueId()))
                 {
-                    if(p.hasPermission("chat.dev"))
-                    {
-                        e.setFormat(ChatColor.LIGHT_PURPLE + "#" + i + devPrefix + ChatColor.GOLD + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
-                    }
-                    else if(p.hasPermission("chat.owner"))
-                    {
-                        e.setFormat(ChatColor.LIGHT_PURPLE + "#" + i + ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
-                    }
-                    else if(p.hasPermission("chat.admin"))
-                    {
-                        e.setFormat(ChatColor.LIGHT_PURPLE + "#" + i + adminPrefix + ChatColor.RED + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
-                    }
-                    else if(p.hasPermission("chat.srmod"))
-                    {
-                        e.setFormat(ChatColor.LIGHT_PURPLE + "#" + i + srmodPrefix + ChatColor.LIGHT_PURPLE + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
-                    }
-                    else if(p.hasPermission("chat.mod"))
-                    {
-                        e.setFormat(ChatColor.LIGHT_PURPLE + "#" + i + modPrefix + ChatColor.AQUA + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
-                    }
-                    else if(p.hasPermission("chat.trial"))
-                    {
-                        e.setFormat(ChatColor.LIGHT_PURPLE + "#" + i + trialPrefix + ChatColor.YELLOW + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
-                    }
-                    else
-                    {
-                        e.setFormat(ChatColor.LIGHT_PURPLE + "#" + i + ChatColor.WHITE +  p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE + e.getMessage());
-                    }
+                    return true;
                 }
             }
         }
+
+        return false;
+    }
+
+    public int getCaptain(Player p)
+    {
+        if(findTeam(p))
+        {
+            for(int i = 0; i < keys.size(); i++)
+            {
+                if(teams.get(keys.get(i)).contains(p.getUniqueId()))
+                {
+                    return i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    public void lateScatterCreateTeam(Player p)
+    {
+        teams.put(p.getUniqueId(), new ArrayList<UUID>());
+        keys.add(p.getUniqueId());
+
+        p.sendMessage(Teamprefix + ChatColor.GREEN + " You have been put on a team.");
     }
 }

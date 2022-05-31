@@ -1,43 +1,63 @@
 package core.mainPackage;
 
+import core.Arena.ArenaKills;
+import core.Chat.ChatEvent;
 import core.Config.ConfigEvent;
+import core.Config.ConfigInventory;
 import core.ConfigVariables.AppleRate;
 import core.ConfigVariables.Horses;
 import core.ConfigVariables.Portals;
 import core.ConfigVariables.SpeedStrength;
-import core.Scatter.ChatEvent;
+import core.Events.Events;
+import core.Kills.PlayerKills;
+import core.Kills.TeamKills;
+import core.Scatter.ChatEventScatter;
 import core.Scatter.Scatter;
-import core.Teams.TeamManager;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.World;
+import core.Scoreboard.Game;
+import core.Scoreboard.Lobby;
+import core.Scoreboard.Time;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
-
 public class Main extends JavaPlugin implements Listener
 {
+	Lobby lob;
+	Scatter scat;
+	Game game;
+	PlayerKills kills;
+
 	public void onEnable()
 	{
 		Commands command = new Commands();
+		lob = new Lobby();
+		scat = new Scatter();
+		game = new Game();
+		kills = new PlayerKills();
 		
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "---------------------------");
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "    UHC CORE ENABLED :D    ");
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "---------------------------");
-		
+
+		createArena();
+
 		this.getServer().getPluginManager().registerEvents(this, this);
 		this.getServer().getPluginManager().registerEvents(new ConfigEvent(), this);
 		this.getServer().getPluginManager().registerEvents(new AppleRate(), this);
 		this.getServer().getPluginManager().registerEvents(new Horses(), this);
 		this.getServer().getPluginManager().registerEvents(new SpeedStrength(), this);
 		this.getServer().getPluginManager().registerEvents(new Portals(), this);
+		this.getServer().getPluginManager().registerEvents(new ChatEventScatter(), this);
 		this.getServer().getPluginManager().registerEvents(new ChatEvent(), this);
-		this.getServer().getPluginManager().registerEvents(new TeamManager(), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerKills(), this);
+		this.getServer().getPluginManager().registerEvents(new TeamKills(), this);
+		this.getServer().getPluginManager().registerEvents(new ArenaKills(), this);
+		this.getServer().getPluginManager().registerEvents(new Events(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
 		getCommand(command.config).setExecutor(command);
@@ -47,6 +67,7 @@ public class Main extends JavaPlugin implements Listener
 		getCommand(command.test).setExecutor(command);
 		getCommand(command.help).setExecutor(command);
 		getCommand(command.tele).setExecutor(command);
+		getCommand(command.arena).setExecutor(command);
 	}
 	
 	public void onDisable()
@@ -55,7 +76,22 @@ public class Main extends JavaPlugin implements Listener
 		getServer().getConsoleSender().sendMessage(ChatColor.RED + "    UHC CORE ENABLED D:    ");
 		getServer().getConsoleSender().sendMessage(ChatColor.RED + "---------------------------");
 	}
-	
+
+	public void createArena()
+	{
+		World world = Bukkit.getWorld("Arena");
+
+		if(world == null)
+		{
+			WorldCreator wc = new WorldCreator("Arena");
+
+			wc.environment(World.Environment.NORMAL);
+			wc.type(WorldType.FLAT);
+
+			wc.createWorld();
+		}
+	}
+
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e)
 	{
@@ -64,6 +100,8 @@ public class Main extends JavaPlugin implements Listener
 		if(!Scatter.started && !Commands.scatter)
 		{
 			World world = Bukkit.getWorld("world");
+
+			p.sendMessage(ChatColor.GREEN + "Welcome!");
 
 			p.teleport(world.getSpawnLocation());
 			p.removePotionEffect(PotionEffectType.BLINDNESS);
@@ -89,10 +127,63 @@ public class Main extends JavaPlugin implements Listener
 			p.removePotionEffect(PotionEffectType.WITHER);
 			p.removePotionEffect(PotionEffectType.NIGHT_VISION);
 			p.removePotionEffect(PotionEffectType.SATURATION);
+
+			lob.setLobby(p);
 		}
 		else if(Commands.scatter)
 		{
 			p.kickPlayer(ChatColor.RED + "Scatter has started, you cannot join now.");
+		}
+		else if(Scatter.started)
+		{
+			if(PlayerKills.dead.contains(p.getUniqueId()))
+			{
+				if(p.hasPermission("death.bypass"))
+				{
+					World world = Bukkit.getWorld("world");
+					p.teleport(world.getSpawnLocation());
+				}
+				else
+				{
+					p.kickPlayer(ChatColor.RED + "You died, unlucky :(");
+				}
+			}
+			else
+			{
+				if(Scatter.allPlayers.contains(p.getUniqueId()))
+				{
+					if(ConfigInventory.teamSize > 1)
+					{
+						game.setGameTeams(p);
+					}
+					else
+					{
+						game.setGameFFA(p);
+					}
+				}
+				else
+				{
+					if(Time.minutes < ConfigInventory.latescatter)
+					{
+						if(ConfigInventory.teamSize > 1)
+						{
+							scat.lateScatterTeams(p);
+							game.setGameTeams(p);
+							kills.latePlayer(p);
+						}
+						else
+						{
+							scat.lateScatterFFA(p);
+							game.setGameFFA(p);
+							kills.latePlayer(p);
+						}
+					}
+					else
+					{
+						p.kickPlayer(ChatColor.RED + "Late Scatter period has ended.");
+					}
+				}
+			}
 		}
 	}
 }

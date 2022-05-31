@@ -1,5 +1,6 @@
 package core.mainPackage;
 
+import core.Arena.PracticeArena;
 import core.Config.ConfigInventory;
 import core.HostsMods.Helpop;
 import core.HostsMods.HostsMods;
@@ -30,6 +31,7 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	private ConfigInventory inv = new ConfigInventory();
 	private HostsMods hosts = new HostsMods();
 	private TeamManager tm = new TeamManager();
+	private PracticeArena a = new PracticeArena();
 	
 	String uhc = "uhc";
 	String config = "config";
@@ -38,6 +40,7 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	String team = "team";
 	String help = "helpop";
 	String tele = "tp";
+	String arena = "arena";
 	String test = "test";
 	
 	@Override
@@ -403,6 +406,38 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 			else
 			{
 				p.sendMessage(ChatColor.RED + "No permission.");
+			}
+		}
+		else if(label.equalsIgnoreCase(arena))
+		{
+			if(args.length == 0)
+			{
+				if(!PracticeArena.playersInArena.contains(p.getUniqueId()))
+				{
+					a.onArenaJoin(p);
+				}
+				else
+				{
+					p.sendMessage(ChatColor.RED + "You are already in the arena! Use /arena leave to leave.");
+				}
+			}
+			else if(args.length == 1)
+			{
+				if(args[0].equals("leave"))
+				{
+					if(!PracticeArena.playersInArena.contains(p.getUniqueId()))
+					{
+						p.sendMessage(ChatColor.RED + "You are not in the arena! Use /arena to join.");
+					}
+					else
+					{
+						a.onArenaLeave(p);
+					}
+				}
+				else
+				{
+					p.sendMessage(ChatColor.RED + "Usage: /arena (leave)");
+				}
 			}
 		}
 		else if(label.equalsIgnoreCase(test))

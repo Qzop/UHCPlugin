@@ -9,22 +9,17 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
+import org.bukkit.scoreboard.*;
 
 public class Lobby implements Listener
 {
     private Scat scat = new Scat();
-    Scoreboard lobby = Bukkit.getScoreboardManager().getNewScoreboard();
     Main plugin = Main.getPlugin(Main.class);
 
     public void setLobby(Player p)
     {
-        Objective obj = lobby.registerNewObjective("Lobby", "Scoreboard");
-        obj.setDisplaySlot(DisplaySlot.SIDEBAR);
-        obj.setDisplayName("" + ChatColor.GOLD + ChatColor.BOLD + "FairUHC");
+        ScoreboardManager manager = Bukkit.getScoreboardManager();
+        Scoreboard lobby = manager.getNewScoreboard();
 
         Team playercount = lobby.registerNewTeam("Player Count");
         playercount.addEntry(ChatColor.AQUA + "Players " + ChatColor.GRAY + "» ");
@@ -33,18 +28,26 @@ public class Lobby implements Listener
         Team teamsize = lobby.registerNewTeam("Team size");
         teamsize.addEntry(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
 
-        obj.getScore("§m--------------").setScore(5);
-        obj.getScore(ChatColor.AQUA + "Players " + ChatColor.GRAY + "» ").setScore(4);
-        obj.getScore(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ").setScore(3);
-        obj.getScore(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ").setScore(2);
-        obj.getScore("§m---------------").setScore(1);
-        obj.getScore(ChatColor.YELLOW + "Server IP").setScore(0);
+        Objective objective = lobby.registerNewObjective("Lobby", "Scoreboard");
+        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "FairUHC");
+
+        Score score1 = objective.getScore(ChatColor.AQUA + "Players " + ChatColor.GRAY + "» ");
+        score1.setScore(4);
+        Score score2 = objective.getScore(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ");
+        score2.setScore(3);
+        Score score3 = objective.getScore(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
+        score3.setScore(2);
+        Score score4 = objective.getScore("");
+        score4.setScore(1);
+        Score score5 = objective.getScore(ChatColor.YELLOW + "Server IP");
+        score5.setScore(0);
 
         new BukkitRunnable()
         {
             public void run()
             {
-                playercount.setSuffix("" + ChatColor.YELLOW + Bukkit.getOnlinePlayers().size());
+                playercount.setSuffix("" + ChatColor.YELLOW + "" + Bukkit.getOnlinePlayers().size());
 
                 if(HostsMods.hosts.isEmpty())
                 {
@@ -52,7 +55,17 @@ public class Lobby implements Listener
                 }
                 else
                 {
-                    host.setSuffix("" + ChatColor.YELLOW + Bukkit.getPlayer(HostsMods.hosts.get(0)));
+                    String name = "";
+
+                    if(Bukkit.getPlayer(HostsMods.hosts.get(0)).getDisplayName().length() > 12)
+                    {
+                        name += Bukkit.getPlayer(HostsMods.hosts.get(0)).getDisplayName().substring(0, 8);
+                        host.setSuffix("" + ChatColor.YELLOW + name + "...");
+                    }
+                    else
+                    {
+                        host.setSuffix("" + ChatColor.YELLOW + Bukkit.getPlayer(HostsMods.hosts.get(0)).getDisplayName());
+                    }
                 }
 
                 if(ConfigInventory.teamSize == 1)
@@ -72,6 +85,7 @@ public class Lobby implements Listener
             }
 
         }.runTaskTimer(plugin, 0, 20);
+
 
         p.setScoreboard(lobby);
     }
