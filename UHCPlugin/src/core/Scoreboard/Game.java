@@ -3,6 +3,7 @@ package core.Scoreboard;
 import core.Config.ConfigInventory;
 import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
+import core.Kills.TeamKills;
 import core.Scatter.Scatter;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
@@ -84,6 +85,8 @@ public class Game implements Listener
 
     public void setGameTeams(Player p)
     {
+        TeamKills tk = new TeamKills();
+
         ScoreboardManager manager = Bukkit.getScoreboardManager();
         Scoreboard game = manager.getNewScoreboard();
 
@@ -93,6 +96,8 @@ public class Game implements Listener
         time.addEntry(ChatColor.AQUA + "Time " + ChatColor.GRAY + "» ");
         Team teamkills = game.registerNewTeam("TeamKills");
         teamkills.addEntry(ChatColor.AQUA + "TeamKills " + ChatColor.GRAY + "» ");
+        Team kills = game.registerNewTeam("Kills");
+        kills.addEntry(ChatColor.AQUA + "Kills " + ChatColor.GRAY + "» ");
 
         Objective objective = game.registerNewObjective("TeamGame", "Scoreboard");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
@@ -118,6 +123,8 @@ public class Game implements Listener
             public void run()
             {
                 time.addEntry(ChatColor.YELLOW + t.getTime());
+                kills.setSuffix(ChatColor.YELLOW + "" + PlayerKills.numKills.get(p.getUniqueId()));
+                teamkills.setSuffix(ChatColor.YELLOW + "" + tk.getTeamKills(p));
 
                 if(HostsMods.hosts.isEmpty())
                 {

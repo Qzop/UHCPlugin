@@ -922,6 +922,28 @@ public class ConfigEvent implements Listener
                     }
                 }
             }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "First Shrink: " + ChatColor.AQUA + ChatColor.BOLD + ConfigInventory.firstShrink + " Minutes"))
+            {
+                if(click == ClickType.LEFT)
+                {
+
+                }
+                else if(click == ClickType.RIGHT)
+                {
+
+                }
+            }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.GOLD + "Shrink Interval: " + ChatColor.AQUA + ChatColor.BOLD + ConfigInventory.shrinkInterval + " Minutes"))
+            {
+                if(click == ClickType.LEFT)
+                {
+
+                }
+                else if(click == ClickType.RIGHT)
+                {
+
+                }
+            }
         }
     }
 }

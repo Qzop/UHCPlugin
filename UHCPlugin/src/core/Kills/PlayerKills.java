@@ -39,6 +39,8 @@ public class PlayerKills implements Listener
             {
                 dead.add(p.getUniqueId());
 
+
+
                 if(p.getKiller() instanceof Player)
                 {
                     UUID uuid = p.getKiller().getUniqueId();

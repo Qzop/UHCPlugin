@@ -10,6 +10,7 @@ import core.ConfigVariables.Portals;
 import core.ConfigVariables.SpeedStrength;
 import core.Events.Events;
 import core.Kills.PlayerKills;
+import core.Kills.Spectator;
 import core.Kills.TeamKills;
 import core.Scatter.ChatEventScatter;
 import core.Scatter.Scatter;
@@ -63,6 +64,7 @@ public class Main extends JavaPlugin implements Listener
 		this.getServer().getPluginManager().registerEvents(new TeamKills(), this);
 		this.getServer().getPluginManager().registerEvents(new ArenaKills(), this);
 		this.getServer().getPluginManager().registerEvents(new Events(), this);
+		this.getServer().getPluginManager().registerEvents(new Spectator(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
 		getCommand(command.config).setExecutor(command);

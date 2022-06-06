@@ -51,6 +51,8 @@ public class ConfigInventory implements Listener
     public static int gracePeriod = 20;
     public static int meetUp = 45;
     public static int latescatter = 20;
+    public static int firstShrink = 35;
+    public static int shrinkInterval = 5;
 
     public void createConfig(Player p)
     {
@@ -410,6 +412,16 @@ public class ConfigInventory implements Listener
                 latemeta.setDisplayName(ChatColor.GOLD + "LateScatter: " + ChatColor.AQUA + ChatColor.BOLD + latescatter + " Minutes");
                 lateScat.setItemMeta(latemeta);
 
+                ItemStack first = new ItemStack(Material.COMPASS, 1, (byte) 0);
+                ItemMeta firstmeta = first.getItemMeta();
+                firstmeta.setDisplayName(ChatColor.GOLD + "First Shrink: " + ChatColor.AQUA + ChatColor.BOLD + firstShrink + " Minutes");
+                first.setItemMeta(firstmeta);
+
+                ItemStack shrinkInt = new ItemStack(Material.ANVIL, 1, (byte) 0);
+                ItemMeta shrinkmeta = shrinkInt.getItemMeta();
+                shrinkmeta.setDisplayName(ChatColor.GOLD + "Shrink Interval: " + ChatColor.AQUA + ChatColor.BOLD + shrinkInterval + " Minutes");
+                shrinkInt.setItemMeta(shrinkmeta);
+
                 i.setItem(0, filler);
                 i.setItem(1, filler);
                 i.setItem(2, filler);
@@ -460,6 +472,8 @@ public class ConfigInventory implements Listener
                 i.setItem(47, pearl);
                 i.setItem(48, nether);
                 i.setItem(49, lateScat);
+                i.setItem(50, first);
+                i.setItem(51, shrinkInt);
                 i.setItem(53, filler);
                 i.setItem(54, filler);
                 i.setItem(55, filler);
@@ -893,6 +907,16 @@ public class ConfigInventory implements Listener
                 latemeta.setLore(latelore);
                 lateScat.setItemMeta(latemeta);
 
+                ItemStack first = new ItemStack(Material.COMPASS, 1, (byte) 0);
+                ItemMeta firstmeta = first.getItemMeta();
+                firstmeta.setDisplayName(ChatColor.GOLD + "First Shrink: " + ChatColor.AQUA + ChatColor.BOLD + firstShrink + " Minutes");
+                first.setItemMeta(firstmeta);
+
+                ItemStack shrinkInt = new ItemStack(Material.ANVIL, 1, (byte) 0);
+                ItemMeta shrinkmeta = shrinkInt.getItemMeta();
+                shrinkmeta.setDisplayName(ChatColor.GOLD + "Shrink Interval: " + ChatColor.AQUA + ChatColor.BOLD + shrinkInterval + " Minutes");
+                shrinkInt.setItemMeta(shrinkmeta);
+
                 i.setItem(0, filler);
                 i.setItem(1, filler);
                 i.setItem(2, filler);
@@ -943,6 +967,8 @@ public class ConfigInventory implements Listener
                 i.setItem(47, pearl);
                 i.setItem(48, nether);
                 i.setItem(49, lateScat);
+                i.setItem(50, first);
+                i.setItem(51, shrinkInt);
                 i.setItem(53, filler);
                 i.setItem(54, filler);
                 i.setItem(55, filler);
