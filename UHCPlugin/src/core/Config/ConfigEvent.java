@@ -1,6 +1,5 @@
 package core.Config;
 
-import core.mainPackage.Commands;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -20,7 +19,6 @@ public class ConfigEvent implements Listener
     @EventHandler
     public void inventoryClick(InventoryClickEvent e)
     {
-        Player p = (Player) e.getWhoClicked();
         Inventory inv = e.getClickedInventory();
         ItemStack item = e.getCurrentItem();
 
@@ -175,19 +173,7 @@ public class ConfigEvent implements Listener
                     }
                     else if(ConfigInventory.borderSize == 1500)
                     {
-                        ConfigInventory.borderSize = 2000;
-                    }
-                    else if(ConfigInventory.borderSize == 2000)
-                    {
-                        ConfigInventory.borderSize = 2500;
-                    }
-                    else if(ConfigInventory.borderSize == 2500)
-                    {
                         ConfigInventory.borderSize = 3000;
-                    }
-                    else if(ConfigInventory.borderSize == 3000)
-                    {
-                        ConfigInventory.borderSize = 3500;
                     }
 
                     for(Player player : Bukkit.getOnlinePlayers())
@@ -221,21 +207,9 @@ public class ConfigEvent implements Listener
                     {
                         ConfigInventory.borderSize = 1000;
                     }
-                    else if(ConfigInventory.borderSize == 2000)
-                    {
-                        ConfigInventory.borderSize = 1500;
-                    }
-                    else if(ConfigInventory.borderSize == 2500)
-                    {
-                        ConfigInventory.borderSize = 2000;
-                    }
                     else if(ConfigInventory.borderSize == 3000)
                     {
-                        ConfigInventory.borderSize = 2500;
-                    }
-                    else if(ConfigInventory.borderSize == 3500)
-                    {
-                        ConfigInventory.borderSize = 3000;
+                        ConfigInventory.borderSize = 1500;
                     }
 
                     for(Player player : Bukkit.getOnlinePlayers())

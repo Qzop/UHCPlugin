@@ -1,7 +1,10 @@
 package core.HostsMods;
 
 import core.Scatter.Scatter;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -25,6 +28,8 @@ public class HostsMods
         else
         {
             hosts.add(p.getUniqueId());
+            Location loc = new Location(Bukkit.getWorld("uhcworld"), 0, 100, 0);
+            p.teleport(loc);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Host.");
         }
     }
@@ -38,6 +43,8 @@ public class HostsMods
         else
         {
             mods.add(p.getUniqueId());
+            Location loc = new Location(Bukkit.getWorld("uhcworld"), 0, 100, 0);
+            p.teleport(loc);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Mod.");
         }
     }
@@ -47,6 +54,8 @@ public class HostsMods
         if(hosts.contains(p.getUniqueId()))
         {
             hosts.remove(p.getUniqueId());
+            Location loc = new Location(Bukkit.getWorld("world"), 0, 100, 0);
+            p.teleport(loc);
             p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You are no longer Host.");
         }
         else

@@ -2,8 +2,8 @@ package core.Scatter;
 
 import java.util.*;
 
-import core.Chat.ChatEvent;
 import core.Config.ConfigInventory;
+import core.ConfigVariables.BedRockBorder;
 import core.ConfigVariables.Horses;
 import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
@@ -27,6 +27,7 @@ public class Scatter implements Listener
     private Horses horse = new Horses();
     private Time time = new Time();
     private PlayerKills kills = new PlayerKills();
+    private BedRockBorder bord = new BedRockBorder();
     public static ArrayList<UUID> allPlayers = new ArrayList<UUID>();
     public static String UHCprefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + ChatColor.BOLD + "UHC" + ChatColor.GRAY + "]";
     Main plugin = Main.getPlugin(Main.class);
@@ -35,7 +36,6 @@ public class Scatter implements Listener
     public static boolean started = false;
     public static boolean ended = false;
     private ArrayList<Player> ffa = new ArrayList<Player>();
-    private ChatEventScatter chat = new ChatEventScatter();
     public static int ffaScattered = 0;
     public static int teamsScattered = 0;
     private static ArrayList<Location> teamLocations = new ArrayList<Location>();
@@ -67,6 +67,8 @@ public class Scatter implements Listener
             {
                 if(seconds == 10)
                 {
+                	bord.setUpBorder();
+                	
                     if (!ConfigInventory.horses)
                     {
                         horse.killCurrentHorses();
@@ -157,29 +159,6 @@ public class Scatter implements Listener
 
         if(ConfigInventory.teamSize == 1)
         {
-            int seconds = 0;
-
-            if(ffa.size() <= 20)
-            {
-                seconds = 60;
-            }
-            else if(ffa.size() > 20 && ffa.size() <= 40)
-            {
-                seconds = 80;
-            }
-            else if(ffa.size() > 40 && ffa.size() <= 60)
-            {
-                seconds = 100;
-            }
-            else if(ffa.size() > 60 && ffa.size() <= 80)
-            {
-                seconds = 120;
-            }
-            else if(ffa.size() > 80)
-            {
-                seconds = 200;
-            }
-
             new BukkitRunnable()
             {
                 int randomX;
@@ -193,6 +172,51 @@ public class Scatter implements Listener
 
                     if(index == ffa.size())
                     {
+                        telePlayer(locations);
+                        cancel();
+                    }
+                    else
+                    {
+                        Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 3, randomZ);
+                        Location checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
+                        Block block = checkloc.getBlock();
+
+                        while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+                        {
+                            randomX = new Random().nextInt(ConfigInventory.borderSize - 1);
+                            randomZ = new Random().nextInt(ConfigInventory.borderSize - 1);
+
+                            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 1, randomZ);
+                            checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
+                            block = checkloc.getBlock();
+                        }
+
+                        world.loadChunk(randomX, randomZ);
+                        locations.add(teleloc);
+                    }
+
+                    index++;
+                }
+
+            }.runTaskTimer(plugin, 0, 1);
+        }
+        else if(ConfigInventory.teamSize > 1)
+        {
+            new BukkitRunnable()
+            {
+                int randomX;
+                int randomZ;
+                int index = 0;
+
+                public void run()
+                {
+                    randomX = new Random().nextInt(ConfigInventory.borderSize - 1);
+                    randomZ = new Random().nextInt(ConfigInventory.borderSize - 1);
+
+                    if(index == TeamManager.teams.size())
+                    {
+                        teamLocations = locations;
+                        telePlayer(locations);
                         cancel();
                     }
                     else
@@ -219,8 +243,13 @@ public class Scatter implements Listener
                 }
 
             }.runTaskTimer(plugin, 0, 20);
+        }
+    }
 
-            // Scatter the players randomly
+    public void telePlayer(ArrayList<Location> locations)
+    {
+        if(ConfigInventory.teamSize == 1)
+        {
             new BukkitRunnable()
             {
                 int index = 0;
@@ -242,83 +271,10 @@ public class Scatter implements Listener
                     index++;
                 }
 
-            }.runTaskTimer(plugin, 0, seconds);
+            }.runTaskTimer(plugin, 0, 40);
         }
-        else if(ConfigInventory.teamSize > 1)
+        else
         {
-            Bukkit.broadcastMessage("Teams test");
-            int count = 0;
-
-            for(Player p : Bukkit.getOnlinePlayers())
-            {
-                count++;
-            }
-
-            int seconds = 0;
-
-            if(count <= 20)
-            {
-                seconds = 60;
-            }
-            else if(count > 20 && ffa.size() <= 40)
-            {
-                seconds = 80;
-            }
-            else if(count > 40 && ffa.size() <= 60)
-            {
-                seconds = 100;
-            }
-            else if(count > 60 && ffa.size() <= 80)
-            {
-                seconds = 120;
-            }
-            else if(count > 80)
-            {
-                seconds = 200;
-            }
-
-            new BukkitRunnable()
-            {
-                int randomX;
-                int randomZ;
-                int index = 0;
-
-                public void run()
-                {
-                    randomX = new Random().nextInt(ConfigInventory.borderSize - 1);
-                    randomZ = new Random().nextInt(ConfigInventory.borderSize - 1);
-
-                    if(index == TeamManager.teams.size())
-                    {
-                        teamLocations = locations;
-                        cancel();
-                    }
-                    else
-                    {
-                        Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 3, randomZ);
-                        Location checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
-                        Block block = checkloc.getBlock();
-
-                        while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-                        {
-                            randomX = new Random().nextInt(ConfigInventory.borderSize - 1);
-                            randomZ = new Random().nextInt(ConfigInventory.borderSize - 1);
-
-                            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 1, randomZ);
-                            checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
-                            block = checkloc.getBlock();
-                        }
-
-                        world.loadChunk(randomX, randomZ);
-                        locations.add(teleloc);
-                    }
-
-                    index++;
-                }
-
-            }.runTaskTimer(plugin, 0, 20);
-
-            //Scatter the teams
             new BukkitRunnable()
             {
                 int index = 0;
@@ -364,10 +320,8 @@ public class Scatter implements Listener
                     index++;
                 }
 
-            }.runTaskTimer(plugin, 0, seconds);
+            }.runTaskTimer(plugin, 0, 40);
         }
-
-        chat.fiveMin();
     }
 
     public void lateScatterFFA(Player p)

@@ -15,8 +15,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.bukkit.Material.SKULL_ITEM;
-
 public class ConfigInventory implements Listener
 {
     Main plugin = Main.getPlugin(Main.class);
@@ -472,11 +470,6 @@ public class ConfigInventory implements Listener
                 i.setItem(60, filler);
                 i.setItem(61, filler);
                 i.setItem(62, filler);
-
-                if(!p.getInventory().equals(i))
-                {
-                    cancel();
-                }
             }
         }.runTaskTimer(plugin, 0, 1);
 
@@ -960,12 +953,6 @@ public class ConfigInventory implements Listener
                 i.setItem(60, filler);
                 i.setItem(61, filler);
                 i.setItem(62, filler);
-
-                if(!p.getInventory().equals(i))
-                {
-                    cancel();
-                }
-
             }
 
         }.runTaskTimer(plugin, 0, 1);

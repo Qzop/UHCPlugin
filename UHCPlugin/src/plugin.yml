@@ -24,3 +24,7 @@ commands:
    arena:
        description: Allows Players to join the practice arena.
        aliases: [a]
+   border:
+       description: Allows staff to shrink the border.
+   gm: 
+       description: Allows staff to change their GameMode.

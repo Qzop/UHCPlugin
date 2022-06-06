@@ -10,11 +10,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -208,7 +205,7 @@ public class TeamManager implements Listener
 
                     for (UUID uuid : keys)
                     {
-                        if (teams.get(uuid).contains(p))
+                        if (teams.get(uuid).contains(p.getUniqueId()))
                         {
                             temp = uuid;
                             check = true;

@@ -1,6 +1,5 @@
 package core.Events;
 
-import core.Arena.PracticeArena;
 import core.Scatter.Scatter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

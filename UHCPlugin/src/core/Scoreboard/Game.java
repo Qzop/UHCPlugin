@@ -32,7 +32,7 @@ public class Game implements Listener
 
         Objective objective = game.registerNewObjective("FFAGame", "Scoreboard");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "FairUHC");
+        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
 
         Score score = objective.getScore(ChatColor.AQUA + "Time " + ChatColor.GRAY + "» ");
         score.setScore(4);
@@ -43,7 +43,7 @@ public class Game implements Listener
         Score score3 = objective.getScore("");
         score3.setScore(1);
         Score score4 = objective.getScore(ChatColor.YELLOW + "Server IP");
-        score4.setScore(0);
+        score4.setScore(0);     
 
         new BukkitRunnable()
         {
@@ -96,7 +96,7 @@ public class Game implements Listener
 
         Objective objective = game.registerNewObjective("TeamGame", "Scoreboard");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "FairUHC");
+        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
 
         Score score = objective.getScore(ChatColor.AQUA + "Time " + ChatColor.GRAY + "» ");
         score.setScore(6);

@@ -21,7 +21,6 @@ public class ChatEvent implements Listener
     public void onChat(AsyncPlayerChatEvent e)
     {
         Player p = e.getPlayer();
-        String message = e.getMessage();
 
         if(TeamManager.keys.contains(p.getUniqueId()))
         {

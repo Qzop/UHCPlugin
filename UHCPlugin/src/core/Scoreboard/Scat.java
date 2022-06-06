@@ -25,7 +25,7 @@ public class Scat implements Listener
 
         Objective objective = scat.registerNewObjective("Scatter", "Scoreboard");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "FairUHC");
+        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
 
         Score score1 = objective.getScore(ChatColor.AQUA + "Scattered " + ChatColor.GRAY + "» ");
         score1.setScore(2);

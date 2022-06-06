@@ -1,5 +1,6 @@
 package core.Scoreboard;
 
+import core.Arena.PracticeArena;
 import core.Config.ConfigInventory;
 import core.HostsMods.HostsMods;
 import core.mainPackage.Commands;
@@ -14,6 +15,7 @@ import org.bukkit.scoreboard.*;
 
 public class Lobby implements Listener
 {
+	private Practice prac = new Practice();
     private Scat scat = new Scat();
     Main plugin = Main.getPlugin(Main.class);
 
@@ -31,7 +33,7 @@ public class Lobby implements Listener
 
         Objective objective = lobby.registerNewObjective("Lobby", "Scoreboard");
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "FairUHC");
+        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
 
         Score score1 = objective.getScore(ChatColor.AQUA + "Players " + ChatColor.GRAY + "» ");
         score1.setScore(4);
@@ -94,9 +96,17 @@ public class Lobby implements Listener
                     scat.setScatter(p);
                     cancel();
                 }
+                
+                
+                if(PracticeArena.playersInArena.contains(p.getUniqueId()))
+                {
+                	prac.setPractice(p);
+                   	cancel();
+                }
+                
             }
 
-        }.runTaskTimer(plugin, 0, 20);
+        }.runTaskTimer(plugin, 0, 1);
 
 
         p.setScoreboard(lobby);

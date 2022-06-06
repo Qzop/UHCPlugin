@@ -2,12 +2,13 @@ package core.mainPackage;
 
 import core.Arena.PracticeArena;
 import core.Config.ConfigInventory;
+import core.ConfigVariables.BedRockBorder;
+import core.HostsMods.Gamemode;
 import core.HostsMods.Helpop;
 import core.HostsMods.HostsMods;
 import core.Teams.TeamManager;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,6 +33,8 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	private HostsMods hosts = new HostsMods();
 	private TeamManager tm = new TeamManager();
 	private PracticeArena a = new PracticeArena();
+	private BedRockBorder bord = new BedRockBorder();
+	private Gamemode gamemode = new Gamemode();
 	
 	String uhc = "uhc";
 	String config = "config";
@@ -41,8 +44,11 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 	String help = "helpop";
 	String tele = "tp";
 	String arena = "arena";
+	String border = "border";
+	String gm = "gm";
 	String test = "test";
 	
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args)
 	{
@@ -440,9 +446,45 @@ public class Commands extends CommandExecute implements Listener, CommandExecuto
 				}
 			}
 		}
+		else if(label.equalsIgnoreCase(border))
+		{
+			if(p.hasPermission("border.shrink"))
+			{
+				bord.setShrink();
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No permission.");
+			}
+		}
+		else if(label.equalsIgnoreCase(gm))
+		{
+			if(p.hasPermission("uhc.Gamemode"))
+			{
+				if(args.length == 1)
+				{
+					int i = Integer.parseInt(args[0]);
+					
+					gamemode.setGamemode(p, i);
+				}
+				else
+				{
+					p.sendMessage(Gamemode.gamemodePrefix + ChatColor.RED + " /gm (0/1/2/3)");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No permission.");
+			}
+		}
 		else if(label.equalsIgnoreCase(test))
 		{
-			// stuff to test in here
+			if(p.hasPermission("dev.test"))
+			{
+				Location loc = new Location(Bukkit.getWorld("uhcworld"), ConfigInventory.borderSize, 70, ConfigInventory.borderSize);
+						
+				p.teleport(loc);
+			}
 		}
 		
 		return false;

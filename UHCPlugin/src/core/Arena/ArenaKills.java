@@ -32,6 +32,11 @@ public class ArenaKills implements Listener
             }
         }
     }
+    
+    public int getKills(Player p)
+    {
+    	return arenaKills.get(p.getUniqueId());
+    }
 
     @EventHandler
     public void onRespawn(PlayerRespawnEvent e)
