@@ -1,16 +1,22 @@
 package core.Scoreboard;
 
+import core.ChunkLoad.Chunks;
 import core.Config.ConfigInventory;
 import core.ConfigVariables.BedRockBorder;
+import core.Events.NPCEvent;
+import core.Events.Quit;
 import core.Scatter.Scatter;
 import core.mainPackage.Commands;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
+import org.bukkit.entity.NPC;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.UUID;
 
 public class Time implements Listener
 {
@@ -21,7 +27,9 @@ public class Time implements Listener
     private static int lastShrink = 0;
     private boolean first = false;
     Main plugin = Main.getPlugin(Main.class);
-
+    private Chunks chunks = new Chunks();
+    
+    
     public void setTime()
     {
         new BukkitRunnable()
@@ -34,6 +42,22 @@ public class Time implements Listener
                 }
                 
                 time++;
+
+				if(!NPCEvent.disconnected.isEmpty())
+				{
+					for(UUID k : NPCEvent.disconnected.keySet())
+					{
+						if(NPCEvent.disconnected.get(k) == 600)
+						{
+							NPCEvent npc = new NPCEvent();
+							npc.setDisqualified(k);
+						}
+						else
+						{
+							NPCEvent.disconnected.put(k, NPCEvent.disconnected.get(k) + 1);
+						}
+					}
+				}
                 
                 if(time % 60 == 0 && time != 0)
                 {
@@ -64,9 +88,18 @@ public class Time implements Listener
     
     public void check()
     {
-    	World world = Bukkit.getWorld("uhc_world");
-    	
-    	world.setTime(0L);
+    	/*if(ConfigInventory.teamSize == 1)
+    	{
+    		if(Scatter.allPlayers.size() == 1)
+    		{
+    			Scatter.ended = true;
+    			chunks.restartServer();
+    		}
+    	}
+    	else
+    	{
+    		
+    	}*/
     	
     	if(minutes == 5 && time == 0)
         {
@@ -76,13 +109,18 @@ public class Time implements Listener
         
         if(minutes == ConfigInventory.finalHeal && time == 0)
         {
-        	for(Player player : Bukkit.getOnlinePlayers())
+        	for(Player player : Main.online.getOnlinePlayers())
         	{
         		player.setHealth(player.getHealth() + (20.0 - player.getHealth()));
         	}
         	
-        	Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GREEN + " Final heal has been given." + ChatColor.RED + " DO NOT ask for another.");
+        	Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.YELLOW + " Final heal has been given." + ChatColor.RED + " DO NOT " + ChatColor.YELLOW + "ask for another.");
         }
+
+		if(minutes == ConfigInventory.gracePeriod && time == 0)
+		{
+			Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.YELLOW + " Grace Period has ended. Good luck.");
+		}
         
         if(Scatter.numShrinks != 0)
         {
@@ -156,9 +194,10 @@ public class Time implements Listener
         	}
         	else if(minutes == ConfigInventory.firstShrink && time == 0)
         	{
-        		bord.setShrink();
+				bord.setUpShrink();
         		lastShrink = minutes;
         		Scatter.numShrinks--;
+				Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GOLD + " Border has shrunk to " + BedRockBorder.currentBorderSize + "x" + BedRockBorder.currentBorderSize + ".");
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 minutes.");
         		first = true;
         	}
@@ -231,12 +270,13 @@ public class Time implements Listener
             	}
             	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) && time == 0)
             	{
-            		bord.setShrink();
+					bord.setUpShrink();
             		lastShrink = minutes;
             		Scatter.numShrinks--;
             		
             		if(Scatter.numShrinks != 0)
             		{
+						Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GOLD + " Border has shrunk to " + BedRockBorder.currentBorderSize + "x" + BedRockBorder.currentBorderSize + ".");
             			Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 minutes.");
             		}
             	}

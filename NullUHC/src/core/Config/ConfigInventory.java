@@ -221,7 +221,7 @@ public class ConfigInventory implements Listener
                 }
                 run.setItemMeta(runmeta);
 
-                ItemStack cross = new ItemStack(Material.BANNER, 1, (byte) 0);
+                ItemStack cross = new ItemStack(Material.ARROW, 1, (byte) 0);
                 ItemMeta crmeta = cross.getItemMeta();
 
                 if (crossteaming)
@@ -682,7 +682,7 @@ public class ConfigInventory implements Listener
                 runmeta.setLore(runlore);
                 run.setItemMeta(runmeta);
 
-                ItemStack cross = new ItemStack(Material.BANNER, 1, (byte) 0);
+                ItemStack cross = new ItemStack(Material.ARROW, 1, (byte) 0);
                 ItemMeta crmeta = cross.getItemMeta();
 
                 if (crossteaming)

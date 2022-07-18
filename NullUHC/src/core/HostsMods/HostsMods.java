@@ -2,6 +2,8 @@ package core.HostsMods;
 
 import core.Scatter.Scatter;
 
+import core.mainPackage.Commands;
+import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -28,10 +30,12 @@ public class HostsMods
         }
         else
         {
-        	for(Player players : Bukkit.getOnlinePlayers())
+        	for(Player players : Main.online.getOnlinePlayers())
         	{
         		players.hidePlayer(p);
         	}
+
+            HostModsItems.vanished.add(p.getUniqueId());
         	
         	p.setAllowFlight(true);
 			p.setFlying(true);
@@ -39,7 +43,7 @@ public class HostsMods
             hosts.add(p.getUniqueId());
             Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
             p.teleport(loc);
-            items.hostmodItems(p);
+            items.hostmodItemsInGame(p);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Host.");
         }
     }
@@ -52,10 +56,12 @@ public class HostsMods
         }
         else
         {
-        	for(Player players : Bukkit.getOnlinePlayers())
+        	for(Player players : Main.online.getOnlinePlayers())
         	{
         		players.hidePlayer(p);
         	}
+
+            HostModsItems.vanished.add(p.getUniqueId());
         	
         	p.setAllowFlight(true);
 			p.setFlying(true);
@@ -63,7 +69,7 @@ public class HostsMods
             mods.add(p.getUniqueId());
             Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
             p.teleport(loc);
-            items.hostmodItems(p);
+            items.hostmodItemsInGame(p);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Mod.");
         }
     }
@@ -74,15 +80,28 @@ public class HostsMods
         {
         	p.getInventory().clear();
         	
-        	for(Player players : Bukkit.getOnlinePlayers())
+        	for(Player players : Main.online.getOnlinePlayers())
         	{
         		players.showPlayer(p);
         	}
-        	
+
+            if(HostModsItems.vanished.contains(p.getUniqueId()))
+            {
+                HostModsItems.vanished.remove(p.getUniqueId());
+            }
+
+
         	p.setAllowFlight(false);
 			p.setFlying(false);
-        	
+
             hosts.remove(p.getUniqueId());
+
+            if(!Scatter.started && !Commands.scatter)
+            {
+                HostModsItems items = new HostModsItems();
+                items.staffLobbyItems(p);
+            }
+
             p.teleport(Bukkit.getWorld("world").getSpawnLocation());
             p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You are no longer Host.");
         }
@@ -98,10 +117,21 @@ public class HostsMods
         {
         	p.getInventory().clear();
         	
-        	for(Player players : Bukkit.getOnlinePlayers())
+        	for(Player players : Main.online.getOnlinePlayers())
         	{
         		players.showPlayer(p);
         	}
+
+            if(HostModsItems.vanished.contains(p.getUniqueId()))
+            {
+                HostModsItems.vanished.remove(p.getUniqueId());
+            }
+
+            if(!Scatter.started && !Commands.scatter)
+            {
+                HostModsItems items = new HostModsItems();
+                items.staffLobbyItems(p);
+            }
         	
         	p.setAllowFlight(false);
 			p.setFlying(false);

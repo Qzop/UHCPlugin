@@ -1,14 +1,21 @@
 package core.Config;
 
+import core.Alerts.Alerts;
+import core.Arena.PracticeArena;
 import core.mainPackage.Main;
+import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.UUID;
 
 public class ConfigEvent implements Listener
 {
@@ -20,8 +27,8 @@ public class ConfigEvent implements Listener
     {
         Inventory inv = e.getClickedInventory();
         ItemStack item = e.getCurrentItem();
-
         ClickType click = e.getClick();
+        Player p = (Player) e.getWhoClicked();
 
         if(inv == null)
         {
@@ -778,7 +785,7 @@ public class ConfigEvent implements Listener
                 {
                 	if(ConfigInventory.shrinkInterval != 15)
                 	{
-                		ConfigInventory.firstShrink += 5;
+                		ConfigInventory.shrinkInterval += 5;
                 		
                 		Bukkit.broadcastMessage(Confprefix + ChatColor.YELLOW + " The border, after first shrink, will shrink every " + ChatColor.AQUA + ChatColor.BOLD + ConfigInventory.shrinkInterval + " Minutes.");
                 	}
@@ -787,11 +794,81 @@ public class ConfigEvent implements Listener
                 {
                 	if(ConfigInventory.shrinkInterval != 5)
                 	{
-                		ConfigInventory.firstShrink -= 5;
+                		ConfigInventory.shrinkInterval -= 5;
                 		
                 		Bukkit.broadcastMessage(Confprefix + ChatColor.YELLOW + " The border, after first shrink, will shrink every " + ChatColor.AQUA + ChatColor.BOLD + ConfigInventory.shrinkInterval + " Minutes.");
                 	}
                 }
+            }
+        }
+        else if(inv.getName().equals(ChatColor.YELLOW + "UHC Configuration"))
+        {
+            e.setCancelled(true);
+
+            if(item == null || !item.hasItemMeta())
+            {
+                return;
+            }
+
+            if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Change Config"))
+            {
+                p.closeInventory();
+                p.performCommand("config admin");
+            }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Change Scenarios"))
+            {
+                p.closeInventory();
+                p.performCommand("scenarios admin");
+            }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Click to turn practice arena: " + ChatColor.RED + "Off"))
+            {
+                PracticeArena arena = new PracticeArena();
+                PracticeArena.arena = false;
+                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "Arena" + ChatColor.GRAY + "] " + ChatColor.YELLOW + "Practice arena is now turned " + ChatColor.RED + ChatColor.BOLD + "Off" + ChatColor.YELLOW + ".");
+
+                if(!PracticeArena.playersInArena.isEmpty())
+                {
+                    for(int i = 0; i < PracticeArena.playersInArena.size(); i++)
+                    {
+                        arena.onArenaLeave(Bukkit.getPlayer(PracticeArena.playersInArena.get(i)));
+                    }
+                }
+            }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Click to turn practice arena: " + ChatColor.GREEN + "On"))
+            {
+                PracticeArena.arena = true;
+                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "Arena" + ChatColor.GRAY + "] " + ChatColor.YELLOW + "Practice arena is now turned " + ChatColor.GREEN + ChatColor.BOLD + "On" + ChatColor.YELLOW + ".");
+
+            }
+        }
+        else if(inv.getName().equals(ChatColor.RED + "Alerts"))
+        {
+            e.setCancelled(true);
+
+            if(item == null || !item.hasItemMeta())
+            {
+                return;
+            }
+
+            if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Xray Alerts: " + ChatColor.RED + "Off"))
+            {
+                Alerts.xrayalerts.remove(p.getUniqueId());
+                p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " Xray Alerts are now " + ChatColor.GREEN + " On" + ChatColor.YELLOW + ".");
+            }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Xray Alerts: " + ChatColor.GREEN + "On"))
+            {
+                Alerts.xrayalerts.add(p.getUniqueId());
+                p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " Xray Alerts are now " + ChatColor.RED + " Off" + ChatColor.YELLOW + ".");
+            }
+            if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "PvP Alerts: " + ChatColor.RED + "Off"))
+            {
+                Alerts.pvpalerts.remove(p.getUniqueId());
+                p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " PvP Alerts are now " + ChatColor.GREEN + " On" + ChatColor.YELLOW + ".");
+            }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "PvP Alerts: " + ChatColor.GREEN + "On"))
+            {
+                Alerts.pvpalerts.add(p.getUniqueId());
+                p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " PvP Alerts are now " + ChatColor.RED + " Off" + ChatColor.YELLOW + ".");
             }
         }
     }

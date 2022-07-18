@@ -29,14 +29,9 @@ public class Gamemode implements Listener
 			p.setGameMode(GameMode.ADVENTURE);
 			p.sendMessage(gamemodePrefix + ChatColor.GREEN + " You are now in Adventure Mode.");
 		}
-		else if(i == 3)
-		{
-			p.setGameMode(GameMode.SPECTATOR);
-			p.sendMessage(gamemodePrefix + ChatColor.GREEN + " You are now in Spectator Mode.");
-		}
 		else 
 		{
-			p.sendMessage(gamemodePrefix + ChatColor.RED + " Usage: /gm (0/1/2/3)");
+			p.sendMessage(gamemodePrefix + ChatColor.RED + " Usage: /gm (0/1/2)");
 		}
 	}
 }

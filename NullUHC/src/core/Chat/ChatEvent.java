@@ -3,6 +3,7 @@ package core.Chat;
 import core.HostsMods.HostsMods;
 import core.Teams.TeamManager;
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -26,7 +27,7 @@ public class ChatEvent implements Listener
         {
             for(int i = 0; i < TeamManager.keys.size(); i++)
             {
-                if(TeamManager.keys.get(i) == p.getUniqueId())
+                if(TeamManager.keys.get(i).equals(p.getUniqueId()))
                 {
                     if(p.hasPermission("chat.owner"))
                     {

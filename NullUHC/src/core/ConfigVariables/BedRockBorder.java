@@ -1,698 +1,696 @@
 package core.ConfigVariables;
 
 import core.Config.ConfigInventory;
-import core.HostsMods.HostsMods;
-import core.Kills.PlayerKills;
 import core.Scatter.Scatter;
 import core.mainPackage.Main;
+import net.minecraft.server.v1_7_R4.BlockActionData;
+import net.minecraft.server.v1_7_R4.Blocks;
+import net.minecraft.server.v1_7_R4.IBlockAccess;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
+import org.bukkit.craftbukkit.v1_7_R4.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
+import java.util.*;
 
 public class BedRockBorder implements Listener
 {
     Main plugin = Main.getPlugin(Main.class);
+	public static HashMap<UUID, Location> teleLocationsFFA = new HashMap<UUID, Location>();
+	public static ArrayList<UUID> offlineDuringTele = new ArrayList<UUID>();
     public static int currentBorderSize = ConfigInventory.borderSize;
+	public static boolean first = false;
+	public static boolean second = false;
+	public static boolean third = false;
+	public static boolean fourth = false;
 
-    public void setUpBorder()
+    public void setUpBorder(int border, World world)
     {
-    	boolean first = setFirstWall();
-    	boolean second = setSecondWall();
-    	boolean third = setThirdWall();
-    	boolean fourth = setFourthWall();
-    	
-    	if(first && second && third && fourth)
-    	{
-    		
-    	}
+    	getFirstWallBlocks(border, world);
+		getSecondWallBlocks(border, world);
+		getThirdWallBlocks(border, world);
+		getFourthWallBlocks(border, world);
     }
     
-    public boolean setFirstWall()
+    public void getFirstWallBlocks(int border, World world)
     {
-    	World world = Bukkit.getWorld("uhc_world");
     	ArrayList<Block> wall = new ArrayList<Block>();
-    	int z = ConfigInventory.borderSize;
-    	boolean check = false;
-    	
-    	
-    	while(!check)
-        {
-        	if(z < -ConfigInventory.borderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(ConfigInventory.borderSize, z) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(ConfigInventory.borderSize, y, z));
-        		}
-        		
-        		z--;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = wall.size() / 10;
-        	
-        	public void run()
-        	{
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 60);
-        
-        return true;
-    }
-    
-    public boolean setSecondWall()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	ArrayList<Block> wall = new ArrayList<Block>();
-    	int z = -ConfigInventory.borderSize;
-    	boolean check = false;
-    	
-    	
-    	while(!check)
-        {
-        	if(z > ConfigInventory.borderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(-ConfigInventory.borderSize, z) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(-ConfigInventory.borderSize, y, z));
-        		}
-        		
-        		z++;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = wall.size() / 10;
-        	
-        	public void run()
-        	{
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 60);
-    	
-    	return true;
-    }
-    
-    public boolean setThirdWall()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	ArrayList<Block> wall = new ArrayList<Block>();
-    	int x = ConfigInventory.borderSize;
-    	boolean check = false;
-    	
-    	while(!check)
-        {
-        	if(x < -ConfigInventory.borderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(x, ConfigInventory.borderSize) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(x, y, ConfigInventory.borderSize));
-        		}
-        		
-        		x--;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = wall.size() / 10;
-        	
-        	public void run()
-        	{
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 60);
-    	
-    	return true;
-    }
-    
-    public boolean setFourthWall()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	ArrayList<Block> wall = new ArrayList<Block>();
-    	int x = -ConfigInventory.borderSize;
-    	boolean check = false;
-    	
-    	while(!check)
-        {
-        	if(x > ConfigInventory.borderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(x, -ConfigInventory.borderSize) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(x, y, -ConfigInventory.borderSize));
-        		}
-        		
-        		x++;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = wall.size() / 10;
-        	
-        	public void run()
-        	{
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 60);
-    	
-    	return true;
-    }
-    
-    public void setShrink()
-    {
-    	if(currentBorderSize == 3000)
-    	{
-    		currentBorderSize = 1500;
-    	}
-    	else if(currentBorderSize == 1500)
-    	{
-    		currentBorderSize = 1000;
-    	}
-    	else if(currentBorderSize == 1000)
-    	{
-    		currentBorderSize = 500;
-    	}
-    	else if(currentBorderSize == 500)
-    	{
-    		currentBorderSize = 250;
-    	}
-    	else if(currentBorderSize == 250)
-    	{
-    		currentBorderSize = 100;
-    	}
-    	else if(currentBorderSize == 100)
-    	{
-    		currentBorderSize = 50;
-    	}
-    	else if(currentBorderSize == 50)
-    	{
-    		currentBorderSize = 25;
-    	}
-    	
-    	teleportPlayers();
-    	
-    	boolean first = ShrinkFirstWall();
-    	boolean second = ShrinkSecondWall();
-    	boolean third = ShrinkThirdWall();
-    	boolean fourth = ShrinkFourthWall();
-    	
-    	if(first && second && third && fourth)
-    	{
-    		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.YELLOW + " The Border has shrunk to " + currentBorderSize + "x" + currentBorderSize + ".");
-    	}
-    }
-    
-    public boolean ShrinkFirstWall()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	ArrayList<Block> wall = new ArrayList<Block>();
-    	int z = currentBorderSize;
-    	boolean check = false;
-    	
-    	
-    	while(!check)
-        {
-        	if(z < -currentBorderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(currentBorderSize, z) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(currentBorderSize, y, z));
-        		}
-        		
-        		z--;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = 0;
-        	boolean check = false;
-        	
-        	public void run()
-        	{
-        		if(currentBorderSize >= 1000 && !check)
-            	{
-            		size = wall.size() / 20;
-            		check = true;
-            	}
-        		else if(currentBorderSize == 500 && !check)
-            	{
-            		size = wall.size() / 10;
-            		check = true;
-            	}
-            	else if(currentBorderSize < 500 && !check)
-            	{
-            		size = wall.size() / 2;
-            		check = true;
-            	}
-        		
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 10);
-        
-    	return true;
-    }
-    
-    public boolean ShrinkSecondWall()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	ArrayList<Block> wall = new ArrayList<Block>();
-    	int z = -currentBorderSize;
-    	boolean check = false;
-    	
-    	
-    	while(!check)
-        {
-        	if(z > currentBorderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(-currentBorderSize, z) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(-currentBorderSize, y, z));
-        		}
-        		
-        		z++;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = 0;
-        	boolean check = false;
-        	
-        	public void run()
-        	{
-        		if(currentBorderSize >= 1000 && !check)
-            	{
-            		size = wall.size() / 20;
-            		check = true;
-            	}
-        		else if(currentBorderSize == 500 && !check)
-            	{
-            		size = wall.size() / 10;
-            		check = true;
-            	}
-            	else if(currentBorderSize < 500 && !check)
-            	{
-            		size = wall.size() / 2;
-            		check = true;
-            	}
-        		
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 10);
-    	
-    	return true;
-    }
-    
-    public boolean ShrinkThirdWall()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	ArrayList<Block> wall = new ArrayList<Block>();
-    	int x = currentBorderSize;
-    	boolean check = false;
-    	
-    	while(!check)
-        {
-        	if(x < -currentBorderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(x, currentBorderSize) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(x, y, currentBorderSize));
-        		}
-        		
-        		x--;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = 0;
-        	boolean check = false;
-        	
-        	public void run()
-        	{
-        		if(currentBorderSize >= 1000 && !check)
-            	{
-            		size = wall.size() / 20;
-            		check = true;
-            	}
-        		else if(currentBorderSize == 500 && !check)
-            	{
-            		size = wall.size() / 10;
-            		check = true;
-            	}
-            	else if(currentBorderSize < 500 && !check)
-            	{
-            		size = wall.size() / 2;
-            		check = true;
-            	}
-        		
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 10);
-        
-    	return true;
-    }
-    
-    public boolean ShrinkFourthWall()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	ArrayList<Block> wall = new ArrayList<Block>();
-    	int x = -currentBorderSize;
-    	boolean check = false;
-    	
-    	while(!check)
-        {
-        	if(x > currentBorderSize)
-            {
-        		check = true;
-            }
-        	else
-        	{
-        		for(int y = 0; y < world.getHighestBlockYAt(x, -currentBorderSize) + 10; y++)
-        		{
-        			wall.add(world.getBlockAt(x, y, -currentBorderSize));
-        		}
-        		
-        		x++;
-        	}
-        }
-        
-        new BukkitRunnable()
-        {
-        	int count = 0;
-        	int size = 0;
-        	boolean check = false;
-        	
-        	public void run()
-        	{
-        		if(currentBorderSize >= 1000 && !check)
-            	{
-            		size = wall.size() / 20;
-            		check = true;
-            	}
-        		else if(currentBorderSize == 500 && !check)
-            	{
-            		size = wall.size() / 10;
-            		check = true;
-            	}
-            	else if(currentBorderSize < 500 && !check)
-            	{
-            		size = wall.size() / 2;
-            		check = true;
-            	}
-        		
-        		if(wall.isEmpty())
-        		{
-        			cancel();
-        		}
-        		
-        		for(int i = 0; i < wall.size(); i++)
-        		{
-    				if(count == size)
-    				{
-    					count = 0;
-    					break;
-    				}
-    				
-    				wall.get(i).setType(Material.BEDROCK);
-    				world.loadChunk(wall.get(i).getChunk());
-    				wall.remove(i);
-    				
-    				count++;
-        		}
-        	}
-        	
-        }.runTaskTimer(plugin, 0, 10);
-        
-    	return true;
-    }
-    
-    public void teleportPlayers()
-    {
-    	World world = Bukkit.getWorld("uhc_world");
-    	
-    	for(Player p : Bukkit.getOnlinePlayers())
-    	{
-    		if(!PlayerKills.dead.contains(p.getUniqueId()) && !HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
-    		{
-    			if(p.getLocation().getX() > currentBorderSize)
-    			{
-    				// Just check Z if we get in here
-    				
-    				if(p.getLocation().getZ() > currentBorderSize)
+		int z = border;
+		boolean check = false;
+
+		while(!check)
+		{
+			if(z < -border)
+			{
+				check = true;
+			}
+			else
+			{
+				for(int y = 0; y < world.getHighestBlockYAt(border, z) + 10; y++)
+				{
+					if(y == world.getHighestBlockYAt(border, z) + 10)
 					{
-						Location loc = new Location(world, currentBorderSize - 1, world.getHighestBlockYAt(currentBorderSize - 1, currentBorderSize - 1) , currentBorderSize - 1);
-						world.loadChunk(loc.getChunk());
-						p.teleport(loc);
+						break;
 					}
-					else if(p.getLocation().getZ() < currentBorderSize)
+					else
 					{
-						if(p.getLocation().getZ() < -currentBorderSize)
+						world.loadChunk(world.getBlockAt(border, y, z).getChunk());
+						wall.add(world.getBlockAt(border, y, z));
+					}
+				}
+
+				z--;
+			}
+		}
+
+		setFirstWall(wall);
+    }
+
+	public void setFirstWall(ArrayList<Block> wall)
+	{
+		World world = Bukkit.getWorld("uhc_world");
+
+		new BukkitRunnable()
+		{
+			int count = 0;
+
+			public void run()
+			{
+				if(count == wall.size())
+				{
+					first = true;
+					cancel();
+				}
+				else
+				{
+					for (Block block : wall)
+					{
+						setBlocks(block.getX(), block.getY(), block.getZ(), world);
+						count++;
+					}
+				}
+			}
+
+		}.runTaskTimer(plugin, 0, 20);
+	}
+
+	public void getSecondWallBlocks(int border, World world)
+	{
+		ArrayList<Block> wall = new ArrayList<Block>();
+		int z = -border;
+		boolean check = false;
+
+		while(!check)
+		{
+			if(z > border)
+			{
+				check = true;
+			}
+			else
+			{
+				for(int y = 0; y < world.getHighestBlockYAt(-border, z) + 10; y++)
+				{
+					wall.add(world.getBlockAt(-border, y, z));
+					world.loadChunk(world.getBlockAt(-border, y, z).getChunk());
+				}
+
+				z++;
+			}
+		}
+
+		setSecondWall(wall);
+	}
+    
+    public void setSecondWall(ArrayList<Block> wall)
+    {
+		World world = Bukkit.getWorld("uhc_world");
+
+		new BukkitRunnable()
+		{
+			int count = 0;
+
+			public void run()
+			{
+				if(count == wall.size())
+				{
+					second = true;
+					cancel();
+				}
+				else
+				{
+					for (Block block : wall)
+					{
+						setBlocks(block.getX(), block.getY(), block.getZ(), world);
+						count++;
+					}
+				}
+			}
+
+		}.runTaskTimer(plugin, 0, 20);
+    }
+
+	public void getThirdWallBlocks(int border, World world)
+	{
+		ArrayList<Block> wall = new ArrayList<Block>();
+		int x = border;
+		boolean check = false;
+
+		while(!check)
+		{
+			if(x < -border)
+			{
+				check = true;
+			}
+			else
+			{
+				for(int y = 0; y < world.getHighestBlockYAt(x, border) + 10; y++)
+				{
+					wall.add(world.getBlockAt(x, y, border));
+					world.loadChunk(world.getBlockAt(x, y, border).getChunk());
+				}
+
+				x--;
+			}
+		}
+
+		setThirdWall(wall);
+	}
+
+    public void setThirdWall(ArrayList<Block> wall)
+    {
+    	World world = Bukkit.getWorld("uhc_world");
+
+		new BukkitRunnable()
+		{
+			int count = 0;
+
+			public void run()
+			{
+				if(count == wall.size())
+				{
+					third = true;
+					cancel();
+				}
+				else
+				{
+					for (Block block : wall)
+					{
+						setBlocks(block.getX(), block.getY(), block.getZ(), world);
+						count++;
+					}
+				}
+			}
+
+		}.runTaskTimer(plugin, 0, 20);
+    }
+
+	public void getFourthWallBlocks(int border, World world)
+	{
+		ArrayList<Block> wall = new ArrayList<Block>();
+		int x = -border;
+		boolean check = false;
+
+		while(!check)
+		{
+			if(x > border)
+			{
+				check = true;
+			}
+			else
+			{
+				for(int y = 0; y < world.getHighestBlockYAt(x, -border) + 10; y++)
+				{
+					wall.add(world.getBlockAt(x, y, -border));
+					world.loadChunk(world.getBlockAt(x, y, -border).getChunk());
+				}
+
+				x++;
+			}
+		}
+
+		setFourthWall(wall);
+	}
+
+    
+    public void setFourthWall(ArrayList<Block> wall)
+    {
+    	World world = Bukkit.getWorld("uhc_world");
+
+		new BukkitRunnable()
+		{
+			int count = 0;
+
+			public void run()
+			{
+				if(count == wall.size())
+				{
+					fourth = true;
+					cancel();
+				}
+				else
+				{
+					for (Block block : wall)
+					{
+						setBlocks(block.getX(), block.getY(), block.getZ(), world);
+						count++;
+					}
+				}
+			}
+
+		}.runTaskTimer(plugin, 0, 20);
+    }
+
+	public void setUpShrink()
+	{
+		switch (currentBorderSize)
+		{
+			case 1500:
+				currentBorderSize = 1000;
+				break;
+
+			case 1000:
+				currentBorderSize = 500;
+				break;
+
+			case 500:
+				currentBorderSize = 250;
+				break;
+
+			case 250:
+				currentBorderSize = 100;
+				break;
+
+			case 100:
+				currentBorderSize = 50;
+				break;
+
+			case 50:
+				currentBorderSize = 25;
+				break;
+		}
+
+		if(ConfigInventory.teamSize == 1)
+		{
+			getTeleportLocationsFFA();
+		}
+		else
+		{
+			getTeleportLocationsTeams();
+		}
+	}
+
+	public void getTeleportLocationsFFA()
+	{
+		World world = Bukkit.getWorld("uhc_world");
+
+		if(currentBorderSize > 500)
+		{
+			new BukkitRunnable()
+			{
+				int count = 0;
+				int x, z;
+
+				public void run()
+				{
+					if(count == Scatter.allPlayers.size())
+					{
+						teleportPlayersFFA();
+						cancel();
+					}
+					else
+					{
+						Player p = Bukkit.getPlayer(Scatter.allPlayers.get(count));
+
+						if(p != null)
 						{
-							Location loc = new Location(world, currentBorderSize - 1, world.getHighestBlockYAt(currentBorderSize - 1, -currentBorderSize + 1) , -currentBorderSize + 1);
-							world.loadChunk(loc.getChunk());
-							p.teleport(loc);
+							if(p.getLocation().getBlockX() > currentBorderSize)
+							{
+								if(p.getLocation().getBlockZ() > currentBorderSize)
+								{
+									x = currentBorderSize;
+									z = currentBorderSize;
+									Location loc = new Location(world, x - 1, world.getHighestBlockYAt(x - 1, z - 1) + 2, z - 1);
+									Location check = new Location(world, x - 1, world.getHighestBlockYAt(x - 1, z - 1) - 1, z - 1);
+									Block block = check.getBlock();
+									int move = 2;
+
+									while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+									{
+										loc = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z - move) + 2, z - move);
+										check = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z - move) - 1, z - move);
+										block = check.getBlock();
+										move++;
+									}
+
+									loc.getChunk().load(true);
+									teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+								}
+								else if(p.getLocation().getBlockZ() < -(currentBorderSize))
+								{
+									z = -(currentBorderSize);
+									x = currentBorderSize;
+									Location loc = new Location(world, x - 1, world.getHighestBlockYAt(currentBorderSize - 1, z + 1) + 2,  z + 1);
+									Location check = new Location(world, x - 1, world.getHighestBlockYAt(currentBorderSize - 1, z + 1) - 1, z + 1);
+									Block block = check.getBlock();
+									int move = 2;
+
+									while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+									{
+										loc = new Location(world, x - move, world.getHighestBlockYAt(x - move, z + move) + 2,  z + move);
+										check = new Location(world, x - move, world.getHighestBlockYAt(x - move, -z + move) - 1,  z + move);
+										block = check.getBlock();
+										move++;
+									}
+
+									loc.getChunk().load(true);
+									teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+								}
+								else
+								{
+									z = p.getLocation().getBlockZ();
+									x = currentBorderSize;
+									Location loc = new Location(world, x - 1, world.getHighestBlockYAt(x , z) + 2, z);
+									Location check = new Location(world, x - 1, world.getHighestBlockYAt(x, z) - 1, z);
+									Block block = check.getBlock();
+									int move = 2;
+
+									while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+									{
+										loc = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z) + 2, z);
+										check = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z) - 1, z);
+										block = check.getBlock();
+										move++;
+									}
+
+									loc.getChunk().load(true);
+									teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+								}
+							}
+							else
+							{
+								if(p.getLocation().getBlockX() < -(currentBorderSize))
+								{
+									if(p.getLocation().getBlockZ() > currentBorderSize)
+									{
+										x = -(currentBorderSize);
+										z = currentBorderSize;
+										Location loc = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z - 1) + 2, z - 1);
+										Location check = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z - 1) - 1, z - 1);
+										Block block = check.getBlock();
+										int move = 2;
+
+										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+										{
+											loc = new Location(world, x + move, world.getHighestBlockYAt(x + move, z - move) + 2, z - move);
+											check = new Location(world, x + move, world.getHighestBlockYAt(x + move, z - move) - 1, z - move);
+											block = check.getBlock();
+											move++;
+										}
+
+										loc.getChunk().load(true);
+										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+									}
+									else if(p.getLocation().getBlockZ() < -(currentBorderSize))
+									{
+										x = -(currentBorderSize);
+										z = -(currentBorderSize);
+										Location loc = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z + 1) + 2, z + 1);
+										Location check = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z + 1) - 1, z + 1);
+										Block block = check.getBlock();
+										int move = 2;
+
+										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+										{
+											loc = new Location(world, x + move, world.getHighestBlockYAt(x + move, z + move) + 2, z + move);
+											check = new Location(world, x + move, world.getHighestBlockYAt(x + move, z + move) - 1, z + move);
+											block = check.getBlock();
+											move++;
+										}
+
+										loc.getChunk().load(true);
+										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+									}
+									else
+									{
+										x = -(currentBorderSize);
+										z = p.getLocation().getBlockZ();
+										Location loc = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z) + 2, z);
+										Location check = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z) - 1, z);
+										Block block = check.getBlock();
+										int move = 2;
+
+										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+										{
+											loc = new Location(world, x + move, world.getHighestBlockYAt(x + move, z) + 2, z);
+											check = new Location(world, x + move, world.getHighestBlockYAt(x + move, z) - 1, z);
+											block = check.getBlock();
+											move++;
+										}
+
+										loc.getChunk().load(true);
+										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+									}
+								}
+								else
+								{
+									if(p.getLocation().getBlockZ() > currentBorderSize)
+									{
+										x = p.getLocation().getBlockX();
+										z = currentBorderSize;
+										Location loc = new Location(world, x, world.getHighestBlockYAt(x, z - 1) + 2, z - 1);
+										Location check = new Location(world, x, world.getHighestBlockYAt(x, z - 1) - 1, z - 1);
+										Block block = check.getBlock();
+										int move = 2;
+
+										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+										{
+											loc = new Location(world, x, world.getHighestBlockYAt(x, z - move) + 2, z - move);
+											check = new Location(world, x, world.getHighestBlockYAt(x, z - move) - 1, z - move);
+											block = check.getBlock();
+											move++;
+										}
+
+										loc.getChunk().load(true);
+										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+									}
+									else if(p.getLocation().getBlockZ() < -(currentBorderSize))
+									{
+										x = p.getLocation().getBlockX();
+										z = -(currentBorderSize);
+										Location loc = new Location(world, x, world.getHighestBlockYAt(x, z + 1) + 2, z + 1);
+										Location check = new Location(world, x, world.getHighestBlockYAt(x, z + 1) - 1, z + 1);
+										Block block = check.getBlock();
+										int move = 2;
+
+										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+										{
+											loc = new Location(world, x, world.getHighestBlockYAt(x, z + move) + 2, z + move);
+											check = new Location(world, x, world.getHighestBlockYAt(x, z + move) - 1, z + move);
+											block = check.getBlock();
+											move++;
+										}
+
+										loc.getChunk().load(true);
+										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
+									}
+								}
+							}
 						}
 						else
 						{
-							//Z is good if we get in here, we just need to change X
-							
-							Location loc = new Location(world, currentBorderSize - 1, world.getHighestBlockYAt(currentBorderSize - 1, (int) p.getLocation().getZ()) , p.getLocation().getZ());
-							world.loadChunk(loc.getChunk());
-							p.teleport(loc);
+							// do something about offline players in here
 						}
+
+						count++;
 					}
-    			}
-    			else if(p.getLocation().getX() < currentBorderSize)
-    			{
-    				if(p.getLocation().getX() < -currentBorderSize)
-    				{
-    					if(p.getLocation().getZ() > currentBorderSize)
-    					{
-    						Location loc = new Location(world, -currentBorderSize + 1, world.getHighestBlockYAt(-currentBorderSize + 1, currentBorderSize - 1) , currentBorderSize - 1);
-    						world.loadChunk(loc.getChunk());
-							p.teleport(loc);
-    					}
-    					else if(p.getLocation().getZ() < currentBorderSize)
-    					{
-    						if(p.getLocation().getZ() < -currentBorderSize)
-    						{
-    							Location loc = new Location(world, -currentBorderSize + 1, world.getHighestBlockYAt(-currentBorderSize + 1, -currentBorderSize + 1) , -currentBorderSize + 1);
-    							world.loadChunk(loc.getChunk());
-    							p.teleport(loc);
-    						}
-    						else
-    						{
-    							//Z is good if we get in here, we just need to change X
-    							
-    							Location loc = new Location(world, -currentBorderSize + 1, world.getHighestBlockYAt(-currentBorderSize + 1, (int) p.getLocation().getZ()) , p.getLocation().getZ());
-    							world.loadChunk(loc.getChunk());
-    							p.teleport(loc);
-    						}
-    					}
-    				}
-    				else
-    				{
-    					// X is good if we get here, we just need to check Z
-    					
-    					if(p.getLocation().getZ() > currentBorderSize)
-    					{
-    						Location loc = new Location(world, p.getLocation().getX(), world.getHighestBlockYAt((int) p.getLocation().getX(), currentBorderSize - 1) , currentBorderSize - 1);
-    						world.loadChunk(loc.getChunk());
-							p.teleport(loc);
-    					}
-    					else if(p.getLocation().getZ() < currentBorderSize)
-    					{
-    						if(p.getLocation().getZ() < -currentBorderSize)
-    						{
-    							Location loc = new Location(world, p.getLocation().getX(), world.getHighestBlockYAt((int) p.getLocation().getX(), -currentBorderSize + 1) , -currentBorderSize + 1);
-    							world.loadChunk(loc.getChunk());
-    							p.teleport(loc);
-    						}
-    					}
-    				}
-    			}
-    		}
-    	}
-    }
+				}
+
+			}.runTaskTimer(plugin, 0, 1);
+		}
+		else
+		{
+			new BukkitRunnable()
+			{
+				int randomX, randomZ, count = 0;
+
+				public void run()
+				{
+					randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+					randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+
+					Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
+					Location checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
+					Block block = checkloc.getBlock();
+
+					if(count == Scatter.allPlayers.size())
+					{
+						teleportPlayersFFA();
+						cancel();
+					}
+					else
+					{
+						Player p = Bukkit.getPlayer(Scatter.allPlayers.get(count));
+
+						if(p != null)
+						{
+							if(p.getLocation().getBlockX() > currentBorderSize)
+							{
+								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+								{
+									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+
+									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
+									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
+									block = checkloc.getBlock();
+								}
+
+								teleloc.getChunk().load(true);
+								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
+							}
+							else if(p.getLocation().getBlockX() < -(currentBorderSize))
+							{
+								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+								{
+									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+
+									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
+									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
+									block = checkloc.getBlock();
+								}
+
+								teleloc.getChunk().load(true);
+								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
+							}
+							else if(p.getLocation().getBlockZ() < -(currentBorderSize))
+							{
+								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+								{
+									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+
+									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
+									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
+									block = checkloc.getBlock();
+								}
+
+								teleloc.getChunk().load(true);
+								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
+							}
+							else if(p.getLocation().getBlockX() > currentBorderSize)
+							{
+								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
+								{
+									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+
+									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
+									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
+									block = checkloc.getBlock();
+								}
+
+								teleloc.getChunk().load(true);
+								world.save();
+								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
+							}
+						}
+						else
+						{
+							// do something about offline players here
+						}
+
+						count++;
+					}
+				}
+
+			}.runTaskTimer(plugin, 0, 1);
+		}
+	}
+
+	public void getTeleportLocationsTeams()
+	{
+		if(currentBorderSize > 500)
+		{
+			new BukkitRunnable()
+			{
+				public void run()
+				{
+
+				}
+
+			}.runTaskTimer(plugin, 0, 10);
+		}
+		else
+		{
+			new BukkitRunnable()
+			{
+				public void run()
+				{
+
+				}
+
+			}.runTaskTimer(plugin, 0, 10);
+		}
+	}
+
+	public void teleportPlayersFFA()
+	{
+		if(!teleLocationsFFA.isEmpty())
+		{
+			new BukkitRunnable()
+			{
+				int count = 0;
+
+				public void run()
+				{
+					if(count == Scatter.allPlayers.size())
+					{
+						setUpBorder(currentBorderSize, Bukkit.getWorld("uhc_world"));
+						cancel();
+					}
+					else
+					{
+						Player p = Bukkit.getPlayer(Scatter.allPlayers.get(count));
+
+						if(p != null)
+						{
+							if(teleLocationsFFA.containsKey(p.getUniqueId()))
+							{
+								teleLocationsFFA.get(p.getUniqueId()).getChunk().load(true);
+								teleLocationsFFA.get(p.getUniqueId()).setPitch(p.getLocation().getPitch());
+								teleLocationsFFA.get(p.getUniqueId()).setYaw(p.getLocation().getYaw());
+								p.teleport(teleLocationsFFA.get(p.getUniqueId()));
+								teleLocationsFFA.remove(p.getUniqueId());
+							}
+						}
+						else
+						{
+							// do something about an offline player here
+						}
+
+						count++;
+					}
+				}
+
+			}.runTaskTimer(plugin, 0, 1);
+		}
+	}
+
+	public void teleportPlayersTeams()
+	{
+
+	}
+    
+  	public void setBlocks(int x, int y, int z, World world)
+	{
+		net.minecraft.server.v1_7_R4.World nmsWorld = ((CraftWorld) world).getHandle();
+		nmsWorld.setTypeAndData(x, y ,z, Blocks.BEDROCK, 0, 2);
+	}
 }

@@ -1,39 +1,36 @@
 package core.mainPackage;
 
+import core.Alerts.PvP;
+import core.Alerts.Xray;
 import core.Arena.ArenaKills;
 import core.Chat.ChatEvent;
+import core.ChunkLoad.Chunks;
 import core.Config.ConfigEvent;
-import core.Config.ConfigInventory;
-import core.ConfigVariables.AppleRate;
-import core.ConfigVariables.Horses;
-import core.ConfigVariables.Portals;
-import core.ConfigVariables.SpeedStrength;
-import core.Events.BreakEvent;
-import core.Events.Events;
+import core.ConfigVariables.*;
+import core.Events.*;
+import core.GoldenHead.GoldenHead;
 import core.HostsMods.HostModsItems;
-import core.HostsMods.HostsMods;
-import core.Kills.HealthEvent;
 import core.Kills.PlayerKills;
 import core.Kills.Spectator;
 import core.Kills.TeamKills;
 import core.Scatter.ChatEventScatter;
 import core.Scatter.Scatter;
+import core.Scenarios.*;
+import core.ScenariosInventory.ScenInvEvent;
+import core.ScenariosInventory.ScenariosInventory;
 import core.Scoreboard.Game;
 import core.Scoreboard.Lobby;
-import core.Scoreboard.Time;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
-import org.apache.commons.io.FileUtils;
+import core.Scoreboard.ScoreboardTeams;
+import net.minecraft.util.org.apache.commons.io.FileUtils;
 import org.bukkit.*;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
+import org.bukkit.entity.NPC;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffectType;
 
 public class Main extends JavaPlugin implements Listener
 {
@@ -41,16 +38,21 @@ public class Main extends JavaPlugin implements Listener
 	Scatter scat;
 	Game game;
 	PlayerKills kills;
+	GoldenHead head;
+	public static OnlinePlayers online;
+	public static boolean loading = false;
+	ScoreboardTeams teams;
 
 	public void onEnable()
 	{
-		createArenaUHCWorld();
 		Commands command = new Commands();
-		createArenaUHCWorld();
 		lob = new Lobby();
 		scat = new Scatter();
 		game = new Game();
 		kills = new PlayerKills();
+		head = new GoldenHead();
+		online = new OnlinePlayers();
+		teams = new ScoreboardTeams();
 		
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "---------------------------");
 		getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "    UHC CORE ENABLED :D    ");
@@ -64,14 +66,33 @@ public class Main extends JavaPlugin implements Listener
 		this.getServer().getPluginManager().registerEvents(new Portals(), this);
 		this.getServer().getPluginManager().registerEvents(new ChatEventScatter(), this);
 		this.getServer().getPluginManager().registerEvents(new ChatEvent(), this);
-		this.getServer().getPluginManager().registerEvents(new PlayerKills(), this);
 		this.getServer().getPluginManager().registerEvents(new TeamKills(), this);
 		this.getServer().getPluginManager().registerEvents(new ArenaKills(), this);
-		this.getServer().getPluginManager().registerEvents(new Events(), this);
+		this.getServer().getPluginManager().registerEvents(new FoodEvent(), this);
 		this.getServer().getPluginManager().registerEvents(new Spectator(), this);
-		this.getServer().getPluginManager().registerEvents(new HealthEvent(), this);
 		this.getServer().getPluginManager().registerEvents(new BreakEvent(), this);
 		this.getServer().getPluginManager().registerEvents(new HostModsItems(), this);
+		this.getServer().getPluginManager().registerEvents(new GoldenHead(), this);
+		this.getServer().getPluginManager().registerEvents(new PickUpItems(), this);
+		this.getServer().getPluginManager().registerEvents(new PassiveMobs(), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerKills(), this);
+		this.getServer().getPluginManager().registerEvents(new Xray(), this);
+		this.getServer().getPluginManager().registerEvents(new PvP(), this);
+		this.getServer().getPluginManager().registerEvents(new Enchants(), this);
+		this.getServer().getPluginManager().registerEvents(new ItemDespawnEvent(), this);
+		this.getServer().getPluginManager().registerEvents(new DamageEvent(), this);
+		this.getServer().getPluginManager().registerEvents(new Join(), this);
+		this.getServer().getPluginManager().registerEvents(new Quit(), this);
+		this.getServer().getPluginManager().registerEvents(new NPCEvent(), this);
+		this.getServer().getPluginManager().registerEvents(new EnderPearlDamage(), this);
+		this.getServer().getPluginManager().registerEvents(new PlayerTeleport(), this);
+		this.getServer().getPluginManager().registerEvents(new ScenInvEvent(), this);
+		this.getServer().getPluginManager().registerEvents(new CutClean(), this);
+		this.getServer().getPluginManager().registerEvents(new HasteyBoys(), this);
+		this.getServer().getPluginManager().registerEvents(new LuckyOres(), this);
+		this.getServer().getPluginManager().registerEvents(new Timber(), this);
+		this.getServer().getPluginManager().registerEvents(new Timebomb(), this);
+		this.getServer().getPluginManager().registerEvents(new Superheroes(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
 		getCommand(command.config).setExecutor(command);
@@ -84,19 +105,57 @@ public class Main extends JavaPlugin implements Listener
 		getCommand(command.arena).setExecutor(command);
 		getCommand(command.border).setExecutor(command);
 		getCommand(command.gm).setExecutor(command);
+		getCommand(command.respawn).setExecutor(command);
+		getCommand(command.world).setExecutor(command);
+		getCommand(command.spawn).setExecutor(command);
+		getCommand(command.heal).setExecutor(command);
+		getCommand(command.feed).setExecutor(command);
+		getCommand(command.alerts).setExecutor(command);
+		getCommand(command.bright).setExecutor(command);
+		getCommand(command.scenarios).setExecutor(command);
+
+		World world = Bukkit.getWorld("world");
+		world.setGameRuleValue("doDaylightCycle", "false");
+		world.setGameRuleValue("doMobSpawning", "false");
+		world.setTime(0);
+		world.setDifficulty(Difficulty.PEACEFUL);
+
+		createArenaUHCWorld();
+		head.createGoldenHead();
+		teams.setColors();
 	}
 	
 	public void onDisable()
 	{
-		Bukkit.unloadWorld("uhc_world", false);
-		
-		try
+		teams.removeTeams();
+
+		if(loading)
 		{
-			FileUtils.forceDelete(new File("uhc_world"));
+			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "wb fill cancel");
 		}
-		catch(IOException e)
+
+		if(Scatter.ended)
 		{
-			e.printStackTrace();
+			Bukkit.unloadWorld("uhc_world", false);
+			Bukkit.unloadWorld("uhc_nether", false);
+			
+			try
+			{
+				FileUtils.forceDelete(new File("uhc_world"));
+				FileUtils.forceDelete(new File("uhc_nether"));
+			}
+			catch(IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+
+		if(!NPCEvent.npcList.isEmpty())
+		{
+			for(UUID keys : NPCEvent.npcList.keySet())
+			{
+				NPCEvent.npcList.get(keys).destroy();
+			}
 		}
 		
 		getServer().getConsoleSender().sendMessage(ChatColor.RED + "---------------------------");
@@ -106,269 +165,39 @@ public class Main extends JavaPlugin implements Listener
 
 	public void createArenaUHCWorld()
 	{
+		Chunks chunks = new Chunks();
+		
 		if(!FileUtils.getFile("Arena").exists())
 		{
-			WorldCreator wc = new WorldCreator("Arena");
-			wc.environment(World.Environment.NORMAL);
-			wc.type(WorldType.FLAT);
-			wc.createWorld();
+			World world = Bukkit.createWorld(new WorldCreator("Arena").environment(World.Environment.NORMAL).type(WorldType.FLAT));
+			world.setGameRuleValue("doDaylightCycle", "false");
+			world.setTime(12000);
+			world.setGameRuleValue("naturalRegeneration", "false");
+			world.setGameRuleValue("doMobSpawning", "false");
+			world.setGameRuleValue("doWeatherCycle", "false");
+		}
+
+		if(!FileUtils.getFile("uhc_nether").exists())
+		{
+			World world = Bukkit.createWorld(new WorldCreator("uhc_nether").environment(World.Environment.NETHER));
 		}
 		
 		if(!FileUtils.getFile("uhc_world").exists())
 		{
-			WorldCreator wc = new WorldCreator("uhc_world");
-			wc.type(WorldType.CUSTOMIZED);
-			wc.generateStructures(true);
-			wc.createWorld();
-		}
-	}
+			loading = true;
 
-	@EventHandler
-	public void onJoin(PlayerJoinEvent e)
-	{
-		Player p = e.getPlayer();
-
-		if(!Scatter.started && !Commands.scatter)
-		{
-			World world = Bukkit.getWorld("world");
-
-			if(p.hasPermission("chat.owner"))
-			{
-				e.setJoinMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "+" + ChatColor.GRAY + "]" + ChatColor.DARK_RED + ChatColor.BOLD +  " " + p.getDisplayName());
-			}
-			else if(p.hasPermission("chat.dev"))
-			{
-				e.setJoinMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "+" + ChatColor.GRAY + "]" + ChatColor.GOLD + ChatColor.BOLD + " " + p.getDisplayName());
-			}
-			else if(p.hasPermission("chat.admin"))
-			{
-				e.setJoinMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "+" + ChatColor.GRAY + "]" + ChatColor.RED + " " + p.getDisplayName());
-			}
-			else if(p.hasPermission("chat.srmod"))
-			{
-				e.setJoinMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "+" + ChatColor.GRAY + "]" + ChatColor.DARK_BLUE + " " + p.getDisplayName());
-			}
-			else if(p.hasPermission("chat.mod"))
-			{
-				e.setJoinMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "+" + ChatColor.GRAY + "]" + ChatColor.DARK_GREEN + " " + p.getDisplayName());
-			}
-			else if(p.hasPermission("chat.trial"))
-			{
-				e.setJoinMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "+" + ChatColor.GRAY + "]" + ChatColor.GREEN + " " + p.getDisplayName());
-			}
-			else
-			{
-				e.setJoinMessage(ChatColor.GRAY + "[" + ChatColor.GREEN + "+" + ChatColor.GRAY + "]" + ChatColor.WHITE + " " + p.getDisplayName());
-			}
-
-			p.teleport(world.getSpawnLocation());
-			p.removePotionEffect(PotionEffectType.BLINDNESS);
-			p.removePotionEffect(PotionEffectType.JUMP);
-			p.removePotionEffect(PotionEffectType.SPEED);
-			p.removePotionEffect(PotionEffectType.SLOW);
-			p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-			p.removePotionEffect(PotionEffectType.ABSORPTION);
-			p.removePotionEffect(PotionEffectType.CONFUSION);
-			p.removePotionEffect(PotionEffectType.FAST_DIGGING);
-			p.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
-			p.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-			p.removePotionEffect(PotionEffectType.HARM);
-			p.removePotionEffect(PotionEffectType.HEALTH_BOOST);
-			p.removePotionEffect(PotionEffectType.HEAL);
-			p.removePotionEffect(PotionEffectType.INVISIBILITY);
-			p.removePotionEffect(PotionEffectType.POISON);
-			p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
-			p.removePotionEffect(PotionEffectType.WATER_BREATHING);
-			p.removePotionEffect(PotionEffectType.WEAKNESS);
-			p.removePotionEffect(PotionEffectType.REGENERATION);
-			p.removePotionEffect(PotionEffectType.HUNGER);
-			p.removePotionEffect(PotionEffectType.WITHER);
-			p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-			p.removePotionEffect(PotionEffectType.SATURATION);
+			World world = Bukkit.createWorld(new WorldCreator("uhc_world").environment(World.Environment.NORMAL).type(WorldType.NORMAL));
+			world.setGameRuleValue("doDaylightCycle", "false");
+			world.setTime(12000);
+			world.setGameRuleValue("naturalRegeneration", "false");
+			world.setGameRuleValue("doWeatherCycle", "false");
 			
-			p.getInventory().clear();
+			chunks.checkZeroZero();
 			
-			p.setHealth(p.getHealth() + (20.0 - p.getHealth()));
-			p.setFoodLevel(20);
-			p.setLevel(0);
-			p.setExp(0);
-			
-			p.setGameMode(GameMode.SURVIVAL);
-			
-			for(Player players : Bukkit.getOnlinePlayers())
+			if(!Chunks.check)
 			{
-				if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
-				{
-					players.showPlayer(p);
-				}
-				
-				if(!HostsMods.hosts.contains(players.getUniqueId()) && !HostsMods.mods.contains(players.getUniqueId()))
-				{
-					p.showPlayer(players);
-				}
+				chunks.loadUHCWorldChunks();
 			}
-
-			lob.setLobby(p);
-		}
-		else if(Commands.scatter)
-		{
-			p.kickPlayer(ChatColor.RED + "Scatter has started, you cannot join now.");
-		}
-		else if(Scatter.started)
-		{
-			if(PlayerKills.dead.contains(p.getUniqueId()))
-			{
-				if(p.hasPermission("death.bypass"))
-				{
-					World world = Bukkit.getWorld("world");
-					p.teleport(world.getSpawnLocation());
-				}
-				else
-				{
-					p.kickPlayer(ChatColor.RED + "You died, unlucky :(");
-				}
-			}
-			else
-			{
-				if(Scatter.allPlayers.contains(p.getUniqueId()))
-				{
-					if(ConfigInventory.teamSize > 1)
-					{
-						game.setGameTeams(p);
-					}
-					else
-					{
-						game.setGameFFA(p);
-					}
-					
-					if(!PlayerKills.dead.isEmpty())
-					{
-						for(int i = 0; i < PlayerKills.dead.size(); i++)
-						{
-							p.hidePlayer(Bukkit.getPlayer(PlayerKills.dead.get(i)));
-						}
-					}
-					
-					p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(0)));
-					
-					for(int i = 0; i < HostsMods.mods.size(); i++)
-					{
-						p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(i)));
-					}
-				}
-				else if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()))
-				{
-					for(Player player : Bukkit.getOnlinePlayers())
-					{
-						player.hidePlayer(p);
-					}
-				}
-				else
-				{
-					if(Time.minutes < ConfigInventory.latescatter)
-					{
-						p.removePotionEffect(PotionEffectType.BLINDNESS);
-						p.removePotionEffect(PotionEffectType.JUMP);
-						p.removePotionEffect(PotionEffectType.SPEED);
-						p.removePotionEffect(PotionEffectType.SLOW);
-						p.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-						p.removePotionEffect(PotionEffectType.ABSORPTION);
-						p.removePotionEffect(PotionEffectType.CONFUSION);
-						p.removePotionEffect(PotionEffectType.FAST_DIGGING);
-						p.removePotionEffect(PotionEffectType.FIRE_RESISTANCE);
-						p.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
-						p.removePotionEffect(PotionEffectType.HARM);
-						p.removePotionEffect(PotionEffectType.HEALTH_BOOST);
-						p.removePotionEffect(PotionEffectType.HEAL);
-						p.removePotionEffect(PotionEffectType.INVISIBILITY);
-						p.removePotionEffect(PotionEffectType.POISON);
-						p.removePotionEffect(PotionEffectType.SLOW_DIGGING);
-						p.removePotionEffect(PotionEffectType.WATER_BREATHING);
-						p.removePotionEffect(PotionEffectType.WEAKNESS);
-						p.removePotionEffect(PotionEffectType.REGENERATION);
-						p.removePotionEffect(PotionEffectType.HUNGER);
-						p.removePotionEffect(PotionEffectType.WITHER);
-						p.removePotionEffect(PotionEffectType.NIGHT_VISION);
-						p.removePotionEffect(PotionEffectType.SATURATION);
-						
-						p.getInventory().clear();
-						
-						p.setHealth(p.getHealth() + (20.0 - p.getHealth()));
-						p.setFoodLevel(20);
-						p.setLevel(0);
-						p.setExp(0);
-						
-						p.setGameMode(GameMode.SURVIVAL);
-						
-						if(ConfigInventory.teamSize > 1)
-						{
-							scat.lateScatterTeams(p);
-							game.setGameTeams(p);
-							kills.latePlayer(p);
-						}
-						else
-						{
-							scat.lateScatterFFA(p);
-							game.setGameFFA(p);
-							kills.latePlayer(p);
-						}
-						
-						if(!PlayerKills.dead.isEmpty())
-						{
-							
-							for(int i = 0; i < PlayerKills.dead.size(); i++)
-							{
-								p.hidePlayer(Bukkit.getPlayer(PlayerKills.dead.get(i)));
-							}
-						}
-						
-						p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(0)));
-						
-						for(int i = 0; i < HostsMods.mods.size(); i++)
-						{
-							p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(i)));
-						}
-					}
-					else
-					{
-						p.kickPlayer(ChatColor.RED + "Late Scatter period has ended.");
-					}
-				}
-			}
-		}
-	}
-	
-	public void onLeave(PlayerQuitEvent e)
-	{
-		Player p = e.getPlayer();
-		
-		if(p.hasPermission("chat.owner"))
-		{
-			e.setQuitMessage(ChatColor.GRAY + "[" + ChatColor.RED + "-" + ChatColor.GRAY + "]" + ChatColor.DARK_RED + ChatColor.BOLD +  " " + p.getDisplayName());
-		}
-		else if(p.hasPermission("chat.dev"))
-		{
-			e.setQuitMessage(ChatColor.GRAY + "[" + ChatColor.RED + "-" + ChatColor.GRAY + "]" + ChatColor.GOLD + ChatColor.BOLD + " " + p.getDisplayName());
-		}
-		else if(p.hasPermission("chat.admin"))
-		{
-			e.setQuitMessage(ChatColor.GRAY + "[" + ChatColor.RED + "-" + ChatColor.GRAY + "]" + ChatColor.RED + " " + p.getDisplayName());
-		}
-		else if(p.hasPermission("chat.srmod"))
-		{
-			e.setQuitMessage(ChatColor.GRAY + "[" + ChatColor.RED + "-" + ChatColor.GRAY + "]" + ChatColor.DARK_BLUE + " " + p.getDisplayName());
-		}
-		else if(p.hasPermission("chat.mod"))
-		{
-			e.setQuitMessage(ChatColor.GRAY + "[" + ChatColor.RED + "-" + ChatColor.GRAY + "]" + ChatColor.DARK_GREEN + " " + p.getDisplayName());
-		}
-		else if(p.hasPermission("chat.trial"))
-		{
-			e.setQuitMessage(ChatColor.GRAY + "[" + ChatColor.RED + "-" + ChatColor.GRAY + "]" + ChatColor.GREEN + " " + p.getDisplayName());
-		}
-		else
-		{
-			e.setQuitMessage(ChatColor.GRAY + "[" + ChatColor.RED + "-" + ChatColor.GRAY + "]" + ChatColor.WHITE + " " + p.getDisplayName());
 		}
 	}
 }

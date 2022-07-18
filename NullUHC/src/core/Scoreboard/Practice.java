@@ -21,26 +21,42 @@ public class Practice implements Listener
 {
 	private Scat scat = new Scat();
 	private ArenaKills ak = new ArenaKills();
-	private Lobby lob;
 	Main plugin = Main.getPlugin(Main.class);
+    private Lobby lob;
+    private ScoreboardTeams teams;
 	
 	public void setPractice(Player p)
 	{
-		ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard prac = manager.getNewScoreboard();
+        teams = new ScoreboardTeams();
 
-        Team kills = prac.registerNewTeam("Kill Count");
+        Scoreboard scoreboard;
+
+        if(teams.getScoreBoard(p) == null)
+        {
+            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        }
+        else
+        {
+            scoreboard = teams.getScoreBoard(p);
+        }
+
+        Team kills = scoreboard.registerNewTeam("Kill Count");
         kills.addEntry(ChatColor.AQUA + "Kills " + ChatColor.GRAY + "» ");
 
-        Objective objective = prac.registerNewObjective("Practice", "Scoreboard");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
+        Objective objective = scoreboard.getObjective("Practice");
+
+        if(objective == null)
+        {
+            objective = scoreboard.registerNewObjective("Practice", "Scoreboard");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
+        }
 
         Score score1 = objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.GRAY + "» ");
         score1.setScore(2);
         Score score2 = objective.getScore("");
         score2.setScore(1);
-        Score score3 = objective.getScore(ChatColor.YELLOW + "Server IP");
+        Score score3 = objective.getScore(ChatColor.YELLOW + "nulluhc.com");
         score3.setScore(0);
 
         new BukkitRunnable()
@@ -49,8 +65,7 @@ public class Practice implements Listener
             {
             	if(!PracticeArena.playersInArena.contains(p.getUniqueId()))
                 {
-                	lob = new Lobby();
-                	lob.setLobby(p);
+                    lob.setLobby(p);
                 	cancel();
                 }
                 else
@@ -63,11 +78,11 @@ public class Practice implements Listener
                     scat.setScatter(p);
                     cancel();
                 }
+
             }
 
         }.runTaskTimer(plugin, 0, 1);
 
-
-        p.setScoreboard(prac);
+        teams.setScoreboard(p, scoreboard);
 	}
 }

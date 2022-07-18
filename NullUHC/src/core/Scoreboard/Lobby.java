@@ -17,23 +17,47 @@ public class Lobby implements Listener
 {
 	private Practice prac = new Practice();
     private Scat scat = new Scat();
+    private ScoreboardTeams teams = new ScoreboardTeams();
     Main plugin = Main.getPlugin(Main.class);
 
     public void setLobby(Player p)
     {
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard lobby = manager.getNewScoreboard();
+        Scoreboard scoreboard;
 
-        Team playercount = lobby.registerNewTeam("Player Count");
-        playercount.addEntry(ChatColor.AQUA + "Players " + ChatColor.GRAY + "» ");
-        Team host = lobby.registerNewTeam("Host");
-        host.addEntry(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ");
-        Team teamsize = lobby.registerNewTeam("Team size");
-        teamsize.addEntry(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
+        if(teams.getScoreBoard(p) == null)
+        {
+            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        }
+        else
+        {
+            scoreboard = teams.getScoreBoard(p);
+        }
 
-        Objective objective = lobby.registerNewObjective("Lobby", "Scoreboard");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
+        Team playercount = scoreboard.getTeam("Player Count");
+        Team host = scoreboard.getTeam("Host");
+        Team teamsize = scoreboard.getTeam("Team size");
+
+        if(playercount == null && host == null && teamsize == null)
+        {
+            playercount = scoreboard.registerNewTeam("Player Count");
+            playercount.addEntry(ChatColor.AQUA + "Players " + ChatColor.GRAY + "» ");
+
+            host = scoreboard.registerNewTeam("Host");
+            host.addEntry(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ");
+
+            teamsize = scoreboard.registerNewTeam("Team size");
+            teamsize.addEntry(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
+        }
+
+
+        Objective objective = scoreboard.getObjective("Sidebar");
+
+        if(objective == null)
+        {
+            objective = scoreboard.registerNewObjective("Sidebar", "Scoreboard");
+            objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        }
 
         Score score1 = objective.getScore(ChatColor.AQUA + "Players " + ChatColor.GRAY + "» ");
         score1.setScore(4);
@@ -43,52 +67,63 @@ public class Lobby implements Listener
         score3.setScore(2);
         Score score4 = objective.getScore("");
         score4.setScore(1);
-        Score score5 = objective.getScore(ChatColor.YELLOW + "Server IP");
+        Score score5 = objective.getScore(ChatColor.YELLOW + "nulluhc.com");
         score5.setScore(0);
+
+        Team finalHost = host;
+        Team finalPlayercount = playercount;
+        Team finalTeamsize = teamsize;
 
         new BukkitRunnable()
         {
             public void run()
             {
-                playercount.setSuffix("" + ChatColor.YELLOW + "" + Bukkit.getOnlinePlayers().size());
+                finalPlayercount.setSuffix("" + ChatColor.YELLOW + "" + Main.online.getOnlinePlayers().size());
 
                 if(HostsMods.hosts.isEmpty())
                 {
-                    host.setSuffix(ChatColor.RED + "None");
+                    finalHost.setSuffix(ChatColor.RED + "None");
                 }
                 else
                 {
                     String name = "";
                     Player h = Bukkit.getPlayer(HostsMods.hosts.get(0));
 
-                    if(h == null)
-                    {
-                        OfflinePlayer host1 = Bukkit.getOfflinePlayer(HostsMods.hosts.get(0));
-
-                        name+= host1.getName().substring(0,8);
-                        host.setSuffix("" + ChatColor.YELLOW + name + "...");
-                    }
-                    else
+                    if(h != null)
                     {
                         if(h.getDisplayName().length() > 12)
                         {
                             name += h.getDisplayName().substring(0, 8);
-                            host.setSuffix("" + ChatColor.YELLOW + name + "...");
+                            finalHost.setSuffix("" + ChatColor.YELLOW + name + "...");
                         }
                         else
                         {
-                            host.setSuffix("" + ChatColor.YELLOW + h.getDisplayName());
+                            finalHost.setSuffix("" + ChatColor.YELLOW + h.getDisplayName());
+                        }
+                    }
+                    else
+                    {
+                        OfflinePlayer temph = Bukkit.getOfflinePlayer(HostsMods.hosts.get(0));
+
+                        if(temph.getName().length() > 12)
+                        {
+                            name += temph.getName().substring(0, 8);
+                            finalHost.setSuffix("" + ChatColor.YELLOW + name + "...");
+                        }
+                        else
+                        {
+                            finalHost.setSuffix("" + ChatColor.YELLOW + temph.getName());
                         }
                     }
                 }
 
                 if(ConfigInventory.teamSize == 1)
                 {
-                    teamsize.setSuffix("" + ChatColor.YELLOW + "FFA");
+                    finalTeamsize.setSuffix("" + ChatColor.YELLOW + "FFA");
                 }
                 else
                 {
-                    teamsize.setSuffix("" + ChatColor.YELLOW + "To" + ConfigInventory.teamSize);
+                    finalTeamsize.setSuffix("" + ChatColor.YELLOW + "To" + ConfigInventory.teamSize);
                 }
 
                 if(Commands.scatter)
@@ -108,7 +143,6 @@ public class Lobby implements Listener
 
         }.runTaskTimer(plugin, 0, 1);
 
-
-        p.setScoreboard(lobby);
+        teams.setScoreboard(p, scoreboard);
     }
 }

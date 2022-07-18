@@ -14,25 +14,49 @@ public class Scat implements Listener
 {
     private Game game = new Game();
     Main plugin = Main.getPlugin(Main.class);
+    private Lobby lob;
+    private ScoreboardTeams teams;
 
     public void setScatter(Player p)
     {
-        ScoreboardManager manager = Bukkit.getScoreboardManager();
-        Scoreboard scat = manager.getNewScoreboard();
+        teams = new ScoreboardTeams();
 
-        Team scattered = scat.registerNewTeam("Scattered");
-        scattered.addEntry(ChatColor.AQUA + "Scattered " + ChatColor.GRAY + "» ");
+        Scoreboard scoreboard;
 
-        Objective objective = scat.registerNewObjective("Scatter", "Scoreboard");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
+        if(teams.getScoreBoard(p) == null)
+        {
+            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+        }
+        else
+        {
+            scoreboard = teams.getScoreBoard(p);
+        }
+
+        Team scattered = scoreboard.getTeam("Scattered");
+
+        if(scattered == null)
+        {
+            scattered = scoreboard.registerNewTeam("Scattered");
+            scattered.addEntry(ChatColor.AQUA + "Scattered " + ChatColor.GRAY + "» ");
+        }
+
+        Objective objective = scoreboard.getObjective("Scatter");
+
+        if(objective == null)
+        {
+            objective = scoreboard.registerNewObjective("Scatter", "Scoreboard");
+            objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
+            objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        }
 
         Score score1 = objective.getScore(ChatColor.AQUA + "Scattered " + ChatColor.GRAY + "» ");
-        score1.setScore(2);
-        Score score2 = objective.getScore("");
-        score2.setScore(1);
-        Score score3 = objective.getScore(ChatColor.YELLOW + "Server IP");
-        score3.setScore(0);
+        score1.setScore(3);
+        Score score2 = objective.getScore(ChatColor.YELLOW + "");
+        score2.setScore(2);
+        Score score3 = objective.getScore(ChatColor.YELLOW + "nulluhc.com");
+        score3.setScore(1);
+
+        Team finalScattered = scattered;
 
         new BukkitRunnable()
         {
@@ -40,11 +64,11 @@ public class Scat implements Listener
             {
                 if(ConfigInventory.teamSize == 1)
                 {
-                    scattered.setSuffix("" + ChatColor.YELLOW + Scatter.ffaScattered);
+                    finalScattered.setSuffix("" + ChatColor.YELLOW + Scatter.ffaScattered);
                 }
                 else
                 {
-                    scattered.setSuffix("" + ChatColor.YELLOW + Scatter.teamsScattered);
+                    finalScattered.setSuffix("" + ChatColor.YELLOW + Scatter.teamsScattered);
                 }
 
                 if(Scatter.started)
@@ -64,6 +88,6 @@ public class Scat implements Listener
 
         }.runTaskTimer(plugin, 0, 1);
 
-        p.setScoreboard(scat);
+        teams.setScoreboard(p, scoreboard);
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class Helpop implements Listener
 {
-    public ArrayList<UUID> used = new ArrayList<UUID>();
+    private static ArrayList<UUID> used = new ArrayList<UUID>();
     public String helpPref = "" + ChatColor.GRAY + "[" + ChatColor.RED + "HelpOp" + ChatColor.GRAY + "]";
     Main plugin = Main.getPlugin(Main.class);
     public void onHelp(Player p, String s)
@@ -26,7 +26,7 @@ public class Helpop implements Listener
             used.add(p.getUniqueId());
             p.sendMessage(helpPref + ChatColor.GREEN + " Your message has been sent successfully.");
 
-            for(Player hm : Bukkit.getOnlinePlayers())
+            for(Player hm : Main.online.getOnlinePlayers())
             {
                 if(hm.hasPermission("HelpOp.see"))
                 {
@@ -36,7 +36,7 @@ public class Helpop implements Listener
 
             new BukkitRunnable()
             {
-                int seconds  = 30;
+                int seconds = 30;
 
                 public void run()
                 {

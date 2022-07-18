@@ -1,39 +1,72 @@
 package core.Arena;
 
+import core.Config.ConfigInventory;
+import core.HostsMods.HostModsItems;
 import core.Scatter.Scatter;
 import core.mainPackage.Commands;
+import core.mainPackage.LobbyItems;
 import core.mainPackage.Main;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.UUID;
 
 public class PracticeArena implements Listener
 {
     public static ArrayList<UUID> playersInArena = new ArrayList<UUID>();
     Main plugin = Main.getPlugin(Main.class);
+    private ArenaKit kit = new ArenaKit();
+    public static boolean arena = true;
 
     public void onArenaJoin(Player p)
     {
-        if(!Commands.scatter && !Scatter.started)
+        if(arena)
         {
-            World world = Bukkit.getWorld("Arena");
-            ArenaKills.arenaKills.put(p.getUniqueId(), 0);
-            playersInArena.add(p.getUniqueId());
+            if(!Commands.scatter && !Scatter.started)
+            {
+                int randomX = new Random().nextInt(45 - 1) - 45;
+                int randomZ = new Random().nextInt(45 - 1) - 45;
 
-            // Make it a random scatter
-            
-            p.getInventory().clear();
-            p.teleport(world.getSpawnLocation());
-            p.sendMessage(ChatColor.GREEN + "You are now in the arena.");
+                new BukkitRunnable()
+                {
+                    public void run()
+                    {
+                        p.getInventory().clear();
+                        p.getInventory().setBoots(null);
+                        p.getInventory().setLeggings(null);
+                        p.getInventory().setChestplate(null);
+                        p.getInventory().setHelmet(null);
+
+                        Location loc = new Location(Bukkit.getWorld("Arena"), randomX, 50 ,randomZ);
+                        ArenaKills.arenaKills.put(p.getUniqueId(), 0);
+                        playersInArena.add(p.getUniqueId());
+                        kit.setArenaKit(p);
+                        p.teleport(loc);
+                        p.sendMessage(ChatColor.GREEN + "You are now in the arena.");
+                        cancel();
+                    }
+
+                }.runTaskTimer(plugin, 0, 1);
+            }
+            else
+            {
+                p.sendMessage(ChatColor.RED + "You may not use this command now!");
+            }
         }
         else
         {
-            p.sendMessage(ChatColor.RED + "You may not use this command now!");
+            p.sendMessage(ChatColor.RED + "Practice arena has been turned off.");
         }
     }
 
@@ -46,12 +79,35 @@ public class PracticeArena implements Listener
         		World world = Bukkit.getWorld("world");
                 ArenaKills.arenaKills.remove(p.getUniqueId());
                 playersInArena.remove(p.getUniqueId());
-                
-                p.getInventory().clear();
 
-                p.teleport(world.getSpawnLocation());
-                
-                p.sendMessage(ChatColor.RED + "You have left the arena.");
+                new BukkitRunnable()
+                {
+                    public void run()
+                    {
+                        p.getInventory().clear();
+                        p.getInventory().setBoots(null);
+                        p.getInventory().setLeggings(null);
+                        p.getInventory().setChestplate(null);
+                        p.getInventory().setHelmet(null);
+
+                        if(p.hasPermission("uhc.mod") || p.hasPermission("uhc.host"))
+                        {
+                            HostModsItems items = new HostModsItems();
+                            items.staffLobbyItems(p);
+                        }
+                        else
+                        {
+                            LobbyItems lobbyitems = new LobbyItems();
+                            lobbyitems.lobbyItems(p);
+                        }
+
+                        p.teleport(world.getSpawnLocation());
+                        p.sendMessage(ChatColor.RED + "You have left the arena.");
+
+                        cancel();
+                    }
+
+                }.runTaskTimer(plugin, 0, 1);
         	}
         	else
         	{

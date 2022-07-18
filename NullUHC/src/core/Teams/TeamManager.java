@@ -1,6 +1,7 @@
 package core.Teams;
 
 import core.Config.ConfigInventory;
+import core.Scoreboard.ScoreboardTeams;
 import core.mainPackage.Main;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -23,6 +24,7 @@ public class TeamManager implements Listener
     public static ArrayList<UUID> keys = new ArrayList<UUID>();
     public static HashMap<UUID, ArrayList<UUID>> teams = new HashMap<UUID, ArrayList<UUID>>();
     public HashMap<UUID, UUID> pendingInv = new HashMap<UUID, UUID>();
+    private static ScoreboardTeams scoreboardTeams = new ScoreboardTeams();
     Main plugin = Main.getPlugin(Main.class);
 
     public void createTeam(Player p)
@@ -35,6 +37,8 @@ public class TeamManager implements Listener
             {
                 teams.put(p.getUniqueId(), new ArrayList<UUID>());
                 keys.add(p.getUniqueId());
+
+                scoreboardTeams.onTeamCreate(p);
 
                 p.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully created a team!");
             }
@@ -57,6 +61,8 @@ public class TeamManager implements Listener
                     teams.put(p.getUniqueId(), new ArrayList<UUID>());
                     keys.add(p.getUniqueId());
 
+                    scoreboardTeams.onTeamCreate(p);
+
                     p.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully created a team!");
                 }
             }
@@ -75,6 +81,7 @@ public class TeamManager implements Listener
             {
                 p.sendMessage(Teamprefix + ChatColor.GREEN + " Successfully removed '" + target.getDisplayName() + "' from your team.");
                 teams.get(p.getUniqueId()).remove(target.getUniqueId());
+                scoreboardTeams.removePlayerFromTeam(p, target);
             }
             else
             {
@@ -112,6 +119,7 @@ public class TeamManager implements Listener
         {
             keys.remove(p.getUniqueId());
             teams.remove(p.getUniqueId());
+            scoreboardTeams.disbandTeam(p);
             p.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully disbanded the team!");
         }
         else
@@ -295,12 +303,14 @@ public class TeamManager implements Listener
     public void addPlayer(Player p)
     {
         Player owner = Bukkit.getPlayer(pendingInv.get(p.getUniqueId()));
+
         if(teams.containsKey(pendingInv.get(p.getUniqueId())))
         {
             teams.get(pendingInv.get(p.getUniqueId())).add(p.getUniqueId());
             p.sendMessage(Teamprefix + ChatColor.GREEN + ChatColor.BOLD + " You have successfully joined " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + Bukkit.getPlayer(pendingInv.get(p.getUniqueId())).getDisplayName() + "'s " + ChatColor.GREEN + " team!");
             owner.sendMessage(Teamprefix + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getDisplayName() + ChatColor.GREEN + ChatColor.BOLD + " has joined your team!");
             pendingInv.remove(p.getUniqueId());
+            scoreboardTeams.onTeamJoin(owner, p);
         }
         else
         {
@@ -312,6 +322,7 @@ public class TeamManager implements Listener
                     p.sendMessage(Teamprefix + ChatColor.GREEN + ChatColor.BOLD + " You have successfully joined " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + Bukkit.getPlayer(pendingInv.get(p.getUniqueId())).getDisplayName() + "'s " + ChatColor.GREEN + " team!");
                     owner.sendMessage(Teamprefix + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getDisplayName() + ChatColor.GREEN + ChatColor.BOLD + " has joined your team!");
                     pendingInv.remove(p.getUniqueId());
+                    scoreboardTeams.onTeamJoin(owner, p);
                 }
             }
         }
@@ -365,9 +376,9 @@ public class TeamManager implements Listener
         }
         else
         {
-            for(int i = 0; i < keys.size(); i++)
+            for(UUID key : teams.keySet())
             {
-                if(teams.get(keys.get(i)).contains(p.getUniqueId()))
+                if(teams.get(key).contains(p.getUniqueId()))
                 {
                     return true;
                 }
@@ -383,7 +394,11 @@ public class TeamManager implements Listener
         {
             for(int i = 0; i < keys.size(); i++)
             {
-                if(teams.get(keys.get(i)).contains(p.getUniqueId()))
+                if(keys.get(i).equals(p.getUniqueId()))
+                {
+                    return i;
+                }
+                else if(teams.get(keys.get(i)).contains(p.getUniqueId()))
                 {
                     return i;
                 }
