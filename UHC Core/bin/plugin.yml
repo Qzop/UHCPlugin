@@ -1,9 +1,0 @@
-name: UHCcore
-author: Qzop (Fair) and TheenComputers
-version: 1.0
-main: core.mainPackage.Main
-description: UHCcore - handles all UHC gamemode sided stuff.
-
-commands:
-   uhc:
-       description: Allows staff to start and stop the uhc.
