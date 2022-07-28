@@ -20,14 +20,11 @@ public class HasteyBoys implements Listener
     @EventHandler
     public void onPrepareItemCraft(PrepareItemCraftEvent event)
     {
-        Logger.getLogger("Minecraft").info("in event");
-
         if (ScenariosInventory.hastey)
         {
             Material result = event.getInventory().getResult().getType();
             ItemStack change;
             ItemMeta meta;
-            Logger.getLogger("Minecraft").info("in craft");
 
             switch (result)
             {
@@ -171,7 +168,6 @@ public class HasteyBoys implements Listener
                 }
                 ItemStack change;
                 ItemMeta meta;
-                Logger.getLogger("Minecraft").info("in craft");
 
                 switch (item)
                 {

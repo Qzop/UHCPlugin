@@ -1,6 +1,7 @@
 package core.Teams;
 
 import core.Config.ConfigInventory;
+import core.Scatter.Scatter;
 import core.Scoreboard.ScoreboardTeams;
 import core.mainPackage.Main;
 import net.md_5.bungee.api.ChatColor;
@@ -21,7 +22,6 @@ import java.util.UUID;
 public class TeamManager implements Listener
 {
     public static String Teamprefix = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Team" + ChatColor.GRAY + "]";
-    public static ArrayList<UUID> keys = new ArrayList<UUID>();
     public static HashMap<UUID, ArrayList<UUID>> teams = new HashMap<UUID, ArrayList<UUID>>();
     public HashMap<UUID, UUID> pendingInv = new HashMap<UUID, UUID>();
     private static ScoreboardTeams scoreboardTeams = new ScoreboardTeams();
@@ -36,7 +36,6 @@ public class TeamManager implements Listener
             if(teams.isEmpty())
             {
                 teams.put(p.getUniqueId(), new ArrayList<UUID>());
-                keys.add(p.getUniqueId());
 
                 scoreboardTeams.onTeamCreate(p);
 
@@ -44,7 +43,7 @@ public class TeamManager implements Listener
             }
             else
             {
-                for(UUID uuid : keys)
+                for(UUID uuid : teams.keySet())
                 {
                     if(teams.get(uuid).contains(p.getUniqueId()))
                     {
@@ -59,7 +58,6 @@ public class TeamManager implements Listener
                 else
                 {
                     teams.put(p.getUniqueId(), new ArrayList<UUID>());
-                    keys.add(p.getUniqueId());
 
                     scoreboardTeams.onTeamCreate(p);
 
@@ -117,7 +115,6 @@ public class TeamManager implements Listener
     {
         if(teams.containsKey(p.getUniqueId()))
         {
-            keys.remove(p.getUniqueId());
             teams.remove(p.getUniqueId());
             scoreboardTeams.disbandTeam(p);
             p.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully disbanded the team!");
@@ -152,7 +149,7 @@ public class TeamManager implements Listener
                         {
                             boolean check = false;
 
-                            for (UUID uuid : keys)
+                            for (UUID uuid : teams.keySet())
                             {
                                 if (teams.get(uuid).contains(target.getUniqueId()))
                                 {
@@ -211,7 +208,7 @@ public class TeamManager implements Listener
                     boolean check = false;
                     // Search if p is in the Array Lists. If not, then tell p to get on a team
 
-                    for (UUID uuid : keys)
+                    for (UUID uuid : teams.keySet())
                     {
                         if (teams.get(uuid).contains(p.getUniqueId()))
                         {
@@ -234,7 +231,7 @@ public class TeamManager implements Listener
                             }
                             else
                             {
-                                for (UUID uuid : keys)
+                                for (UUID uuid : teams.keySet())
                                 {
                                     if (teams.get(uuid).contains(target.getUniqueId()))
                                     {
@@ -314,7 +311,7 @@ public class TeamManager implements Listener
         }
         else
         {
-            for(UUID uuid : keys)
+            for(UUID uuid : teams.keySet())
             {
                 if(teams.get(uuid).contains(pendingInv.get(p.getUniqueId())))
                 {
@@ -355,11 +352,26 @@ public class TeamManager implements Listener
         if(teams.containsKey(temp))
         {
             p.sendMessage(Teamprefix + ChatColor.GOLD + ChatColor.BOLD + " Team List:");
-            p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(temp).getDisplayName());
+
+            if(Scatter.allPlayers.contains(t.getUniqueId()))
+            {
+                p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(temp).getDisplayName());
+            }
+            else
+            {
+                p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(temp).getDisplayName());
+            }
 
             for(UUID uuid : teams.get(temp))
             {
-                p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName());
+                if(Scatter.allPlayers.contains(t.getUniqueId()))
+                {
+                    p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName());
+                }
+                else
+                {
+                    p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(uuid).getDisplayName());
+                }
             }
         }
         else
@@ -388,30 +400,69 @@ public class TeamManager implements Listener
         return false;
     }
 
-    public int getCaptain(Player p)
+    public boolean findTeamOffline(OfflinePlayer p)
     {
-        if(findTeam(p))
+        if(teams.containsKey(p.getUniqueId()))
         {
-            for(int i = 0; i < keys.size(); i++)
+            return true;
+        }
+        else
+        {
+            for(UUID key : teams.keySet())
             {
-                if(keys.get(i).equals(p.getUniqueId()))
+                if(teams.get(key).contains(p.getUniqueId()))
                 {
-                    return i;
-                }
-                else if(teams.get(keys.get(i)).contains(p.getUniqueId()))
-                {
-                    return i;
+                    return true;
                 }
             }
         }
 
-        return -1;
+        return false;
+    }
+
+    public UUID getCaptain(Player p)
+    {
+        if(findTeam(p))
+        {
+            for(UUID keys : teams.keySet())
+            {
+                if(keys.equals(p.getUniqueId()))
+                {
+                    return keys;
+                }
+                else if(teams.get(keys).contains(p.getUniqueId()))
+                {
+                    return keys;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public UUID getCaptainOffline(OfflinePlayer p)
+    {
+        if(findTeamOffline(p))
+        {
+            for(UUID keys : teams.keySet())
+            {
+                if(keys.equals(p.getUniqueId()))
+                {
+                    return keys;
+                }
+                else if(teams.get(keys).contains(p.getUniqueId()))
+                {
+                    return keys;
+                }
+            }
+        }
+
+        return null;
     }
 
     public void lateScatterCreateTeam(Player p)
     {
         teams.put(p.getUniqueId(), new ArrayList<UUID>());
-        keys.add(p.getUniqueId());
 
         p.sendMessage(Teamprefix + ChatColor.GREEN + " You have been put on a team.");
     }

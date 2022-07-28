@@ -1,6 +1,8 @@
 package core.mainPackage;
 
 import core.Alerts.PvP;
+import core.Alerts.ReportInv;
+import core.Alerts.ReportInvEvent;
 import core.Alerts.Xray;
 import core.Arena.ArenaKills;
 import core.Chat.ChatEvent;
@@ -78,7 +80,6 @@ public class Main extends JavaPlugin implements Listener
 		this.getServer().getPluginManager().registerEvents(new PlayerKills(), this);
 		this.getServer().getPluginManager().registerEvents(new Xray(), this);
 		this.getServer().getPluginManager().registerEvents(new PvP(), this);
-		this.getServer().getPluginManager().registerEvents(new Enchants(), this);
 		this.getServer().getPluginManager().registerEvents(new ItemDespawnEvent(), this);
 		this.getServer().getPluginManager().registerEvents(new DamageEvent(), this);
 		this.getServer().getPluginManager().registerEvents(new Join(), this);
@@ -93,6 +94,7 @@ public class Main extends JavaPlugin implements Listener
 		this.getServer().getPluginManager().registerEvents(new Timber(), this);
 		this.getServer().getPluginManager().registerEvents(new Timebomb(), this);
 		this.getServer().getPluginManager().registerEvents(new Superheroes(), this);
+		this.getServer().getPluginManager().registerEvents(new ReportInvEvent(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
 		getCommand(command.config).setExecutor(command);
@@ -113,6 +115,14 @@ public class Main extends JavaPlugin implements Listener
 		getCommand(command.alerts).setExecutor(command);
 		getCommand(command.bright).setExecutor(command);
 		getCommand(command.scenarios).setExecutor(command);
+		getCommand(command.regenerate).setExecutor(command);
+		getCommand(command.report).setExecutor(command);
+		getCommand(command.bugreport).setExecutor(command);
+		getCommand(command.spawn).setExecutor(command);
+		getCommand(command.discord).setExecutor(command);
+		getCommand(command.ping).setExecutor(command);
+		getCommand(command.specchat).setExecutor(command);
+		getCommand(command.staffchat).setExecutor(command);
 
 		World world = Bukkit.getWorld("world");
 		world.setGameRuleValue("doDaylightCycle", "false");
@@ -169,7 +179,7 @@ public class Main extends JavaPlugin implements Listener
 		
 		if(!FileUtils.getFile("Arena").exists())
 		{
-			World world = Bukkit.createWorld(new WorldCreator("Arena").environment(World.Environment.NORMAL).type(WorldType.FLAT));
+			World world = Bukkit.createWorld(new WorldCreator("Arena").environment(World.Environment.NORMAL).type(WorldType.FLAT).generateStructures(false));
 			world.setGameRuleValue("doDaylightCycle", "false");
 			world.setTime(12000);
 			world.setGameRuleValue("naturalRegeneration", "false");

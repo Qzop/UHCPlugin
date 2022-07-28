@@ -910,11 +910,15 @@ public class ConfigInventory implements Listener
                 ItemStack first = new ItemStack(Material.COMPASS, 1, (byte) 0);
                 ItemMeta firstmeta = first.getItemMeta();
                 firstmeta.setDisplayName(ChatColor.GOLD + "First Shrink: " + ChatColor.AQUA + ChatColor.BOLD + firstShrink + " Minutes");
+                List<String> firstlore = Arrays.asList("" + ChatColor.AQUA + ChatColor.BOLD + "LeftClick to Increase, RightClick to Decrease.");
+                firstmeta.setLore(firstlore);
                 first.setItemMeta(firstmeta);
 
                 ItemStack shrinkInt = new ItemStack(Material.ANVIL, 1, (byte) 0);
                 ItemMeta shrinkmeta = shrinkInt.getItemMeta();
                 shrinkmeta.setDisplayName(ChatColor.GOLD + "Shrink Interval: " + ChatColor.AQUA + ChatColor.BOLD + shrinkInterval + " Minutes");
+                List<String> shrinklore = Arrays.asList("" + ChatColor.AQUA + ChatColor.BOLD + "LeftClick to Increase, RightClick to Decrease.");
+                shrinkmeta.setLore(shrinklore);
                 shrinkInt.setItemMeta(shrinkmeta);
 
                 i.setItem(0, filler);

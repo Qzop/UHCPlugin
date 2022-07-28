@@ -1,6 +1,7 @@
 package core.Events;
 
 import core.HostsMods.HostsMods;
+import core.Kills.PlayerKills;
 import core.Scatter.Scatter;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -118,7 +119,7 @@ public class Events implements Listener
                 }
             }
             
-            if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()))
+            if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()))
             {
             	if(e.getCause().equals(EntityDamageEvent.DamageCause.CONTACT))
                 {

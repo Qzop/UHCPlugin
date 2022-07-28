@@ -103,7 +103,7 @@ public class Chunks implements Listener
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "wb fill confirm");
 				}
 
-				if(count == 16)
+				if(count == 20)
 				{
 					restartServer();
 					cancel();
@@ -115,7 +115,7 @@ public class Chunks implements Listener
 						index = 1;
 						count++;
 
-						int minutes = (16 - count);
+						int minutes = (20 - count);
 
 						if(minutes > 1)
 						{

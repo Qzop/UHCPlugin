@@ -43,3 +43,17 @@ commands:
       description: Allows players to turn full brightness on/off.
    scenarios:
       description: Allows staff to change scenarios and players to view scenarios.
+   regenerate:
+      description: Allows staff to regenerate the uhc map.
+   report:
+      description: Allows players to report a player.
+   bugreport:
+      description: Allows players to report a bug.
+   ping:
+      description: Allows players to see their ping to the server.
+   discord:
+      description: Allows players to join the NullUHC discord.
+   specchat:
+      description: Allows staff to switch to Spectator chat.
+   sc:
+      description: Allows staff to switch to Staff chat.

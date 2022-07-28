@@ -7,18 +7,15 @@ import core.Arena.PracticeArena;
 import core.Config.ConfigInventory;
 import core.ConfigVariables.BedRockBorder;
 import core.ConfigVariables.Horses;
-import core.Events.NPCEvent;
-import core.HostsMods.HostModsItems;
+import core.Events.Join;
 import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
+import core.Scenarios.SuperheroesCMD;
+import core.ScenariosInventory.ScenariosInventory;
 import core.Scoreboard.Time;
 import core.Teams.TeamManager;
-import core.mainPackage.LobbyItems;
-import net.citizensnpcs.api.CitizensAPI;
-import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -29,7 +26,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import core.mainPackage.Commands;
 import core.mainPackage.Main;
 import net.md_5.bungee.api.ChatColor;
-import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class Scatter implements Listener
@@ -49,10 +45,11 @@ public class Scatter implements Listener
     private ArrayList<Player> ffa = new ArrayList<Player>();
     public static int ffaScattered = 0;
     public static int teamsScattered = 0;
-    private static ArrayList<Location> teamLocations = new ArrayList<Location>();
+    private static HashMap<UUID, Location> teamLocations = new HashMap<UUID, Location>();
     private static ArrayList<Location> ffaLocations = new ArrayList<Location>();
     public static int numShrinks = 0;
     private TeamManager tm = new TeamManager();
+    private Join join = new Join();
 
     public void onStart()
     {
@@ -66,15 +63,13 @@ public class Scatter implements Listener
                 {
                     ArenaKills.arenaKills.remove(p.getUniqueId());
                     PracticeArena.playersInArena.remove(p.getUniqueId());
-                    p.getInventory().clear();
-                    p.getInventory().setArmorContents(null);
+                    join.clearInventory(p);
                     p.teleport(world.getSpawnLocation());
                     p.sendMessage(ChatColor.RED + "You have left the arena.");
                 }
                 else
                 {
-                    p.getInventory().clear();
-                    p.getInventory().setArmorContents(null);
+                    join.clearInventory(p);
                 }
             }
         }
@@ -187,6 +182,8 @@ public class Scatter implements Listener
                 }
             }
 
+            ArrayList<UUID> tempKeys = new ArrayList<UUID>(TeamManager.teams.keySet());
+
             new BukkitRunnable()
             {
                 int randomX;
@@ -219,7 +216,7 @@ public class Scatter implements Listener
                             block = checkloc.getBlock();
                         }
 
-                        teamLocations.add(teleloc);
+                        teamLocations.put(tempKeys.get(index), teleloc);
                         world.getChunkAt(teleloc).load(true);
                         world.getChunkAt(randomX - 16, randomZ - 16).load(true);
                         world.getChunkAt(randomX + 16, randomZ + 16).load(true);
@@ -313,6 +310,35 @@ public class Scatter implements Listener
                         }
                     }
 
+                    if(ScenariosInventory.superheroes && ConfigInventory.teamSize > 1)
+                    {
+                        SuperheroesCMD cmd = new SuperheroesCMD();
+
+                        for(Player p : Main.online.getOnlinePlayers())
+                        {
+                            if(!HostsMods.hosts.contains(p.getUniqueId()) || !HostsMods.mods.contains(p.getUniqueId()) || !PlayerKills.spectator.contains(p.getUniqueId()))
+                            {
+                                cmd.setSuperPower(p.getDisplayName(), "assign");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        ScenariosInventory.superheroes = false;
+
+                        for(ItemStack item : ScenariosInventory.enabledScenarios)
+                        {
+                            if(item.hasItemMeta())
+                            {
+                                if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "SuperHeroes"))
+                                {
+                                    ScenariosInventory.enabledScenarios.remove(item);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     Bukkit.broadcastMessage(UHCprefix + ChatColor.GREEN + " The UHC has started, good luck! Use /helpop if you need help. You may relog now.");
                     
                     for(int i = 0; i < allPlayers.size(); i++)
@@ -382,6 +408,8 @@ public class Scatter implements Listener
         }
         else
         {
+            ArrayList<UUID> tempKeys = new ArrayList<UUID>(TeamManager.teams.keySet());
+
             new BukkitRunnable()
             {
                 int index = 0;
@@ -396,30 +424,30 @@ public class Scatter implements Listener
                     }
                     else
                     {
-                        Player owner = Bukkit.getPlayer(TeamManager.keys.get(index));
+                        Player owner = Bukkit.getPlayer(tempKeys.get(index));
 
                         if(owner == null)
                         {
-                            offlineDuringScat.add(TeamManager.keys.get(index));
+                            offlineDuringScat.add(tempKeys.get(index));
                         }
                         else
                         {
-                            owner.teleport(teamLocations.get(index));
-                            world.getChunkAt(teamLocations.get(index)).load(true);
+                            owner.teleport(teamLocations.get(tempKeys.get(index)));
+                            world.getChunkAt(teamLocations.get(tempKeys.get(index))).load(true);
                         }
 
-                        for(int i = 0; i < TeamManager.teams.get(TeamManager.keys.get(index)).size(); i++)
+                        for(int i = 0; i < TeamManager.teams.get(tempKeys.get(index)).size(); i++)
                         {
-                            Player teammate = Bukkit.getPlayer(TeamManager.teams.get(TeamManager.keys.get(index)).get(i));
+                            Player teammate = Bukkit.getPlayer(TeamManager.teams.get(tempKeys.get(index)).get(i));
 
                             if(teammate == null)
                             {
-                                offlineDuringScat.add(TeamManager.teams.get(TeamManager.keys.get(index)).get(i));
+                                offlineDuringScat.add(TeamManager.teams.get(tempKeys.get(index)).get(i));
                             }
                             else
                             {
-                                teammate.teleport(teamLocations.get(index));
-                                world.getChunkAt(teamLocations.get(index)).load(true);
+                                teammate.teleport(teamLocations.get(tempKeys.get(index)));
+                                world.getChunkAt(teamLocations.get(tempKeys.get(index))).load(true);
                             }
 
                             teamsScattered++;
@@ -442,24 +470,32 @@ public class Scatter implements Listener
         randomX = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
         randomZ = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
 
-        Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 3, randomZ);
+        Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
         Location checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
         Block block = checkloc.getBlock();
 
-        allPlayers.add(p.getUniqueId());
+        if(!allPlayers.contains(p.getUniqueId()))
+        {
+            allPlayers.add(p.getUniqueId());
+        }
         
         while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
         {
             randomX = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
             randomZ = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
 
-            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 3, randomZ);
+            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
             checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
             block = checkloc.getBlock();
         }
         
         p.teleport(teleloc);
         world.getChunkAt(randomX, randomZ).load(true);
+
+        p.removePotionEffect(PotionEffectType.BLINDNESS);
+        p.removePotionEffect(PotionEffectType.SLOW);
+        p.removePotionEffect(PotionEffectType.JUMP);
+        p.setVelocity(new Vector());
 
         p.getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
         p.sendMessage(UHCprefix + ChatColor.GREEN + "You have been late scattered! Use /helpop if you need help.");
@@ -484,18 +520,21 @@ public class Scatter implements Listener
             randomX = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
             randomZ = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
 
-            Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 6, randomZ);
+            Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
             Location checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
             Block block = checkloc.getBlock();
 
-            allPlayers.add(p.getUniqueId());
+            if(!allPlayers.contains(p.getUniqueId()))
+            {
+                allPlayers.add(p.getUniqueId());
+            }
 
             while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
             {
                 randomX = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
                 randomZ = new Random().nextInt(ConfigInventory.borderSize + ConfigInventory.borderSize) - ConfigInventory.borderSize;
 
-                teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 6, randomZ);
+                teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
                 checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
                 block = checkloc.getBlock();
             }
@@ -503,6 +542,11 @@ public class Scatter implements Listener
             world.loadChunk(randomX, randomZ);
 
             p.teleport(teleloc);
+
+            p.removePotionEffect(PotionEffectType.BLINDNESS);
+            p.removePotionEffect(PotionEffectType.SLOW);
+            p.removePotionEffect(PotionEffectType.JUMP);
+            p.setVelocity(new Vector());
 
             p.getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
             p.sendMessage(UHCprefix + ChatColor.GREEN + "You have been late scattered! Use /helpop if you need help.");

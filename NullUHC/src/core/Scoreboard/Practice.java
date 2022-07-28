@@ -23,22 +23,12 @@ public class Practice implements Listener
 	private ArenaKills ak = new ArenaKills();
 	Main plugin = Main.getPlugin(Main.class);
     private Lobby lob;
-    private ScoreboardTeams teams;
 	
 	public void setPractice(Player p)
 	{
-        teams = new ScoreboardTeams();
+        lob = new Lobby();
 
-        Scoreboard scoreboard;
-
-        if(teams.getScoreBoard(p) == null)
-        {
-            scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        }
-        else
-        {
-            scoreboard = teams.getScoreBoard(p);
-        }
+        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();;
 
         Team kills = scoreboard.registerNewTeam("Kill Count");
         kills.addEntry(ChatColor.AQUA + "Kills " + ChatColor.GRAY + "» ");
@@ -83,6 +73,6 @@ public class Practice implements Listener
 
         }.runTaskTimer(plugin, 0, 1);
 
-        teams.setScoreboard(p, scoreboard);
+        p.setScoreboard(scoreboard);
 	}
 }

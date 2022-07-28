@@ -56,7 +56,6 @@ public class ScoreboardTeams implements Listener
             scoreboards.put(p.getUniqueId(), scoreboard);
             p.setScoreboard(scoreboard);
         }
-
     }
 
     public Scoreboard getScoreBoard(Player p)

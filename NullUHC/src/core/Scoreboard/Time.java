@@ -6,12 +6,12 @@ import core.ConfigVariables.BedRockBorder;
 import core.Events.NPCEvent;
 import core.Events.Quit;
 import core.Scatter.Scatter;
+import core.Teams.TeamManager;
 import core.mainPackage.Commands;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.World;
-import org.bukkit.entity.NPC;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -36,10 +36,24 @@ public class Time implements Listener
         {
             public void run()
             {
-                if(Scatter.ended)
-                {
-                    cancel();
-                }
+				/*if(ConfigInventory.teamSize == 1)
+				{
+					if(Scatter.allPlayers.size() == 1)
+					{
+						Scatter.ended = true;
+						announceWinners();
+						cancel();
+					}
+				}
+				else
+				{
+					if(TeamManager.teams.size() == 1)
+					{
+						Scatter.ended = true;
+						announceWinners();
+						cancel();
+					}
+				}*/
                 
                 time++;
 
@@ -88,19 +102,6 @@ public class Time implements Listener
     
     public void check()
     {
-    	/*if(ConfigInventory.teamSize == 1)
-    	{
-    		if(Scatter.allPlayers.size() == 1)
-    		{
-    			Scatter.ended = true;
-    			chunks.restartServer();
-    		}
-    	}
-    	else
-    	{
-    		
-    	}*/
-    	
     	if(minutes == 5 && time == 0)
         {
         	Commands.chat = false;
@@ -114,7 +115,7 @@ public class Time implements Listener
         		player.setHealth(player.getHealth() + (20.0 - player.getHealth()));
         	}
         	
-        	Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.YELLOW + " Final heal has been given." + ChatColor.RED + " DO NOT " + ChatColor.YELLOW + "ask for another.");
+        	Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GREEN + " Final heal has been given." + ChatColor.RED + " DO NOT " + ChatColor.GREEN + "ask for another.");
         }
 
 		if(minutes == ConfigInventory.gracePeriod && time == 0)
@@ -197,8 +198,6 @@ public class Time implements Listener
 				bord.setUpShrink();
         		lastShrink = minutes;
         		Scatter.numShrinks--;
-				Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GOLD + " Border has shrunk to " + BedRockBorder.currentBorderSize + "x" + BedRockBorder.currentBorderSize + ".");
-        		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 minutes.");
         		first = true;
         	}
         	
@@ -273,14 +272,79 @@ public class Time implements Listener
 					bord.setUpShrink();
             		lastShrink = minutes;
             		Scatter.numShrinks--;
-            		
-            		if(Scatter.numShrinks != 0)
-            		{
-						Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GOLD + " Border has shrunk to " + BedRockBorder.currentBorderSize + "x" + BedRockBorder.currentBorderSize + ".");
-            			Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 minutes.");
-            		}
             	}
         	}
         }
     }
+
+	public void announceWinners()
+	{
+		String winners = "";
+
+		if(ConfigInventory.teamSize == 1)
+		{
+			Player winner = Bukkit.getPlayer(Scatter.allPlayers.get(0));
+
+			if(winner != null)
+			{
+				Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GREEN + " Congratulations to " + ChatColor.AQUA + ChatColor.BOLD + winner.getDisplayName() + ChatColor.GREEN + " on winning this UHC!");
+			}
+			else
+			{
+				OfflinePlayer pl = Bukkit.getOfflinePlayer(Scatter.allPlayers.get(0));
+				Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GREEN + " Congratulations to " + ChatColor.AQUA + ChatColor.BOLD + pl.getName() + ChatColor.GREEN + " on winning this UHC!");
+			}
+		}
+		else
+		{
+			UUID winner = UUID.randomUUID();
+
+			for(UUID keys : TeamManager.teams.keySet())
+			{
+				winner = keys;
+				break;
+			}
+
+			if(Bukkit.getPlayer(winner) != null)
+			{
+				winners = Bukkit.getPlayer(winner).getDisplayName();
+			}
+			else
+			{
+				winners = Bukkit.getOfflinePlayer(winner).getName();
+			}
+
+			for(int i = 0; i < TeamManager.teams.get(winner).size(); i++)
+			{
+				Player win = Bukkit.getPlayer(TeamManager.teams.get(winner).get(i));
+
+				if(win != null)
+				{
+					if(i == TeamManager.teams.get(winner).size() - 1)
+					{
+						winners += "and " + win.getName();
+					}
+					else
+					{
+						winners += ", " + win.getName();
+					}
+				}
+				else
+				{
+					OfflinePlayer winn = Bukkit.getOfflinePlayer(TeamManager.teams.get(winner).get(i));
+
+					if(i == TeamManager.teams.get(winner).size() - 1)
+					{
+						winners += "and " + winn.getName();
+					}
+					else
+					{
+						winners += ", " + winn.getName();
+					}
+				}
+			}
+
+			Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GREEN + " Congratulations to " + ChatColor.AQUA + ChatColor.BOLD + winners + ChatColor.GREEN + " on winning this UHC!");
+		}
+	}
 }

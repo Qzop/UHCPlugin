@@ -327,7 +327,7 @@ public class ConfigEvent implements Listener
             {
                 if(click == ClickType.LEFT)
                 {
-                    if(ConfigInventory.nBorderSize >= 500 && ConfigInventory.nBorderSize < 2500)
+                    if(ConfigInventory.nBorderSize >= 500 && ConfigInventory.nBorderSize < 1500)
                     {
                         ConfigInventory.nBorderSize += 500;
                         
@@ -336,7 +336,7 @@ public class ConfigEvent implements Listener
                 }
                 if(click == ClickType.RIGHT)
                 {
-                    if(ConfigInventory.nBorderSize > 500 && ConfigInventory.nBorderSize <= 2500)
+                    if(ConfigInventory.nBorderSize > 500 && ConfigInventory.nBorderSize <= 1500)
                     {
                         ConfigInventory.nBorderSize -= 500;
                         
@@ -869,6 +869,16 @@ public class ConfigEvent implements Listener
             {
                 Alerts.pvpalerts.add(p.getUniqueId());
                 p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " PvP Alerts are now " + ChatColor.RED + " Off" + ChatColor.YELLOW + ".");
+            }
+            if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Report Alerts: " + ChatColor.RED + "Off"))
+            {
+                Alerts.reportalerts.remove(p.getUniqueId());
+                p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " Report Alerts are now " + ChatColor.GREEN + " On" + ChatColor.YELLOW + ".");
+            }
+            else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Report Alerts: " + ChatColor.GREEN + "On"))
+            {
+                Alerts.reportalerts.add(p.getUniqueId());
+                p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " Report Alerts are now " + ChatColor.RED + " Off" + ChatColor.YELLOW + ".");
             }
         }
     }

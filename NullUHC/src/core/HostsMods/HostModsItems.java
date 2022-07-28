@@ -362,7 +362,7 @@ public class HostModsItems implements Listener
 						}
 						else if(p.getItemInHand().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Scenarios") && p.getItemInHand().getType() == Material.DIAMOND)
 						{
-							p.performCommand("scenario");
+							p.performCommand("scenarios");
 						}
 						else if(p.getItemInHand().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "UHC Mod") && p.getItemInHand().getType() == Material.ENDER_PEARL)
 						{

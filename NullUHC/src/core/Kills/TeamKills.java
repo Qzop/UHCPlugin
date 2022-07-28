@@ -5,6 +5,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
+import java.util.UUID;
+
 public class TeamKills implements Listener
 {
     private TeamManager team = new TeamManager();
@@ -15,13 +17,13 @@ public class TeamKills implements Listener
 
         if(team.findTeam(p))
         {
-            int cap = team.getCaptain(p);
+            UUID cap = team.getCaptain(p);
 
-            total += PlayerKills.numKills.get(TeamManager.keys.get(cap));
+            total += PlayerKills.numKills.get(cap);
 
-            for(int i = 0; i < TeamManager.teams.get(TeamManager.keys.get(cap)).size(); i++)
+            for(int i = 0; i < TeamManager.teams.get(cap).size(); i++)
             {
-                total += PlayerKills.numKills.get(TeamManager.teams.get(TeamManager.keys.get(cap)).get(i));
+                total += PlayerKills.numKills.get(TeamManager.teams.get(cap).get(i));
             }
 
             return total;

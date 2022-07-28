@@ -54,7 +54,7 @@ public class Spectator implements Listener
         {
             if(p.getWorld().getName().equals("uhc_world") && PlayerKills.spectator.contains(p.getUniqueId()))
             {
-                if(p.getLocation().getX() >= 101)
+                if(p.getLocation().getBlockX() >= 101)
                 {
                     Location temp = new Location(Bukkit.getWorld("uhc_world"), 100, p.getLocation().getY(), p.getLocation().getZ());
                     temp.setYaw(p.getLocation().getYaw());
@@ -62,7 +62,7 @@ public class Spectator implements Listener
                     p.teleport(temp);
                     p.sendMessage(ChatColor.RED + "You cannot spectate outside of 100x100!");
                 }
-                else if(p.getLocation().getZ() >= 101)
+                else if(p.getLocation().getBlockZ() >= 101)
                 {
                     Location temp = new Location(Bukkit.getWorld("uhc_world"), p.getLocation().getX(), p.getLocation().getY(), 100);
                     temp.setYaw(p.getLocation().getYaw());
@@ -70,7 +70,7 @@ public class Spectator implements Listener
                     p.teleport(temp);
                     p.sendMessage(ChatColor.RED + "You cannot spectate outside of 100x100!");
                 }
-                else if(p.getLocation().getX() <= -101)
+                else if(p.getLocation().getBlockX() <= -101)
                 {
                     Location temp = new Location(Bukkit.getWorld("uhc_world"), -100, p.getLocation().getY(), p.getLocation().getZ());
                     temp.setYaw(p.getLocation().getYaw());
@@ -78,7 +78,7 @@ public class Spectator implements Listener
                     p.teleport(temp);
                     p.sendMessage(ChatColor.RED + "You cannot spectate outside of 100x100!");
                 }
-                else if(p.getLocation().getZ() <= -101)
+                else if(p.getLocation().getBlockZ() <= -101)
                 {
                     Location temp = new Location(Bukkit.getWorld("uhc_world"), p.getLocation().getX(), p.getLocation().getY(), -100);
                     temp.setYaw(p.getLocation().getYaw());
@@ -91,33 +91,35 @@ public class Spectator implements Listener
         
         if(p.getWorld().getName().equals("uhc_world") && !PlayerKills.spectator.contains(p.getUniqueId()) && !HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
         {
-        	if(p.getLocation().getX() >= BedRockBorder.currentBorderSize)
+            double border = BedRockBorder.currentBorderSize;
+
+        	if(p.getLocation().getBlockX() >= border)
         	{
-        		Location temp = new Location(Bukkit.getWorld("uhc_world"), BedRockBorder.currentBorderSize - 2, p.getLocation().getY(), p.getLocation().getZ());
+        		Location temp = new Location(Bukkit.getWorld("uhc_world"), border - 1, p.getLocation().getBlockY(), p.getLocation().getBlockZ());
         		temp.setYaw(p.getLocation().getYaw());
                 temp.setPitch(p.getLocation().getPitch());
                 p.teleport(temp);
                 p.sendMessage(ChatColor.RED + "You cannot go outside of the border!");
         	}
-        	else if(p.getLocation().getX() <= -(BedRockBorder.currentBorderSize))
+        	else if(p.getLocation().getBlockX() <= -border)
         	{
-        		Location temp = new Location(Bukkit.getWorld("uhc_world"), -(BedRockBorder.currentBorderSize) + 2, p.getLocation().getY(), p.getLocation().getZ());
+        		Location temp = new Location(Bukkit.getWorld("uhc_world"), -border + 2, p.getLocation().getBlockY(), p.getLocation().getBlockZ());
         		temp.setYaw(p.getLocation().getYaw());
                 temp.setPitch(p.getLocation().getPitch());
                 p.teleport(temp);
                 p.sendMessage(ChatColor.RED + "You cannot go outside of the border!");
         	}
-        	else if(p.getLocation().getZ() >= BedRockBorder.currentBorderSize)
+        	else if(p.getLocation().getBlockZ() >= border)
         	{
-        		Location temp = new Location(Bukkit.getWorld("uhc_world"), p.getLocation().getX(), p.getLocation().getY(), BedRockBorder.currentBorderSize - 2);
+        		Location temp = new Location(Bukkit.getWorld("uhc_world"), p.getLocation().getBlockX(), p.getLocation().getBlockY(), border - 1);
         		temp.setYaw(p.getLocation().getYaw());
                 temp.setPitch(p.getLocation().getPitch());
                 p.teleport(temp);
                 p.sendMessage(ChatColor.RED + "You cannot go outside of the border!");
         	}
-        	else if(p.getLocation().getZ() <= -(BedRockBorder.currentBorderSize))
+        	else if(p.getLocation().getBlockZ() <= -border)
         	{
-        		Location temp = new Location(Bukkit.getWorld("uhc_world"), p.getLocation().getX(), p.getLocation().getY(), -(BedRockBorder.currentBorderSize) + 2);
+        		Location temp = new Location(Bukkit.getWorld("uhc_world"), p.getLocation().getBlockX(), p.getLocation().getBlockY(), -border + 2);
         		temp.setYaw(p.getLocation().getYaw());
                 temp.setPitch(p.getLocation().getPitch());
                 p.teleport(temp);

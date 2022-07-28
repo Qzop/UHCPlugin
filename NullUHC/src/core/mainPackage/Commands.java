@@ -1,7 +1,11 @@
 package core.mainPackage;
 
+import com.sun.org.apache.regexp.internal.RE;
 import core.Alerts.Alerts;
+import core.Alerts.BugReport;
+import core.Alerts.ReportInv;
 import core.Arena.PracticeArena;
+import core.Chat.ChatEvent;
 import core.ChunkLoad.DeleteWorld;
 import core.Config.ConfigInventory;
 import core.ConfigVariables.BedRockBorder;
@@ -9,6 +13,7 @@ import core.ConfigVariables.Horses;
 import core.HostsMods.Gamemode;
 import core.HostsMods.Helpop;
 import core.HostsMods.HostsMods;
+import core.Kills.PlayerKills;
 import core.Kills.Respawn;
 import core.ScenariosInventory.ScenariosInventory;
 import core.Teams.TeamManager;
@@ -18,6 +23,7 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -48,6 +54,7 @@ public class Commands implements Listener, CommandExecutor
 	private DeleteWorld delete = new DeleteWorld();
 	private Alerts alert = new Alerts();
 	private ScenariosInventory sceninv = new ScenariosInventory();
+	private ReportInv rep = new ReportInv();
 
 	private ArrayList<UUID> brightness = new ArrayList<UUID>();
 	
@@ -70,6 +77,13 @@ public class Commands implements Listener, CommandExecutor
 	String alerts = "alerts";
 	String bright = "bright";
 	String scenarios = "scenarios";
+	String regenerate = "regenerate";
+	String report = "report";
+	String bugreport = "bugreport";
+	String ping = "ping";
+	String discord = "discord";
+	String specchat = "specchat";
+	String staffchat = "sc";
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -102,7 +116,7 @@ public class Commands implements Listener, CommandExecutor
 				if(args.length == 0)
 				{
 					p.sendMessage(Scatter.UHCprefix + " " + ChatColor.GOLD + ChatColor.BOLD + "UHC Commands: \n"
-							+ ChatColor.AQUA + "- /uhc start \n - /uhc stop" );
+							+ ChatColor.AQUA + "- /uhc start" );
 					
 				}
 				else if(args.length == 1)
@@ -113,10 +127,6 @@ public class Commands implements Listener, CommandExecutor
 						scatter = true;
 						Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.RED + " Chat is now disabled.");
 						scat.onStart();
-					}
-					else if(args[0].equals("stop"))
-					{
-
 					}
 					else 
 					{
@@ -434,6 +444,13 @@ public class Commands implements Listener, CommandExecutor
 					else
 					{
 						p.teleport(target);
+						target.getLocation().getChunk().load(true);
+
+						if(!HostsMods.mods.contains(p.getUniqueId()) || !HostsMods.hosts.contains(p.getUniqueId()) || !PlayerKills.spectator.contains(p.getUniqueId()))
+						{
+							target.showPlayer(p);
+						}
+
 						p.sendMessage(ChatColor.GREEN + "Teleported to " + target.getDisplayName() + ".");
 					}
 				}
@@ -453,6 +470,14 @@ public class Commands implements Listener, CommandExecutor
 					else
 					{
 						targ1.teleport(targ2);
+
+						targ2.getLocation().getChunk().load(true);
+
+						if(!HostsMods.mods.contains(p.getUniqueId()) || !HostsMods.hosts.contains(p.getUniqueId()) || !PlayerKills.spectator.contains(p.getUniqueId()))
+						{
+							targ2.showPlayer(targ1);
+						}
+
 						p.sendMessage(ChatColor.GREEN + "Successfully teleported '" + targ1.getName() + "' to '" + targ2.getName() + "'.");
 					}
 				}
@@ -523,9 +548,15 @@ public class Commands implements Listener, CommandExecutor
 			{
 				if(args.length == 1)
 				{
-					int i = Integer.parseInt(args[0]);
-					
-					gamemode.setGamemode(p, i);
+					try
+					{
+						int i = Integer.parseInt(args[0]);
+						gamemode.setGamemode(p, i);
+					}
+					catch(NumberFormatException e)
+					{
+						p.sendMessage(Gamemode.gamemodePrefix + ChatColor.RED + "You must enter a number!");
+					}
 				}
 				else
 				{
@@ -595,33 +626,51 @@ public class Commands implements Listener, CommandExecutor
 		}
 		else if(label.equalsIgnoreCase(spawn))
 		{
-			if(p.hasPermission("spawn.set"))
+			if(args.length == 0)
 			{
-				if(args.length == 1)
+				if (!started && !scatter && !PracticeArena.playersInArena.contains(p.getUniqueId()))
 				{
-					if(args[0].equals("set"))
-					{
-						World world = p.getWorld();
-
-						world.setSpawnLocation(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
-						world.getSpawnLocation().setYaw(p.getLocation().getYaw());
-						world.getSpawnLocation().setPitch(p.getLocation().getPitch());
-
-						p.sendMessage(ChatColor.GREEN + "Spawn Location for the World '" + world.getName() + "' set successfully.");
-					}
-					else
-					{
-						p.sendMessage(ChatColor.RED + "Usage: /spawn set");
-					}
+					p.teleport(Bukkit.getWorld("world").getSpawnLocation());
+				}
+				else if (!started && !scatter && PracticeArena.playersInArena.contains(p.getUniqueId()))
+				{
+					a.onArenaLeave(p);
 				}
 				else
 				{
-					p.sendMessage(ChatColor.RED + "Usage: /spawn set");
+					p.sendMessage(ChatColor.RED + "You may not use this now!");
+				}
+			}
+			else if(args.length == 1)
+			{
+				if(p.hasPermission("spawn.set"))
+				{
+					if(args[0].equals("set"))
+					{
+						if(p.hasPermission("spawn.set"))
+						{
+							World world = p.getWorld();
+
+							world.setSpawnLocation(p.getLocation().getBlockX(), p.getLocation().getBlockY(), p.getLocation().getBlockZ());
+							world.getSpawnLocation().setYaw(p.getLocation().getYaw());
+							world.getSpawnLocation().setPitch(p.getLocation().getPitch());
+
+							p.sendMessage(ChatColor.GREEN + "Spawn Location for the World '" + world.getName() + "' set successfully.");
+						}
+						else
+						{
+							p.sendMessage(ChatColor.RED + "No Permission.");
+						}
+					}
+					else
+					{
+						p.sendMessage(ChatColor.RED + "Usage: /spawn (set)");
+					}
 				}
 			}
 			else
 			{
-				p.sendMessage(ChatColor.RED + "No Permission.");
+				p.sendMessage(ChatColor.RED + "Usage: /spawn (set)");
 			}
 		}
 		else if(label.equalsIgnoreCase(feed))
@@ -691,7 +740,14 @@ public class Commands implements Listener, CommandExecutor
 			{
 				if(args.length == 0)
 				{
-					alert.turnSpecificAlertsOnAndOff(p);
+					if(Alerts.allalerts.contains(p.getUniqueId()))
+					{
+						p.sendMessage(Alerts.alertPref + ChatColor.RED + " You must turn all alerts back on! Use /alerts on");
+					}
+					else
+					{
+						alert.turnSpecificAlertsOnAndOff(p);
+					}
 				}
 				else if(args.length == 1)
 				{
@@ -740,11 +796,184 @@ public class Commands implements Listener, CommandExecutor
 				p.sendMessage(ChatColor.RED + "Usage: /bright");
 			}
 		}
+		else if(label.equalsIgnoreCase(regenerate))
+		{
+			if(p.hasPermission("uhc.regeneratemap"))
+			{
+				delete.deleteWorld(p, "uhc_world");
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No Permission.");
+			}
+		}
+		else if(label.equalsIgnoreCase(report))
+		{
+			if(args.length != 1)
+			{
+				p.sendMessage(ChatColor.RED + "Usage: /report (player)");
+			}
+			else
+			{
+				Player target = Bukkit.getPlayer(args[0]);
+
+				if(target.getUniqueId().equals(p.getUniqueId()))
+				{
+					p.sendMessage(ReportInv.reportPref + ChatColor.RED + " You cannot report yourself!");
+				}
+				else
+				{
+					if(target == null)
+					{
+						p.sendMessage(ReportInv.reportPref + ChatColor.RED + " That player is not online!");
+					}
+					else
+					{
+						if(!ReportInv.reportWait.contains(p.getUniqueId()))
+						{
+							ReportInv.report.put(p.getUniqueId(), target.getUniqueId());
+							rep.onReport(p);
+						}
+						else
+						{
+							p.sendMessage(ReportInv.reportPref + ChatColor.RED + " You must wait until you can use /report again!");
+						}
+					}
+				}
+			}
+		}
+		else if(label.equalsIgnoreCase(bugreport))
+		{
+			if(args.length > 1)
+			{
+				if(BugReport.bugreportWait.contains(p.getUniqueId()))
+				{
+					p.sendMessage(BugReport.bugreportPref + ChatColor.RED + " You must wait until you can use /bugreport again!");
+				}
+				else
+				{
+					BugReport rep = new BugReport();
+					String message = "";
+
+					for(int i = 0; i < args.length; i++)
+					{
+						message += " " + args[i];
+					}
+
+					rep.sendBugreport(p, message);
+					p.sendMessage(BugReport.bugreportPref + ChatColor.GREEN + " Bug report sent successfully!");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "Usage: /bugreport (description)");
+			}
+		}
+		else if(label.equalsIgnoreCase(ping))
+		{
+			if(args.length == 0)
+			{
+				int ping = ((CraftPlayer) p).getHandle().ping;
+				p.sendMessage(ChatColor.LIGHT_PURPLE + "Ping " + ChatColor.YELLOW + ping + "ms");
+			}
+			else if(args.length == 1)
+			{
+				Player target = Bukkit.getPlayer(args[0]);
+
+				if(target != null)
+				{
+					int ping = ((CraftPlayer) target).getHandle().ping;
+					p.sendMessage(ChatColor.LIGHT_PURPLE + target.getDisplayName() +  "'s Ping " + ChatColor.YELLOW + ping + "ms");
+				}
+				else
+				{
+					p.sendMessage(ChatColor.RED + "That player is not online!");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "Usage: /ping (player)");
+			}
+		}
+		else if(label.equalsIgnoreCase(discord))
+		{
+			p.sendMessage(ChatColor.GOLD + "Discord: " + ChatColor.WHITE + "https://discord.gg/TBPbcJpHaX");
+		}
+		else if(label.equalsIgnoreCase(specchat))
+		{
+			if(p.hasPermission("uhc.specchat"))
+			{
+				if(args.length == 0)
+				{
+					if(ChatEvent.specchat.contains(p.getUniqueId()))
+					{
+						ChatEvent.specchat.remove(p.getUniqueId());
+						p.sendMessage(ChatEvent.specPref + ChatColor.RED + " Spectator chat is now off.");
+					}
+					else
+					{
+						if(ChatEvent.staffchat.contains(p.getUniqueId()))
+						{
+							ChatEvent.staffchat.remove(p.getUniqueId());
+							p.sendMessage(ChatEvent.staffchatPref + ChatColor.RED + " StaffChat is now off.");
+						}
+
+						ChatEvent.specchat.add(p.getUniqueId());
+						p.sendMessage(ChatEvent.specPref + ChatColor.GREEN + " Spectator chat is now on.");
+					}
+				}
+				else
+				{
+					p.sendMessage(ChatColor.RED + "Usage: /specchat");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No Permission.");
+			}
+		}
+		else if(label.equalsIgnoreCase(staffchat))
+		{
+			if(p.hasPermission("staffchat"))
+			{
+				if(args.length == 0)
+				{
+					if(ChatEvent.staffchat.contains(p.getUniqueId()))
+					{
+						ChatEvent.staffchat.remove(p.getUniqueId());
+						p.sendMessage(ChatEvent.staffchatPref + ChatColor.RED + " StaffChat is now off.");
+					}
+					else
+					{
+						if(ChatEvent.specchat.contains(p.getUniqueId()))
+						{
+							ChatEvent.specchat.remove(p.getUniqueId());
+							p.sendMessage(ChatEvent.specPref + ChatColor.RED + " Spectator chat is now off.");
+						}
+
+						ChatEvent.staffchat.add(p.getUniqueId());
+						p.sendMessage(ChatEvent.staffchatPref + ChatColor.GREEN + " StaffChat is now on.");
+					}
+				}
+				else
+				{
+					p.sendMessage(ChatColor.RED + "Usage: /sc");
+				}
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No permission.");
+			}
+		}
 		else if(label.equalsIgnoreCase(test))
 		{
 			if(p.hasPermission("dev.test"))
 			{
 
+			}
+			else
+			{
+				p.sendMessage(ChatColor.RED + "No Permission.");
 			}
 		}
 		

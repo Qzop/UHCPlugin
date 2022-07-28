@@ -22,7 +22,5 @@ public class FoodEvent implements Listener
         {
             e.setCancelled(true);
         }
-
-
     }
 }

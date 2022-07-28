@@ -1,7 +1,10 @@
 package core.Scoreboard;
 
+import com.sun.deploy.security.SelectableSecurityManager;
 import core.Config.ConfigInventory;
+import core.HostsMods.HostsMods;
 import core.Scatter.Scatter;
+import core.Teams.TeamManager;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -10,6 +13,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
+
+import java.util.UUID;
 
 public class End implements Listener
 {
@@ -32,36 +37,12 @@ public class End implements Listener
             scoreboard = teams.getScoreBoard(p);
         }
 
-        Team winner;
-
-        if(ConfigInventory.teamSize == 1)
-        {
-            winner = scoreboard.getTeam("Winner");
-
-            if(winner == null)
-            {
-                winner = scoreboard.registerNewTeam("Winner");
-                winner.addEntry(ChatColor.AQUA + "Winner " + ChatColor.GRAY + "» ");
-            }
-        }
-        else
-        {
-            winner = scoreboard.getTeam("Winners");
-
-            if(winner == null)
-            {
-                winner = scoreboard.registerNewTeam("Winners");
-                winner.addEntry(ChatColor.AQUA + "Winners " + ChatColor.GRAY + "» ");
-            }
-        }
-
-
         Team restart = scoreboard.getTeam("Restart");
 
         if(restart == null)
         {
             restart = scoreboard.registerNewTeam("Restart");
-            restart.addEntry(ChatColor.RED + "Restarting in " + ChatColor.GRAY + "» ");
+            restart.addEntry(ChatColor.RED + "Restart " + ChatColor.GRAY + "» ");
         }
 
         Objective objective = scoreboard.getObjective("GameEnding");
@@ -73,18 +54,7 @@ public class End implements Listener
             objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
         }
 
-        if(ConfigInventory.teamSize == 1)
-        {
-            Score score = objective.getScore(ChatColor.AQUA + "Winner " + ChatColor.GRAY + "» ");
-            score.setScore(4);
-        }
-        else
-        {
-            Score score = objective.getScore(ChatColor.AQUA + "Winners " + ChatColor.GRAY + "» ");
-            score.setScore(4);
-        }
-
-        Score score1 = objective.getScore(ChatColor.RED + "Restarting in " + ChatColor.GRAY + "» ");
+        Score score1 = objective.getScore(ChatColor.RED + "Restart " + ChatColor.GRAY + "» ");
         score1.setScore(3);
         Score score3 = objective.getScore("");
         score3.setScore(2);
@@ -92,7 +62,6 @@ public class End implements Listener
         score4.setScore(1);
 
         Team finalRestart = restart;
-        Team finalWinner = winner;
 
         new BukkitRunnable()
         {
@@ -108,26 +77,6 @@ public class End implements Listener
                     Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "restart");
                     cancel();
                 }
-
-                if(ConfigInventory.teamSize == 1)
-                {
-                    Player win = Bukkit.getPlayer(Scatter.allPlayers.get(0));
-
-                    if(win != null)
-                    {
-                        finalWinner.setSuffix(ChatColor.YELLOW + "" + win.getDisplayName());
-                    }
-                    else
-                    {
-                        OfflinePlayer win1 = Bukkit.getOfflinePlayer(Scatter.allPlayers.get(0));
-                        finalWinner.setSuffix(ChatColor.YELLOW + "" + win1.getName());
-                    }
-                }
-                else
-                {
-
-                }
-
 
                 seconds--;
             }

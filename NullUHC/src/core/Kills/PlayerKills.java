@@ -1,9 +1,11 @@
 package core.Kills;
 
+import core.Config.ConfigInventory;
 import core.Scatter.Scatter;
 import core.Scenarios.DoScenario;
 import core.Scenarios.Timebomb;
 import core.ScenariosInventory.ScenariosInventory;
+import core.Teams.TeamManager;
 import core.mainPackage.Main;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
@@ -26,6 +28,7 @@ import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -174,29 +177,29 @@ public class PlayerKills implements Listener
                             }
                             else if (time == 30)
                             {
-                               killer.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
+                               Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
                             }
                             else if (time == 20)
                             {
-                                killer.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
+                                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
                             }
                             else if (time == 15)
                             {
-                                killer.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
+                                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
                             }
                             else if (time == 10)
                             {
-                                killer.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
+                                Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
                             }
                             else if(time <= 5 && time > 0)
                             {
                                 if(time != 1)
                                 {
-                                    killer.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
+                                    Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " seconds.");
                                 }
                                 else
                                 {
-                                    killer.sendMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " second.");
+                                    Bukkit.broadcastMessage(ChatColor.GRAY + "[" + ChatColor.RED + "TimeBomb" + ChatColor.GRAY + "]" + ChatColor.YELLOW + " " + p.getDisplayName() + "'s" + ChatColor.RED + " Chest will explode in " + ChatColor.AQUA + time + " second.");
                                 }
                             }
 
@@ -208,6 +211,26 @@ public class PlayerKills implements Listener
                 PlayerKills.deathLocations.put(p.getUniqueId(), p.getLocation());
                 Scatter.allPlayers.remove(p.getUniqueId());
 
+                if(ConfigInventory.teamSize > 1)
+                {
+                    TeamManager tm = new TeamManager();
+                    UUID cap = tm.getCaptain(p);
+                    int count = 0;
+
+                    for(UUID uuid : TeamManager.teams.get(cap))
+                    {
+                        if(!Scatter.allPlayers.contains(uuid))
+                        {
+                            count++;
+                        }
+                    }
+
+                    if(count == ConfigInventory.teamSize)
+                    {
+                        TeamManager.teams.remove(cap);
+                    }
+                }
+
                 if(p.getKiller() != null)
                 {
                     UUID uuid = p.getKiller().getUniqueId();
@@ -216,6 +239,62 @@ public class PlayerKills implements Listener
                     if(PlayerKills.numKills.containsKey(uuid))
                     {
                         PlayerKills.numKills.put(uuid, PlayerKills.numKills.get(uuid) + 1);
+                    }
+
+                    if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "was slain by " + ChatColor.YELLOW + p.getKiller().getDisplayName() + ChatColor.GRAY + "[" + numKills.get(p.getKiller().getUniqueId()) + ChatColor.GRAY + "]");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.PROJECTILE)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "was shot to death by " + ChatColor.YELLOW + p.getKiller().getDisplayName() + ChatColor.GRAY + "[" + numKills.get(p.getKiller().getUniqueId()) + ChatColor.GRAY + "]");
+                    }
+                }
+                else
+                {
+                    if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FIRE || p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FIRE_TICK || p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.LAVA)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "was burnt to death!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.BLOCK_EXPLOSION)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "got blown the fuck up!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.DROWNING)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "drank too much water!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALL)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "fell to their death!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.FALLING_BLOCK)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "was crushed to death!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.LIGHTNING)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "was electrocuted to death!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.POISON)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "was poisoned to death!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUICIDE)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "committed the unthinkable!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.STARVATION)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "starved to death!");
+                    }
+                    else if(p.getLastDamageCause().getCause() == EntityDamageEvent.DamageCause.SUFFOCATION)
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "suffocated to death!");
+                    }
+                    else
+                    {
+                        e.setDeathMessage(ChatColor.YELLOW + p.getDisplayName() + ChatColor.GRAY + "[" + ChatColor.WHITE + numKills.get(p.getUniqueId()) + ChatColor.GRAY + "] " + ChatColor.RED + "died!");
                     }
                 }
 

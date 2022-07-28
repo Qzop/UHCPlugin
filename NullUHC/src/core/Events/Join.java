@@ -2,6 +2,7 @@ package core.Events;
 
 import com.lunarclient.bukkitapi.LunarClientAPI;
 import core.Config.ConfigInventory;
+import core.ConfigVariables.BedRockBorder;
 import core.HostsMods.HostModsItems;
 import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
@@ -19,6 +20,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Join implements Listener
 {
@@ -33,6 +35,14 @@ public class Join implements Listener
         Lobby lob = new Lobby();
         PlayerKills kills = new PlayerKills();
         ScoreboardTeams teams = new ScoreboardTeams();
+
+        if(p.hasPermission("whitelist.bypass"))
+        {
+            if(!p.isWhitelisted())
+            {
+                p.setWhitelisted(true);
+            }
+        }
 
         Main.online.addPlayer(p);
 
@@ -135,15 +145,11 @@ public class Join implements Listener
         {
             if(PlayerKills.spectator.contains(p.getUniqueId()))
             {
-                if(p.hasPermission("death.bypass"))
-                {
-                    World world = Bukkit.getWorld("world");
-                    p.teleport(world.getSpawnLocation());
-                }
-                else
-                {
-                    p.kickPlayer(ChatColor.RED + "You died, unlucky :(");
-                }
+                Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
+                p.teleport(loc);
+                p.setAllowFlight(true);
+                p.setFlying(true);
+                p.sendMessage(ChatColor.GREEN + "You are now a spectator.");
             }
             else
             {
@@ -158,6 +164,12 @@ public class Join implements Listener
                     else
                     {
                         game.setGameFFA(p);
+                    }
+
+                    if(BedRockBorder.offlineDuringTele.containsKey(p.getUniqueId()))
+                    {
+                        p.teleport(BedRockBorder.offlineDuringTele.get(p.getUniqueId()));
+                        BedRockBorder.offlineDuringTele.remove(p.getUniqueId());
                     }
 
                     if(NPCEvent.disconnected.containsKey(p.getUniqueId()))
@@ -193,8 +205,13 @@ public class Join implements Listener
                     {
                         for(int i = 0; i < HostsMods.mods.size(); i++)
                         {
-                            p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(i)));
+                            p.hidePlayer(Bukkit.getPlayer(HostsMods.mods.get(i)));
                         }
+                    }
+
+                    if(p.getWorld().getName().equals("world"))
+                    {
+                        clearInventoryLate(p);
                     }
                 }
                 else if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()))
@@ -212,20 +229,7 @@ public class Join implements Listener
                 {
                     if(Time.minutes < ConfigInventory.latescatter)
                     {
-                        removeAllPotions(p);
-
-                        if(ConfigInventory.teamSize > 1)
-                        {
-                            scat.lateScatterTeams(p);
-                            game.setGameTeams(p);
-                            kills.latePlayer(p);
-                        }
-                        else
-                        {
-                            scat.lateScatterFFA(p);
-                            game.setGameFFA(p);
-                            kills.latePlayer(p);
-                        }
+                        clearInventoryLate(p);
 
                         if(!PlayerKills.spectator.isEmpty())
                         {
@@ -240,22 +244,20 @@ public class Join implements Listener
                             p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(0)));
                         }
 
-                        for(int i = 0; i < HostsMods.mods.size(); i++)
+                        if(!HostsMods.mods.isEmpty())
                         {
-                            p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(i)));
+                            for(int i = 0; i < HostsMods.mods.size(); i++)
+                            {
+                                p.hidePlayer(Bukkit.getPlayer(HostsMods.mods.get(i)));
+                            }
                         }
                     }
                     else
                     {
-                        if(p.hasPermission("latescatter.bypass"))
-                        {
-                            p.teleport(Bukkit.getWorld("world").getSpawnLocation());
-                        }
-                        else
-                        {
-                            Spectator spectator = new Spectator();
-                            spectator.setSpectator(p);
-                        }
+                        Spectator spectator = new Spectator();
+                        spectator.setSpectator(p);
+
+                        p.sendMessage(Scatter.UHCprefix + ChatColor.YELLOW + " Late scatter period ended, you are now a spectator.");
                     }
                 }
             }
@@ -294,5 +296,63 @@ public class Join implements Listener
         p.setExp(0);
 
         p.setGameMode(GameMode.SURVIVAL);
+    }
+
+    public void clearInventory(Player p)
+    {
+        new BukkitRunnable()
+        {
+            public void run()
+            {
+                p.getInventory().clear();
+                p.getInventory().setBoots(null);
+                p.getInventory().setLeggings(null);
+                p.getInventory().setChestplate(null);
+                p.getInventory().setHelmet(null);
+                cancel();
+            }
+
+        }.runTaskTimer(plugin, 0, 1);
+
+
+    }
+
+    public void clearInventoryLate(Player p)
+    {
+        Game game = new Game();
+        Scatter scat = new Scatter();
+        PlayerKills kills = new PlayerKills();
+
+        new BukkitRunnable()
+        {
+            public void run()
+            {
+                p.getInventory().clear();
+                p.getInventory().setBoots(null);
+                p.getInventory().setLeggings(null);
+                p.getInventory().setChestplate(null);
+                p.getInventory().setHelmet(null);
+
+                if(ConfigInventory.teamSize > 1)
+                {
+                    scat.lateScatterTeams(p);
+                    game.setGameTeams(p);
+                    kills.latePlayer(p);
+                }
+                else
+                {
+                    scat.lateScatterFFA(p);
+                    game.setGameFFA(p);
+                    kills.latePlayer(p);
+                }
+
+                removeAllPotions(p);
+
+                cancel();
+            }
+
+        }.runTaskTimer(plugin, 0, 1);
+
+
     }
 }

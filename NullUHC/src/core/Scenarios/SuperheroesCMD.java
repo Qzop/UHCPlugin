@@ -1,5 +1,6 @@
 package core.Scenarios;
 
+import core.Scatter.Scatter;
 import core.ScenariosInventory.ScenariosInventory;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
@@ -66,7 +67,7 @@ public class SuperheroesCMD implements Listener
 
             int randNum = (int)Math.round(Math.random()*(currentSuperPowers.size() - 1));
             playerToSuperPower.put(p.getUniqueId().toString(), currentSuperPowers.get(randNum));
-            p.sendMessage(ChatColor.GREEN + "You have been assigned the super power of " + currentSuperPowers.get(randNum));
+            p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You have been assigned the super power of " + ChatColor.YELLOW + ChatColor.BOLD + currentSuperPowers.get(randNum));
             InitializeSuperPower(p.getName(), currentSuperPowers.get(randNum));
             return true;
         }

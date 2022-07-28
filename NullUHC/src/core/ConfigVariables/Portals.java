@@ -28,6 +28,12 @@ public class Portals implements Listener
                 e.setTo(netherLoc);
             }
         }
+        else if(e.getCause().toString().equals("NETHER_PORTAL") && e.getPlayer().getWorld().getName().equals("uhc_nether"))
+        {
+            e.setFrom(e.getPlayer().getLocation());
+            Location netherLoc = new Location(Bukkit.getWorld("uhc_world"), (e.getPlayer().getLocation().getX() * 8) , e.getPlayer().getLocation().getY(), (e.getPlayer().getLocation().getZ() * 8));
+            e.setTo(netherLoc);
+        }
         else if(e.getCause().toString().equals("END_PORTAL") && e.getPlayer().getWorld().getName().equals("uhc_world"))
         {
             e.setCancelled(true);

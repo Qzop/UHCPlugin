@@ -6,6 +6,7 @@ import core.Kills.PlayerKills;
 import core.Kills.Spectator;
 import core.Kills.TeamKills;
 import core.Scatter.Scatter;
+import core.Teams.TeamManager;
 import core.mainPackage.Main;
 import net.minecraft.server.v1_7_R4.ScoreboardTeam;
 import org.bukkit.Bukkit;
@@ -17,6 +18,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
 
 import javax.persistence.Lob;
+import java.util.UUID;
 
 public class Game implements Listener
 {
@@ -24,10 +26,12 @@ public class Game implements Listener
     Time t = new Time();
     private Lobby lob;
     private ScoreboardTeams teams;
+    private End end;
 
     public void setGameFFA(Player p)
     {
         teams = new ScoreboardTeams();
+        end = new End();
 
         Scoreboard scoreboard;
 
@@ -72,15 +76,15 @@ public class Game implements Listener
         if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()))
         {
             Score score = objective.getScore(ChatColor.AQUA + "Time " + ChatColor.GRAY + "» ");
-            score.setScore(4);
+            score.setScore(5);
             Score score1 = objective.getScore(ChatColor.AQUA + "Alive " + ChatColor.GRAY + "» ");
-            score1.setScore(3);
+            score1.setScore(4);
             Score score2 = objective.getScore(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ");
-            score2.setScore(2);
+            score2.setScore(3);
             Score score3 = objective.getScore("");
-            score3.setScore(1);
+            score3.setScore(2);
             Score score4 = objective.getScore(ChatColor.YELLOW + "nulluhc.com");
-            score4.setScore(0);
+            score4.setScore(1);
         }
         else
         {
@@ -150,6 +154,7 @@ public class Game implements Listener
 
                 if(Scatter.ended)
                 {
+                    end.onWinner(p);
                     cancel();
                 }
             }
@@ -163,6 +168,7 @@ public class Game implements Listener
     {
         TeamKills tk = new TeamKills();
         teams = new ScoreboardTeams();
+        end = new End();
 
         Scoreboard scoreboard;
 
@@ -281,6 +287,12 @@ public class Game implements Listener
                         {
                             finalHost.setSuffix("" + ChatColor.YELLOW + h.getDisplayName());
                         }
+                    }
+
+                    if(Scatter.ended)
+                    {
+                        end.onWinner(p);
+                        cancel();
                     }
                 }
             }

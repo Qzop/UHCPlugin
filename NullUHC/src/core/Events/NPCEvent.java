@@ -3,6 +3,7 @@ package core.Events;
 import core.Config.ConfigInventory;
 import core.Scatter.Scatter;
 import core.Scoreboard.Time;
+import core.Teams.TeamManager;
 import net.citizensnpcs.api.event.NPCDamageByEntityEvent;
 import net.citizensnpcs.api.event.NPCDamageEvent;
 import net.citizensnpcs.api.event.NPCDeathEvent;
@@ -86,7 +87,10 @@ public class NPCEvent implements Listener
     {
         for(UUID keys : npcList.keySet())
         {
-            if(npcList.get(keys).getUniqueId().equals(e.getNPC().getUniqueId())) {
+            if(npcList.get(keys).getUniqueId().equals(e.getNPC().getUniqueId()))
+            {
+                Bukkit.broadcastMessage("TEST");
+
                 npcList.get(keys).destroy();
 
                 for (int i = 0; i < inventory.get(keys).size(); i++) {
@@ -103,7 +107,24 @@ public class NPCEvent implements Listener
                 }
                 else
                 {
-                    // teams stuff in here
+                    Scatter.allPlayers.remove(keys);
+
+                    TeamManager tm = new TeamManager();
+                    UUID cap = tm.getCaptainOffline(Bukkit.getOfflinePlayer(keys));
+                    int count = 0;
+
+                    for(UUID uuid : TeamManager.teams.get(cap))
+                    {
+                        if(!Scatter.allPlayers.contains(uuid))
+                        {
+                            count++;
+                        }
+                    }
+
+                    if(count == ConfigInventory.teamSize)
+                    {
+                        TeamManager.teams.remove(cap);
+                    }
                 }
             }
         }
@@ -135,7 +156,24 @@ public class NPCEvent implements Listener
         }
         else
         {
-            // teams stuff in here
+            Scatter.allPlayers.remove(p);
+
+            TeamManager tm = new TeamManager();
+            UUID cap = tm.getCaptainOffline(Bukkit.getOfflinePlayer(p));
+            int count = 0;
+
+            for(UUID uuid : TeamManager.teams.get(cap))
+            {
+                if(!Scatter.allPlayers.contains(uuid))
+                {
+                    count++;
+                }
+            }
+
+            if(count == ConfigInventory.teamSize)
+            {
+                TeamManager.teams.remove(cap);
+            }
         }
 
         Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.GOLD + Bukkit.getOfflinePlayer(p).getName() + ChatColor.RED + " Has been disqualified for being disconnected for more than 10 minutes.");

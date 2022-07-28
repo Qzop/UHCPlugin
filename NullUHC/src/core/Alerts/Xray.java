@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,353 +18,65 @@ import java.util.UUID;
 public class Xray implements Listener
 {
     Main plugin = Main.getPlugin(Main.class);
-    private ArrayList<Location> blocksMined = new ArrayList<Location>();
+    private ArrayList<Block> blocksMined = new ArrayList<Block>();
+    private int size = 0;
 
     @EventHandler
     public void onBreak(BlockBreakEvent e)
     {
-        if(e.getBlock().getType() == Material.DIAMOND_ORE && e.getBlock().getWorld().getName().equals("uhc_world") && !blocksMined.contains(e.getBlock().getLocation()))
+        if((e.getBlock().getType() == Material.DIAMOND_ORE || e.getBlock().getType() == Material.GOLD_ORE) && e.getBlock().getWorld().getName().equals("uhc_world") && !blocksMined.contains(e.getBlock()))
         {
             Player breaker = e.getPlayer();
             Block block = e.getBlock();
-            int x = block.getX();
-            int z = block.getZ();
-            int y = block.getY();
-            int count = 1;
-
-            blocksMined.add(block.getLocation());
-
-           if(block.getWorld().getBlockAt(x, y + 1, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y + 1, z).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x + 1, y + 1, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y + 1, z).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x, y + 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y + 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x, y + 1, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y + 1, z - 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y + 1, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x + 1, y + 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y + 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x + 1, y + 1, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y + 1, z - 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y + 1, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z - 1).getLocation());
-               count++;
-           }
-
-           if(block.getWorld().getBlockAt(x, y - 1, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y - 1, z).getLocation());
-               count++;
-           }
-
-           if(block.getWorld().getBlockAt(x + 1, y - 1, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y - 1, z).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y - 1, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x, y - 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y - 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x, y - 1, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y - 1, z - 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x + 1, y - 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y - 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x + 1, y - 1, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y - 1, z - 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y - 1, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z - 1).getLocation());
-               count++;
-           }
-
-           if(block.getWorld().getBlockAt(x + 1, y, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y, z).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y, z).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x, y, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x, y, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x, y, z - 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x + 1, y, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x + 1, y, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x + 1, y, z - 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y, z + 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z + 1).getLocation());
-               count++;
-           }
-           if(block.getWorld().getBlockAt(x - 1, y, z - 1).getType() == Material.DIAMOND_ORE)
-           {
-               blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z - 1).getLocation());
-               count++;
-           }
+            getBlocks(block);
 
             for(Player p : Main.online.getOnlinePlayers())
             {
                 if(p.hasPermission("uhc.alerts") && !Alerts.allalerts.contains(p.getUniqueId()) && !Alerts.xrayalerts.contains(p.getUniqueId()))
                 {
-                    if(count > 1)
+                    if(block.getType() == Material.DIAMOND_ORE)
                     {
-                        p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " " + breaker.getDisplayName() + " mined " + ChatColor.AQUA + count + " Diamonds.");
+                        p.sendMessage(Alerts.alertPref + " " + ChatColor.LIGHT_PURPLE + breaker.getDisplayName() + ChatColor.YELLOW + " mined " + ChatColor.AQUA + size + " Diamond(s).");
                     }
-                    else
+                    else if(block.getType() == Material.GOLD_ORE)
                     {
-                        p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " " + breaker.getDisplayName() + " mined " + ChatColor.AQUA + count + " Diamond.");
+                        p.sendMessage(Alerts.alertPref + " " + ChatColor.LIGHT_PURPLE + breaker.getDisplayName() + ChatColor.YELLOW + " mined " + ChatColor.GOLD + size + " Gold.");
+                    }
+
+                    if(blocksMined.size() > 100)
+                    {
+                        blocksMined.clear();
                     }
                 }
             }
         }
+    }
 
-        if(e.getBlock().getType() == Material.GOLD_ORE && e.getBlock().getWorld().getName().equals("uhc_world") && !blocksMined.contains(e.getBlock().getLocation()))
+    public void getBlocks(Block block)
+    {
+        if(block.getType() != Material.DIAMOND_ORE && block.getType() != Material.GOLD_ORE)
         {
-            Player breaker = e.getPlayer();
-            Block block = e.getBlock();
-            int x = block.getX();
-            int z = block.getZ();
-            int y = block.getY();
-            int count = 1;
-
-            blocksMined.add(block.getLocation());
-
-            if(block.getWorld().getBlockAt(x, y + 1, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y + 1, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y + 1, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y + 1, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x, y + 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y + 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x, y + 1, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y + 1, z - 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y + 1, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y + 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y + 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y + 1, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y + 1, z - 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y + 1, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y + 1, z - 1).getLocation());
-                count++;
-            }
-
-            if(block.getWorld().getBlockAt(x, y - 1, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y - 1, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y - 1, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y - 1, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y - 1, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x, y - 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y - 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x, y - 1, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y - 1, z - 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y - 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y - 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y - 1, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y - 1, z - 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y - 1, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y - 1, z - 1).getLocation());
-                count++;
-            }
-
-            if(block.getWorld().getBlockAt(x + 1, y, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y, z).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x, y, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x, y, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x, y, z - 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x + 1, y, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x + 1, y, z - 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y, z + 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z + 1).getLocation());
-                count++;
-            }
-            if(block.getWorld().getBlockAt(x - 1, y, z - 1).getType() == Material.GOLD_ORE)
-            {
-                blocksMined.add(block.getWorld().getBlockAt(x - 1, y, z - 1).getLocation());
-                count++;
-            }
-
-            for(Player p : Main.online.getOnlinePlayers())
-            {
-                if(p.hasPermission("uhc.alerts") && !Alerts.allalerts.contains(p.getUniqueId()) && !Alerts.xrayalerts.contains(p.getUniqueId()))
-                {
-                    p.sendMessage(Alerts.alertPref + ChatColor.YELLOW + " " + breaker.getDisplayName() + " mined " + ChatColor.GOLD + count + " Gold.");
-                }
-            }
+            return;
         }
+
+        if(blocksMined.contains(block))
+        {
+            return;
+        }
+
+        blocksMined.add(block);
+
+        getBlocks(block.getRelative(BlockFace.NORTH));
+        getBlocks(block.getRelative(BlockFace.SOUTH));
+        getBlocks(block.getRelative(BlockFace.EAST));
+        getBlocks(block.getRelative(BlockFace.WEST));
+        getBlocks(block.getRelative(BlockFace.DOWN));
+        getBlocks(block.getRelative(BlockFace.UP));
+        getBlocks(block.getRelative(BlockFace.NORTH_EAST));
+        getBlocks(block.getRelative(BlockFace.NORTH_WEST));
+        getBlocks(block.getRelative(BlockFace.SOUTH_EAST));
+        getBlocks(block.getRelative(BlockFace.SOUTH_WEST));
+
+        size++;
     }
 }

@@ -1,20 +1,21 @@
 package core.ConfigVariables;
 
 import core.Config.ConfigInventory;
+import core.Events.NPCEvent;
+import core.HostsMods.HostsMods;
+import core.Kills.PlayerKills;
 import core.Scatter.Scatter;
 import core.mainPackage.Main;
 import net.minecraft.server.v1_7_R4.BlockActionData;
 import net.minecraft.server.v1_7_R4.Blocks;
 import net.minecraft.server.v1_7_R4.IBlockAccess;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R4.block.CraftBlock;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -23,13 +24,8 @@ public class BedRockBorder implements Listener
 {
     Main plugin = Main.getPlugin(Main.class);
 	public static HashMap<UUID, Location> teleLocationsFFA = new HashMap<UUID, Location>();
-	public static ArrayList<UUID> offlineDuringTele = new ArrayList<UUID>();
+	public static HashMap<UUID, Location> offlineDuringTele = new HashMap<UUID, Location>();
     public static int currentBorderSize = ConfigInventory.borderSize;
-	public static boolean first = false;
-	public static boolean second = false;
-	public static boolean third = false;
-	public static boolean fourth = false;
-
     public void setUpBorder(int border, World world)
     {
     	getFirstWallBlocks(border, world);
@@ -84,7 +80,6 @@ public class BedRockBorder implements Listener
 			{
 				if(count == wall.size())
 				{
-					first = true;
 					cancel();
 				}
 				else
@@ -139,7 +134,6 @@ public class BedRockBorder implements Listener
 			{
 				if(count == wall.size())
 				{
-					second = true;
 					cancel();
 				}
 				else
@@ -194,7 +188,6 @@ public class BedRockBorder implements Listener
 			{
 				if(count == wall.size())
 				{
-					third = true;
 					cancel();
 				}
 				else
@@ -250,7 +243,8 @@ public class BedRockBorder implements Listener
 			{
 				if(count == wall.size())
 				{
-					fourth = true;
+					Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GOLD + " Border has shrunk to " + BedRockBorder.currentBorderSize + "x" + BedRockBorder.currentBorderSize + ".");
+					Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 minutes.");
 					cancel();
 				}
 				else
@@ -311,307 +305,213 @@ public class BedRockBorder implements Listener
 
 		if(currentBorderSize > 500)
 		{
-			new BukkitRunnable()
+			for(int i = 0; i < Scatter.allPlayers.size(); i++)
 			{
-				int count = 0;
-				int x, z;
+				boolean posx = false, negx = false, posz = false, negz = false;
+				int x = 0, z = 0;
+				Player p = Bukkit.getPlayer(Scatter.allPlayers.get(i));
 
-				public void run()
+				if(p != null)
 				{
-					if(count == Scatter.allPlayers.size())
+					if(p.getLocation().getBlockX() > currentBorderSize)
 					{
-						teleportPlayersFFA();
-						cancel();
+						posx = true;
+					}
+					else if(p.getLocation().getBlockX() < -(currentBorderSize))
+					{
+						negx = true;
+					}
+
+					if(p.getLocation().getBlockZ() > currentBorderSize)
+					{
+						posz = true;
+					}
+					else if(p.getLocation().getBlockZ() < -(currentBorderSize))
+					{
+						negz = true;
+					}
+
+					if(posx)
+					{
+						if(posz)
+						{
+							x = currentBorderSize - 2;
+							z = currentBorderSize - 2;
+						}
+						else if(negz)
+						{
+							x = currentBorderSize - 2;
+							z = -(currentBorderSize) + 2;
+						}
+						else
+						{
+							x = currentBorderSize - 2;
+							z = p.getLocation().getBlockZ();
+						}
+					}
+					else if(negx)
+					{
+						if(posz)
+						{
+							x = -(currentBorderSize) + 2;
+							z = currentBorderSize;
+						}
+						else if(negz)
+						{
+							x = -(currentBorderSize) + 2;
+							z = -(currentBorderSize) + 2;
+						}
+						else
+						{
+							x = -(currentBorderSize) + 2;
+							z = p.getLocation().getBlockZ();
+						}
 					}
 					else
 					{
-						Player p = Bukkit.getPlayer(Scatter.allPlayers.get(count));
-
-						if(p != null)
+						if(posz)
 						{
-							if(p.getLocation().getBlockX() > currentBorderSize)
+							x = p.getLocation().getBlockX();
+							z = currentBorderSize - 2;
+						}
+						else if(negz)
+						{
+							x = p.getLocation().getBlockX();
+							z = -(currentBorderSize) + 2;
+						}
+					}
+
+					if(x != 0 && z != 0)
+					{
+						Location loc = new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
+						teleLocationsFFA.put(p.getUniqueId(), loc);
+					}
+				}
+				else
+				{
+					if(NPCEvent.npcList.containsKey(Scatter.allPlayers.get(i)))
+					{
+						OfflinePlayer offp = Bukkit.getOfflinePlayer(Scatter.allPlayers.get(i));
+
+						if(NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockX() > currentBorderSize)
+						{
+							posx = true;
+						}
+						else if(NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockX() < -(currentBorderSize))
+						{
+							negx = true;
+						}
+
+						if(NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockZ() > currentBorderSize)
+						{
+							posz = true;
+						}
+						else if(NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockZ() < -(currentBorderSize))
+						{
+							negz = true;
+						}
+
+						if(posx)
+						{
+							if(posz)
 							{
-								if(p.getLocation().getBlockZ() > currentBorderSize)
-								{
-									x = currentBorderSize;
-									z = currentBorderSize;
-									Location loc = new Location(world, x - 1, world.getHighestBlockYAt(x - 1, z - 1) + 2, z - 1);
-									Location check = new Location(world, x - 1, world.getHighestBlockYAt(x - 1, z - 1) - 1, z - 1);
-									Block block = check.getBlock();
-									int move = 2;
-
-									while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-									{
-										loc = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z - move) + 2, z - move);
-										check = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z - move) - 1, z - move);
-										block = check.getBlock();
-										move++;
-									}
-
-									loc.getChunk().load(true);
-									teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-								}
-								else if(p.getLocation().getBlockZ() < -(currentBorderSize))
-								{
-									z = -(currentBorderSize);
-									x = currentBorderSize;
-									Location loc = new Location(world, x - 1, world.getHighestBlockYAt(currentBorderSize - 1, z + 1) + 2,  z + 1);
-									Location check = new Location(world, x - 1, world.getHighestBlockYAt(currentBorderSize - 1, z + 1) - 1, z + 1);
-									Block block = check.getBlock();
-									int move = 2;
-
-									while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-									{
-										loc = new Location(world, x - move, world.getHighestBlockYAt(x - move, z + move) + 2,  z + move);
-										check = new Location(world, x - move, world.getHighestBlockYAt(x - move, -z + move) - 1,  z + move);
-										block = check.getBlock();
-										move++;
-									}
-
-									loc.getChunk().load(true);
-									teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-								}
-								else
-								{
-									z = p.getLocation().getBlockZ();
-									x = currentBorderSize;
-									Location loc = new Location(world, x - 1, world.getHighestBlockYAt(x , z) + 2, z);
-									Location check = new Location(world, x - 1, world.getHighestBlockYAt(x, z) - 1, z);
-									Block block = check.getBlock();
-									int move = 2;
-
-									while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-									{
-										loc = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z) + 2, z);
-										check = new Location(world, (x - move), world.getHighestBlockYAt(x - move, z) - 1, z);
-										block = check.getBlock();
-										move++;
-									}
-
-									loc.getChunk().load(true);
-									teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-								}
+								x = currentBorderSize - 2;
+								z = currentBorderSize - 2;
+							}
+							else if(negz)
+							{
+								x = currentBorderSize - 2;
+								z = -(currentBorderSize) + 2;
 							}
 							else
 							{
-								if(p.getLocation().getBlockX() < -(currentBorderSize))
-								{
-									if(p.getLocation().getBlockZ() > currentBorderSize)
-									{
-										x = -(currentBorderSize);
-										z = currentBorderSize;
-										Location loc = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z - 1) + 2, z - 1);
-										Location check = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z - 1) - 1, z - 1);
-										Block block = check.getBlock();
-										int move = 2;
-
-										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-										{
-											loc = new Location(world, x + move, world.getHighestBlockYAt(x + move, z - move) + 2, z - move);
-											check = new Location(world, x + move, world.getHighestBlockYAt(x + move, z - move) - 1, z - move);
-											block = check.getBlock();
-											move++;
-										}
-
-										loc.getChunk().load(true);
-										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-									}
-									else if(p.getLocation().getBlockZ() < -(currentBorderSize))
-									{
-										x = -(currentBorderSize);
-										z = -(currentBorderSize);
-										Location loc = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z + 1) + 2, z + 1);
-										Location check = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z + 1) - 1, z + 1);
-										Block block = check.getBlock();
-										int move = 2;
-
-										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-										{
-											loc = new Location(world, x + move, world.getHighestBlockYAt(x + move, z + move) + 2, z + move);
-											check = new Location(world, x + move, world.getHighestBlockYAt(x + move, z + move) - 1, z + move);
-											block = check.getBlock();
-											move++;
-										}
-
-										loc.getChunk().load(true);
-										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-									}
-									else
-									{
-										x = -(currentBorderSize);
-										z = p.getLocation().getBlockZ();
-										Location loc = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z) + 2, z);
-										Location check = new Location(world, x + 1, world.getHighestBlockYAt(x + 1, z) - 1, z);
-										Block block = check.getBlock();
-										int move = 2;
-
-										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-										{
-											loc = new Location(world, x + move, world.getHighestBlockYAt(x + move, z) + 2, z);
-											check = new Location(world, x + move, world.getHighestBlockYAt(x + move, z) - 1, z);
-											block = check.getBlock();
-											move++;
-										}
-
-										loc.getChunk().load(true);
-										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-									}
-								}
-								else
-								{
-									if(p.getLocation().getBlockZ() > currentBorderSize)
-									{
-										x = p.getLocation().getBlockX();
-										z = currentBorderSize;
-										Location loc = new Location(world, x, world.getHighestBlockYAt(x, z - 1) + 2, z - 1);
-										Location check = new Location(world, x, world.getHighestBlockYAt(x, z - 1) - 1, z - 1);
-										Block block = check.getBlock();
-										int move = 2;
-
-										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-										{
-											loc = new Location(world, x, world.getHighestBlockYAt(x, z - move) + 2, z - move);
-											check = new Location(world, x, world.getHighestBlockYAt(x, z - move) - 1, z - move);
-											block = check.getBlock();
-											move++;
-										}
-
-										loc.getChunk().load(true);
-										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-									}
-									else if(p.getLocation().getBlockZ() < -(currentBorderSize))
-									{
-										x = p.getLocation().getBlockX();
-										z = -(currentBorderSize);
-										Location loc = new Location(world, x, world.getHighestBlockYAt(x, z + 1) + 2, z + 1);
-										Location check = new Location(world, x, world.getHighestBlockYAt(x, z + 1) - 1, z + 1);
-										Block block = check.getBlock();
-										int move = 2;
-
-										while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-										{
-											loc = new Location(world, x, world.getHighestBlockYAt(x, z + move) + 2, z + move);
-											check = new Location(world, x, world.getHighestBlockYAt(x, z + move) - 1, z + move);
-											block = check.getBlock();
-											move++;
-										}
-
-										loc.getChunk().load(true);
-										teleLocationsFFA.put(Scatter.allPlayers.get(count), loc);
-									}
-								}
+								x = currentBorderSize - 2;
+								z = NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockZ();
+							}
+						}
+						else if(negx)
+						{
+							if(posz)
+							{
+								x = -(currentBorderSize) + 2;
+								z = currentBorderSize;
+							}
+							else if(negz)
+							{
+								x = -(currentBorderSize) + 2;
+								z = -(currentBorderSize) + 2;
+							}
+							else
+							{
+								x = -(currentBorderSize) + 2;
+								z = NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockZ();
 							}
 						}
 						else
 						{
-							// do something about offline players in here
+							if(posz)
+							{
+								x = NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockX();
+								z = currentBorderSize - 2;
+							}
+							else if(negz)
+							{
+								x = NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockX();
+								z = -(currentBorderSize) + 2;
+							}
 						}
 
-						count++;
+						if(x != 0 && z != 0)
+						{
+							Location loc = new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
+							loc.getChunk().load(true);
+							offlineDuringTele.put(Scatter.allPlayers.get(i), loc);
+						}
 					}
 				}
-
-			}.runTaskTimer(plugin, 0, 1);
+			}
 		}
 		else
 		{
-			new BukkitRunnable()
+			for(int i = 0; i < Scatter.allPlayers.size(); i++)
 			{
-				int randomX, randomZ, count = 0;
+				int x = 0, z = 0;
+				Player p = Bukkit.getPlayer(Scatter.allPlayers.get(i));
 
-				public void run()
+				if(p != null)
 				{
-					randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-					randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-
-					Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
-					Location checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
-					Block block = checkloc.getBlock();
-
-					if(count == Scatter.allPlayers.size())
+					if(p.getLocation().getBlockX() > currentBorderSize || p.getLocation().getBlockX() < -(currentBorderSize) || p.getLocation().getBlockX() > currentBorderSize || p.getLocation().getBlockZ() > currentBorderSize || p.getLocation().getBlockZ() < -(currentBorderSize))
 					{
-						teleportPlayersFFA();
-						cancel();
-					}
-					else
-					{
-						Player p = Bukkit.getPlayer(Scatter.allPlayers.get(count));
+						x = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+						z = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
 
-						if(p != null)
-						{
-							if(p.getLocation().getBlockX() > currentBorderSize)
-							{
-								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-								{
-									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-
-									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
-									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
-									block = checkloc.getBlock();
-								}
-
-								teleloc.getChunk().load(true);
-								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
-							}
-							else if(p.getLocation().getBlockX() < -(currentBorderSize))
-							{
-								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-								{
-									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-
-									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
-									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
-									block = checkloc.getBlock();
-								}
-
-								teleloc.getChunk().load(true);
-								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
-							}
-							else if(p.getLocation().getBlockZ() < -(currentBorderSize))
-							{
-								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-								{
-									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-
-									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
-									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
-									block = checkloc.getBlock();
-								}
-
-								teleloc.getChunk().load(true);
-								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
-							}
-							else if(p.getLocation().getBlockX() > currentBorderSize)
-							{
-								while(block.getType() == Material.LAVA || block.getType() == Material.WATER || block.getType() == Material.STATIONARY_LAVA || block.getType() == Material.STATIONARY_WATER)
-								{
-									randomX = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-									randomZ = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
-
-									teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
-									checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
-									block = checkloc.getBlock();
-								}
-
-								teleloc.getChunk().load(true);
-								world.save();
-								teleLocationsFFA.put(Scatter.allPlayers.get(count), teleloc);
-							}
-						}
-						else
-						{
-							// do something about offline players here
-						}
-
-						count++;
+						Location loc = new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
+						loc.getChunk().load(true);
+						teleLocationsFFA.put(p.getUniqueId(), loc);
 					}
 				}
+				else
+				{
+					if(NPCEvent.npcList.containsKey(Scatter.allPlayers.get(i)))
+					{
+						OfflinePlayer offp = Bukkit.getOfflinePlayer(Scatter.allPlayers.get(i));
 
-			}.runTaskTimer(plugin, 0, 1);
+						if(NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockX() > currentBorderSize || NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockX() < -(currentBorderSize) ||
+								NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockZ() > currentBorderSize || NPCEvent.npcList.get(offp.getUniqueId()).getStoredLocation().getBlockZ() < -(currentBorderSize))
+						{
+							x = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+							z = new Random().nextInt(currentBorderSize + currentBorderSize) - currentBorderSize;
+
+							Location loc = new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
+							loc.getChunk().load(true);
+							offlineDuringTele.put(Scatter.allPlayers.get(i), loc);
+						}
+					}
+				}
+			}
 		}
+
+		teleportPlayersFFA();
 	}
 
 	public void getTeleportLocationsTeams()
@@ -663,16 +563,12 @@ public class BedRockBorder implements Listener
 						{
 							if(teleLocationsFFA.containsKey(p.getUniqueId()))
 							{
-								teleLocationsFFA.get(p.getUniqueId()).getChunk().load(true);
 								teleLocationsFFA.get(p.getUniqueId()).setPitch(p.getLocation().getPitch());
 								teleLocationsFFA.get(p.getUniqueId()).setYaw(p.getLocation().getYaw());
 								p.teleport(teleLocationsFFA.get(p.getUniqueId()));
+								teleLocationsFFA.get(p.getUniqueId()).getChunk().load(true);
 								teleLocationsFFA.remove(p.getUniqueId());
 							}
-						}
-						else
-						{
-							// do something about an offline player here
 						}
 
 						count++;

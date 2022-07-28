@@ -1,5 +1,6 @@
 package core.Scenarios;
 
+import core.Config.ConfigInventory;
 import core.ScenariosInventory.ScenariosInventory;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,7 +18,7 @@ public class Superheroes implements Listener
         //nerfs strength and resistance
         if(e.getDamager() instanceof Player && e.getEntity() instanceof Player)
         {
-            if(ScenariosInventory.superheroes)
+            if(ScenariosInventory.superheroes && ConfigInventory.teamSize > 1)
             {
                 Player Attacker = (Player) e.getDamager();
                 Player Victim = (Player) e.getEntity();

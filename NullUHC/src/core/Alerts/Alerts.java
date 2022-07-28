@@ -16,9 +16,10 @@ import java.util.UUID;
 
 public class Alerts implements Listener
 {
-    public static ArrayList<UUID> allalerts = new ArrayList<>();
-    public static ArrayList<UUID> xrayalerts = new ArrayList<>();
-    public static ArrayList<UUID> pvpalerts = new ArrayList<>();
+    public static ArrayList<UUID> allalerts = new ArrayList<UUID>();
+    public static ArrayList<UUID> xrayalerts = new ArrayList<UUID>();
+    public static ArrayList<UUID> pvpalerts = new ArrayList<UUID>();
+    public static ArrayList<UUID> reportalerts = new ArrayList<UUID>();
     public static String alertPref = ChatColor.GRAY + "[" + ChatColor.RED + "Alerts" + ChatColor.GRAY + "]";
     Main plugin = Main.getPlugin(Main.class);
 
@@ -65,7 +66,7 @@ public class Alerts implements Listener
                 ItemStack xray = new ItemStack(Material.DIAMOND_PICKAXE);
                 ItemMeta xraymeta = xray.getItemMeta();
 
-                if(xrayalerts.contains(player.getUniqueId()))
+                if(xrayalerts.contains(player.getUniqueId()) || allalerts.contains(player.getUniqueId()))
                 {
                     xraymeta.setDisplayName(ChatColor.YELLOW + "Xray Alerts: " + ChatColor.RED + "Off");
                 }
@@ -78,7 +79,7 @@ public class Alerts implements Listener
                 ItemStack pvp = new ItemStack(Material.DIAMOND_SWORD);
                 ItemMeta pvpmeta = pvp.getItemMeta();
 
-                if(pvpalerts.contains(player.getUniqueId()))
+                if(pvpalerts.contains(player.getUniqueId()) || allalerts.contains(player.getUniqueId()))
                 {
                     pvpmeta.setDisplayName(ChatColor.YELLOW + "PvP Alerts: " + ChatColor.RED + "Off");
                 }
@@ -87,6 +88,19 @@ public class Alerts implements Listener
                     pvpmeta.setDisplayName(ChatColor.YELLOW + "PvP Alerts: " + ChatColor.GREEN + "On");
                 }
                 pvp.setItemMeta(pvpmeta);
+
+                ItemStack report = new ItemStack(Material.BOOK_AND_QUILL);
+                ItemMeta reportmeta = report.getItemMeta();
+
+                if(reportalerts.contains(player.getUniqueId()) || allalerts.contains(player.getUniqueId()))
+                {
+                    reportmeta.setDisplayName(ChatColor.YELLOW + "Report Alerts: " + ChatColor.RED + "Off");
+                }
+                else
+                {
+                    reportmeta.setDisplayName(ChatColor.YELLOW + "Report Alerts: " + ChatColor.GREEN + "On");
+                }
+                report.setItemMeta(reportmeta);
 
                 inventory.setItem(0, filler);
                 inventory.setItem(1, filler);
@@ -101,6 +115,7 @@ public class Alerts implements Listener
 
                 inventory.setItem(12, xray);
                 inventory.setItem(13, pvp);
+                inventory.setItem(14, report);
 
                 inventory.setItem(17, filler);
                 inventory.setItem(18, filler);

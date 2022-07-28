@@ -81,14 +81,21 @@ public class ScenInvEvent implements Listener
             }
             else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "SuperHeroes: " + ChatColor.RED + ChatColor.BOLD + "Off"))
             {
-                ItemMeta itemmeta = item.getItemMeta();
-                itemmeta.setDisplayName(ChatColor.YELLOW + "SuperHeroes");
-                item.setItemMeta(itemmeta);
+                if(ConfigInventory.teamSize > 1)
+                {
+                    ItemMeta itemmeta = item.getItemMeta();
+                    itemmeta.setDisplayName(ChatColor.YELLOW + "SuperHeroes");
+                    item.setItemMeta(itemmeta);
 
-                ScenariosInventory.enabledScenarios.add(item);
-                ScenariosInventory.superheroes = true;
+                    ScenariosInventory.enabledScenarios.add(item);
+                    ScenariosInventory.superheroes = true;
 
-                Bukkit.broadcastMessage(scenariosPref + ChatColor.YELLOW + " SuperHeroes is now " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                    Bukkit.broadcastMessage(scenariosPref + ChatColor.YELLOW + " SuperHeroes is now " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    p.sendMessage(scenariosPref + ChatColor.RED + " You must turn teams on for Superheroes!");
+                }
             }
             else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "CutClean: " + ChatColor.GREEN + ChatColor.BOLD + "On"))
             {

@@ -79,8 +79,6 @@ public class CutClean implements Listener
 
             if(canEnterInv)
             {
-                p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
-                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
                 p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, dropsNum));
             }
             else
