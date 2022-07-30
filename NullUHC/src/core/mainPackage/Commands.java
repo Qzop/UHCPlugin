@@ -13,6 +13,7 @@ import core.ConfigVariables.Horses;
 import core.HostsMods.Gamemode;
 import core.HostsMods.Helpop;
 import core.HostsMods.HostsMods;
+import core.Kills.KillTop;
 import core.Kills.PlayerKills;
 import core.Kills.Respawn;
 import core.ScenariosInventory.ScenariosInventory;
@@ -55,6 +56,7 @@ public class Commands implements Listener, CommandExecutor
 	private Alerts alert = new Alerts();
 	private ScenariosInventory sceninv = new ScenariosInventory();
 	private ReportInv rep = new ReportInv();
+	private KillTop killtop = new KillTop();
 
 	private ArrayList<UUID> brightness = new ArrayList<UUID>();
 	
@@ -84,6 +86,7 @@ public class Commands implements Listener, CommandExecutor
 	String discord = "discord";
 	String specchat = "specchat";
 	String staffchat = "sc";
+	String kt = "kt";
 	
 	@SuppressWarnings("deprecation")
 	@Override
@@ -444,13 +447,19 @@ public class Commands implements Listener, CommandExecutor
 					else
 					{
 						p.teleport(target);
-						target.getLocation().getChunk().load(true);
 
-						if(!HostsMods.mods.contains(p.getUniqueId()) || !HostsMods.hosts.contains(p.getUniqueId()) || !PlayerKills.spectator.contains(p.getUniqueId()))
+						if(!HostsMods.mods.contains(p.getUniqueId()) && !HostsMods.hosts.contains(p.getUniqueId()) && !PlayerKills.spectator.contains(p.getUniqueId()))
 						{
 							target.showPlayer(p);
+
+							if(!HostsMods.mods.contains(target.getUniqueId()) && !HostsMods.hosts.contains(target.getUniqueId()) && !PlayerKills.spectator.contains(target.getUniqueId()))
+							{
+								p.showPlayer(target);
+							}
 						}
 
+						target.getLocation().getChunk().load(true);
+						p.getLocation().getChunk().load(true);
 						p.sendMessage(ChatColor.GREEN + "Teleported to " + target.getDisplayName() + ".");
 					}
 				}
@@ -471,13 +480,18 @@ public class Commands implements Listener, CommandExecutor
 					{
 						targ1.teleport(targ2);
 
-						targ2.getLocation().getChunk().load(true);
-
-						if(!HostsMods.mods.contains(p.getUniqueId()) || !HostsMods.hosts.contains(p.getUniqueId()) || !PlayerKills.spectator.contains(p.getUniqueId()))
+						if(!HostsMods.mods.contains(targ1.getUniqueId()) && !HostsMods.hosts.contains(targ1.getUniqueId()) && !PlayerKills.spectator.contains(targ1.getUniqueId()))
 						{
 							targ2.showPlayer(targ1);
+
+							if(!HostsMods.mods.contains(targ2.getUniqueId()) && !HostsMods.hosts.contains(targ2.getUniqueId()) && !PlayerKills.spectator.contains(targ2.getUniqueId()))
+							{
+								targ1.showPlayer(targ2);
+							}
 						}
 
+						targ2.getLocation().getChunk().load(true);
+						targ1.getLocation().getChunk().load(true);
 						p.sendMessage(ChatColor.GREEN + "Successfully teleported '" + targ1.getName() + "' to '" + targ2.getName() + "'.");
 					}
 				}
@@ -535,7 +549,14 @@ public class Commands implements Listener, CommandExecutor
 		{
 			if(p.hasPermission("border.shrink"))
 			{
-				bord.setUpShrink();
+				if(started)
+				{
+					bord.setUpShrink();
+				}
+				else
+				{
+					p.sendMessage(ChatColor.RED + "The game has not started yet!");
+				}
 			}
 			else
 			{
@@ -964,6 +985,10 @@ public class Commands implements Listener, CommandExecutor
 			{
 				p.sendMessage(ChatColor.RED + "No permission.");
 			}
+		}
+		else if(label.equalsIgnoreCase(kt))
+		{
+			killtop.getKillTop(p);
 		}
 		else if(label.equalsIgnoreCase(test))
 		{

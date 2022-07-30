@@ -20,7 +20,7 @@ public class BreakEvent implements Listener
 
 		if(Scatter.started)
 		{
-			if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()))
+			if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()) || p.getWorld().getName().equals("world") || p.getWorld().getName().equals("Arena"))
 			{
 				e.setCancelled(true);
 			}

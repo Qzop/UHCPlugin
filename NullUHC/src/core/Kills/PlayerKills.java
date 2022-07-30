@@ -1,6 +1,8 @@
 package core.Kills;
 
+import core.Chat.ChatEvent;
 import core.Config.ConfigInventory;
+import core.GoldenHead.GoldenHead;
 import core.Scatter.Scatter;
 import core.Scenarios.DoScenario;
 import core.Scenarios.Timebomb;
@@ -11,6 +13,7 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.md_5.bungee.api.ChatColor;
 import net.minecraft.server.v1_7_R4.EntityPlayer;
+import net.minecraft.server.v1_7_R4.RecipesArmor;
 import net.minecraft.server.v1_7_R4.TileEntitySkull;
 import net.minecraft.util.com.mojang.authlib.GameProfile;
 import net.minecraft.util.com.mojang.authlib.properties.Property;
@@ -26,15 +29,14 @@ import org.bukkit.block.Skull;
 import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -50,6 +52,8 @@ public class PlayerKills implements Listener
     private Spectator spec = new Spectator();
     public static HashMap<UUID, Location> deathLocations = new HashMap<UUID, Location>();
     public static ArrayList<UUID> spectator = new ArrayList<UUID>();
+    public static HashMap<UUID, ArrayList<ItemStack>> inventory = new HashMap<UUID, ArrayList<ItemStack>>();
+    public static HashMap<UUID, ArrayList<ItemStack>> armorinv = new HashMap<UUID, ArrayList<ItemStack>>();
 
     Main plugin = Main.getPlugin(Main.class);
 
@@ -71,10 +75,79 @@ public class PlayerKills implements Listener
     {
         Player p = e.getEntity();
 
+        ArrayList<Material> helmets = new ArrayList<Material>();
+        ArrayList<Material> chestplates = new ArrayList<Material>();
+        ArrayList<Material> leggings = new ArrayList<Material>();
+        ArrayList<Material> boots = new ArrayList<Material>();
+
+        helmets.add(Material.DIAMOND_HELMET);
+        helmets.add(Material.IRON_HELMET);
+        helmets.add(Material.GOLD_HELMET);
+        helmets.add(Material.CHAINMAIL_HELMET);
+        helmets.add(Material.LEATHER_HELMET);
+
+        chestplates.add(Material.DIAMOND_CHESTPLATE);
+        chestplates.add(Material.IRON_CHESTPLATE);
+        chestplates.add(Material.GOLD_CHESTPLATE);
+        chestplates.add(Material.CHAINMAIL_CHESTPLATE);
+        chestplates.add(Material.LEATHER_CHESTPLATE);
+
+        leggings.add(Material.DIAMOND_LEGGINGS);
+        leggings.add(Material.IRON_LEGGINGS);
+        leggings.add(Material.GOLD_LEGGINGS);
+        leggings.add(Material.CHAINMAIL_LEGGINGS);
+        leggings.add(Material.LEATHER_LEGGINGS);
+
+        boots.add(Material.DIAMOND_BOOTS);
+        boots.add(Material.IRON_BOOTS);
+        boots.add(Material.GOLD_BOOTS);
+        boots.add(Material.CHAINMAIL_BOOTS);
+        boots.add(Material.LEATHER_BOOTS);
+
         if(Scatter.started)
         {
             if(p.getWorld().getName().equals("uhc_world"))
             {
+                ArrayList<ItemStack> items = new ArrayList<ItemStack>();
+                ArrayList<ItemStack> armor = new ArrayList<ItemStack>();
+
+                for(int i = 0; i < e.getDrops().size(); i++)
+                {
+                    if(e.getDrops().get(i) != null && e.getDrops().get(i).getType() != Material.AIR)
+                    {
+                        if(i >= e.getDrops().size() - 4)
+                        {
+                            if(boots.contains(e.getDrops().get(i).getType()))
+                            {
+                                armor.add(e.getDrops().get(i));
+                            }
+                            else if(leggings.contains(e.getDrops().get(i).getType()))
+                            {
+                                armor.add(e.getDrops().get(i));
+                            }
+                            else if(chestplates.contains(e.getDrops().get(i).getType()))
+                            {
+                                armor.add(e.getDrops().get(i));
+                            }
+                            else if(helmets.contains(e.getDrops().get(i).getType()))
+                            {
+                                armor.add(e.getDrops().get(i));
+                            }
+                            else
+                            {
+                                items.add(e.getDrops().get(i));
+                            }
+                        }
+                        else
+                        {
+                            items.add(e.getDrops().get(i));
+                        }
+                    }
+                }
+
+                inventory.put(p.getUniqueId(), items);
+                armorinv.put(p.getUniqueId(), armor);
+
                 if(!ScenariosInventory.timebomb)
                 {
                     for(int i = 0; i < e.getDrops().size(); i++)
@@ -125,19 +198,8 @@ public class PlayerKills implements Listener
                             chest.getInventory().addItem(item);
                         }
                     }
-                    PlayerKills kill = new PlayerKills();
-                    EntityPlayer player = ((CraftPlayer) p).getHandle();
-                    GameProfile profile = player.getProfile();
-                    Property property = profile.getProperties().get("textures").iterator().next();
-                    String texture = property.getValue();
 
-                    ItemStack pHead = kill.getSkull(texture);
-                    SkullMeta pHeadMeta = (SkullMeta) pHead.getItemMeta();
-                    pHeadMeta.setOwner(p.getName());
-                    pHeadMeta.setDisplayName(net.md_5.bungee.api.ChatColor.GOLD + p.getDisplayName() + "'s Head");
-                    pHead.setItemMeta(pHeadMeta);
-
-                    chest.getInventory().addItem(pHead);
+                    chest.getInventory().addItem(GoldenHead.head);
 
                     e.getDrops().clear();
                     double xAdder = 0.5;
@@ -208,9 +270,6 @@ public class PlayerKills implements Listener
                     }.runTaskTimer(plugin, 0, 20);
                 }
 
-                PlayerKills.deathLocations.put(p.getUniqueId(), p.getLocation());
-                Scatter.allPlayers.remove(p.getUniqueId());
-
                 if(ConfigInventory.teamSize > 1)
                 {
                     TeamManager tm = new TeamManager();
@@ -230,6 +289,8 @@ public class PlayerKills implements Listener
                         TeamManager.teams.remove(cap);
                     }
                 }
+
+                PlayerKills.deathLocations.put(p.getUniqueId(), p.getLocation());
 
                 if(p.getKiller() != null)
                 {

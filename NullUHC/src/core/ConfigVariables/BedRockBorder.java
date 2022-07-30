@@ -32,6 +32,9 @@ public class BedRockBorder implements Listener
 		getSecondWallBlocks(border, world);
 		getThirdWallBlocks(border, world);
 		getFourthWallBlocks(border, world);
+
+		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GOLD + " Border has shrunk to " + BedRockBorder.currentBorderSize + "x" + BedRockBorder.currentBorderSize + ".");
+		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 minutes.");
     }
     
     public void getFirstWallBlocks(int border, World world)
@@ -243,8 +246,6 @@ public class BedRockBorder implements Listener
 			{
 				if(count == wall.size())
 				{
-					Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GOLD + " Border has shrunk to " + BedRockBorder.currentBorderSize + "x" + BedRockBorder.currentBorderSize + ".");
-					Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 minutes.");
 					cancel();
 				}
 				else

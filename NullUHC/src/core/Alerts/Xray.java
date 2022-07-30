@@ -47,6 +47,8 @@ public class Xray implements Listener
                     {
                         blocksMined.clear();
                     }
+
+                    size = 0;
                 }
             }
         }

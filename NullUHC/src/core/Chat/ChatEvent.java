@@ -120,31 +120,31 @@ public class ChatEvent implements Listener
                     {
                         if(p.hasPermission("chat.owner"))
                         {
-                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                         }
                         else if(p.hasPermission("chat.dev"))
                         {
-                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + devPrefix + ChatColor.GOLD + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + devPrefix + ChatColor.GOLD + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                         }
                         else if(p.hasPermission("chat.admin"))
                         {
-                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + adminPrefix + ChatColor.RED + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + adminPrefix + ChatColor.RED + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                         }
                         else if(p.hasPermission("chat.srmod"))
                         {
-                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + srmodPrefix + ChatColor.DARK_BLUE + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + srmodPrefix + ChatColor.DARK_BLUE + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                         }
                         else if(p.hasPermission("chat.mod"))
                         {
-                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + modPrefix + ChatColor.DARK_GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + modPrefix + ChatColor.DARK_GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                         }
                         else if(p.hasPermission("chat.trial"))
                         {
-                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + trialPrefix + ChatColor.GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + trialPrefix + ChatColor.GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                         }
                         else
                         {
-                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + ChatColor.WHITE +  p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE + e.getMessage());
+                            e.setFormat(ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + "#" + (i + 1) + ChatColor.GRAY + "] " + ChatColor.WHITE +  "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                         }
                     }
                 }
@@ -153,85 +153,85 @@ public class ChatEvent implements Listener
             {
                 if(p.hasPermission("chat.owner"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.dev"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + devPrefix + ChatColor.GOLD + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + devPrefix + ChatColor.GOLD + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE +  "%s");
                 }
                 else if(p.hasPermission("chat.admin"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + adminPrefix + ChatColor.RED + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + adminPrefix + ChatColor.RED + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE +  "%s");
                 }
                 else if(p.hasPermission("chat.srmod"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + srmodPrefix + ChatColor.DARK_BLUE + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + srmodPrefix + ChatColor.DARK_BLUE + "%s" + ChatColor.GRAY +  ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.mod"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + modPrefix + ChatColor.DARK_GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + modPrefix + ChatColor.DARK_GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.trial"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + trialPrefix + ChatColor.GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.RED + "Host" + ChatColor.GRAY + "] " + trialPrefix + ChatColor.GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
             }
             else if(HostsMods.mods.contains(p.getUniqueId()))
             {
                 if(p.hasPermission("chat.owner"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.dev"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + devPrefix + ChatColor.GOLD + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + devPrefix + ChatColor.GOLD + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.admin"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + adminPrefix + ChatColor.RED + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + adminPrefix + ChatColor.RED + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.srmod"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + srmodPrefix + ChatColor.DARK_BLUE + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + srmodPrefix + ChatColor.DARK_BLUE + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.mod"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + modPrefix + ChatColor.DARK_GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + modPrefix + ChatColor.DARK_GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.trial"))
                 {
-                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + trialPrefix + ChatColor.GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ChatColor.GRAY + "[" + ChatColor.AQUA + "Mod" + ChatColor.GRAY + "] " + trialPrefix + ChatColor.GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
             }
             else
             {
                 if(p.hasPermission("chat.owner"))
                 {
-                    e.setFormat(ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(ownerPrefix + ChatColor.DARK_RED + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.dev"))
                 {
-                    e.setFormat(devPrefix + ChatColor.GOLD + ChatColor.BOLD + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(devPrefix + ChatColor.GOLD + ChatColor.BOLD + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.admin"))
                 {
-                    e.setFormat(adminPrefix + ChatColor.RED + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(adminPrefix + ChatColor.RED + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.srmod"))
                 {
-                    e.setFormat(srmodPrefix + ChatColor.DARK_BLUE + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(srmodPrefix + ChatColor.DARK_BLUE + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.mod"))
                 {
-                    e.setFormat(modPrefix + ChatColor.DARK_GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(modPrefix + ChatColor.DARK_GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else if(p.hasPermission("chat.trial"))
                 {
-                    e.setFormat(trialPrefix + ChatColor.GREEN + p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE +  e.getMessage());
+                    e.setFormat(trialPrefix + ChatColor.GREEN + "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
                 else
                 {
-                    e.setFormat(ChatColor.WHITE +  p.getName() + ChatColor.GRAY + ": " + ChatColor.WHITE + e.getMessage());
+                    e.setFormat(ChatColor.WHITE +  "%s" + ChatColor.GRAY + ": " + ChatColor.WHITE + "%s");
                 }
             }
         }

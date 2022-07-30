@@ -2,6 +2,7 @@ package core.Config;
 
 import core.Alerts.Alerts;
 import core.Arena.PracticeArena;
+import core.ScenariosInventory.ScenariosInventory;
 import core.mainPackage.Main;
 import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Bukkit;
@@ -642,7 +643,7 @@ public class ConfigEvent implements Listener
             {
                 if(click == ClickType.LEFT)
                 {
-                    if(ConfigInventory.flintRate >= 25.0 && ConfigInventory.flintRate < 100.0)
+                    if(ConfigInventory.flintRate >= 25.0 && ConfigInventory.flintRate < 100.0 && !ScenariosInventory.cutclean)
                     {
                         ConfigInventory.flintRate += 5.0;
                         
@@ -651,7 +652,7 @@ public class ConfigEvent implements Listener
                 }
                 else if(click == ClickType.RIGHT)
                 {
-                    if(ConfigInventory.flintRate > 25.0 && ConfigInventory.flintRate <= 100.0)
+                    if(ConfigInventory.flintRate > 25.0 && ConfigInventory.flintRate <= 100.0 && !ScenariosInventory.cutclean)
                     {
                         ConfigInventory.flintRate -= 5.0;
                         

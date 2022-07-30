@@ -27,7 +27,6 @@ public class Time implements Listener
     private static int lastShrink = 0;
     private boolean first = false;
     Main plugin = Main.getPlugin(Main.class);
-    private Chunks chunks = new Chunks();
     
     
     public void setTime()
@@ -36,7 +35,7 @@ public class Time implements Listener
         {
             public void run()
             {
-				/*if(ConfigInventory.teamSize == 1)
+				if(ConfigInventory.teamSize == 1)
 				{
 					if(Scatter.allPlayers.size() == 1)
 					{
@@ -53,7 +52,7 @@ public class Time implements Listener
 						announceWinners();
 						cancel();
 					}
-				}*/
+				}
                 
                 time++;
 
@@ -68,6 +67,15 @@ public class Time implements Listener
 						}
 						else
 						{
+							if(NPCEvent.disconnected.get(k) % 60 == 0 && NPCEvent.disconnected.get(k) != 0)
+							{
+								int currtime = NPCEvent.disconnected.get(k) / 60;
+								OfflinePlayer offp = Bukkit.getOfflinePlayer(k);
+
+								Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.AQUA + offp.getName() + ChatColor.RED + " has "
+										+ ChatColor.AQUA + (10 - currtime) + ChatColor.RED + " minute(s) to reconnect.");
+							}
+
 							NPCEvent.disconnected.put(k, NPCEvent.disconnected.get(k) + 1);
 						}
 					}

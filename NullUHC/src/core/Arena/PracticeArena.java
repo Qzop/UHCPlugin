@@ -2,6 +2,7 @@ package core.Arena;
 
 import core.Config.ConfigInventory;
 import core.HostsMods.HostModsItems;
+import core.HostsMods.HostsMods;
 import core.Scatter.Scatter;
 import core.mainPackage.Commands;
 import core.mainPackage.LobbyItems;
@@ -42,6 +43,21 @@ public class PracticeArena implements Listener
                 {
                     public void run()
                     {
+                        if (HostsMods.hosts.contains(p.getUniqueId()))
+                        {
+                            HostsMods.hosts.remove(p.getUniqueId());
+                            p.setFlying(false);
+                            p.setAllowFlight(false);
+                            p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You are no longer host.");
+                        }
+                        else if(HostsMods.mods.contains(p.getUniqueId()))
+                        {
+                            HostsMods.mods.remove(p.getUniqueId());
+                            p.setFlying(false);
+                            p.setAllowFlight(false);
+                            p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You are no longer mod.");
+                        }
+
                         p.getInventory().clear();
                         p.getInventory().setBoots(null);
                         p.getInventory().setLeggings(null);
@@ -101,6 +117,10 @@ public class PracticeArena implements Listener
                             lobbyitems.lobbyItems(p);
                         }
 
+                        p.setHealth(p.getHealth() + (20.0 - p.getHealth()));
+                        p.setFoodLevel(20);
+                        p.setLevel(0);
+                        p.setExp(0);
                         p.teleport(world.getSpawnLocation());
                         p.sendMessage(ChatColor.RED + "You have left the arena.");
 

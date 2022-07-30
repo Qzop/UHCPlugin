@@ -55,6 +55,11 @@ public class Scatter implements Listener
     {
         for(Player p : Main.online.getOnlinePlayers())
         {
+            p.setHealth(p.getHealth() + (20.0 - p.getHealth()));
+            p.setFoodLevel(20);
+            p.setLevel(0);
+            p.setExp(0);
+
             if(p != null  && !HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
             {
                 World world = Bukkit.getWorld("world");

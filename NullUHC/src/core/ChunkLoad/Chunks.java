@@ -36,11 +36,10 @@ public class Chunks implements Listener
 		try
 		{
 			if(!world.getBiome(0, 0).equals(Biome.PLAINS) && !world.getBiome(0, 0).equals(Biome.DESERT) && !world.getBiome(0, 0).equals(Biome.SAVANNA)
-					&& !world.getBiome(0, 0).equals(Biome.RIVER) && !world.getBiome(0, 0).equals(Biome.SUNFLOWER_PLAINS) && !world.getBiome(0, 0).equals(Biome.ICE_PLAINS)
-				    && !world.getBiome(0, 0).equals(Biome.DESERT_HILLS))
+					&& !world.getBiome(0, 0).equals(Biome.RIVER) && !world.getBiome(0, 0).equals(Biome.SUNFLOWER_PLAINS))
 			{
 				check = true;
-				plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + "NOT PLAINS, DESERT, DESERT HILLS, SAVANNAH, ICE PLAINS, OR RIVER.");
+				plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + "NOT PLAINS, DESERT, SAVANNAH, OR RIVER.");
 				
 				new BukkitRunnable()
 				{
@@ -103,7 +102,7 @@ public class Chunks implements Listener
 					Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "wb fill confirm");
 				}
 
-				if(count == 20)
+				if(count == 11)
 				{
 					restartServer();
 					cancel();
@@ -115,7 +114,7 @@ public class Chunks implements Listener
 						index = 1;
 						count++;
 
-						int minutes = (20 - count);
+						int minutes = (11 - count);
 
 						if(minutes > 1)
 						{

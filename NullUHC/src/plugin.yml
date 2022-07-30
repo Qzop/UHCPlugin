@@ -57,3 +57,5 @@ commands:
       description: Allows staff to switch to Spectator chat.
    sc:
       description: Allows staff to switch to Staff chat.
+   kt:
+      description: Allows players to see who the top killers are.

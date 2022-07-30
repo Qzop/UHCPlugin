@@ -106,6 +106,8 @@ public class ScenInvEvent implements Listener
                 ScenariosInventory.enabledScenarios.remove(item);
                 ScenariosInventory.cutclean = false;
 
+                ConfigInventory.flintRate = 50.0;
+
                 Bukkit.broadcastMessage(scenariosPref + ChatColor.YELLOW + " CutClean is now " + ChatColor.RED + ChatColor.BOLD + "Off");
             }
             else if(item.getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "CutClean: " + ChatColor.RED + ChatColor.BOLD + "Off"))
@@ -116,6 +118,8 @@ public class ScenInvEvent implements Listener
 
                 ScenariosInventory.enabledScenarios.add(item);
                 ScenariosInventory.cutclean = true;
+
+                ConfigInventory.flintRate = 100.0;
 
                 Bukkit.broadcastMessage(scenariosPref + ChatColor.YELLOW + " CutClean is now " + ChatColor.GREEN + ChatColor.BOLD + "On");
             }

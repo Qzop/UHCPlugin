@@ -43,6 +43,13 @@ public class DamageEvent implements Listener
                     e.setCancelled(true);
                 }
             }
+            else
+            {
+                if(p.getWorld().getName().equals("world"))
+                {
+                    e.setCancelled(true);
+                }
+            }
 
             if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()))
             {

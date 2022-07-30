@@ -1,5 +1,7 @@
 package core.Kills;
 
+import core.Chat.ChatEvent;
+import core.Scatter.Scatter;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,7 +20,17 @@ public class Spectator implements Listener
     {
         Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
 
+        if(Scatter.allPlayers.contains(p.getUniqueId()))
+        {
+            Scatter.allPlayers.remove(p.getUniqueId());
+        }
+
         PlayerKills.spectator.add(p.getUniqueId());
+
+        if(!ChatEvent.specchat.contains(p.getUniqueId()))
+        {
+            ChatEvent.specchat.add(p.getUniqueId());
+        }
 
         p.spigot().respawn();
         p.teleport(loc);
@@ -29,12 +41,19 @@ public class Spectator implements Listener
         {
             players.hidePlayer(p);
         }
+
+        p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a spectator.");
     }
     
     public void removeSpectator(Player p)
     {
     	PlayerKills.spectator.remove(p.getUniqueId());
     	PlayerKills.deathLocations.remove(p.getUniqueId());
+
+        if(ChatEvent.specchat.contains(p.getUniqueId()))
+        {
+            ChatEvent.specchat.remove(p.getUniqueId());
+        }
     	
     	p.setAllowFlight(false);
     	p.setFlying(false);
@@ -43,6 +62,8 @@ public class Spectator implements Listener
     	{
     		players.showPlayer(p);
     	}
+
+        p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You are no longer a spectator.");
     }
 
     @EventHandler
@@ -125,6 +146,14 @@ public class Spectator implements Listener
                 p.teleport(temp);
                 p.sendMessage(ChatColor.RED + "You cannot go outside of the border!");
         	}
-        }   
+        }
+
+        if(p.getWorld().getName().equals("world"))
+        {
+            if(p.getLocation().getY() <= 50)
+            {
+                p.performCommand("spawn");
+            }
+        }
     }
 }

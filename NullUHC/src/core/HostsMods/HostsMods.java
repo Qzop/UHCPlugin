@@ -1,5 +1,7 @@
 package core.HostsMods;
 
+import core.Arena.ArenaKills;
+import core.Arena.PracticeArena;
 import core.Scatter.Scatter;
 
 import core.mainPackage.Commands;
@@ -7,6 +9,7 @@ import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -35,13 +38,31 @@ public class HostsMods
         		players.hidePlayer(p);
         	}
 
+
             HostModsItems.vanished.add(p.getUniqueId());
-        	
+
+            p.setHealth(p.getHealth() + (20.0 - p.getHealth()));
+            p.setFoodLevel(20);
+            p.setLevel(0);
+            p.setExp(0);
         	p.setAllowFlight(true);
 			p.setFlying(true);
         	
             hosts.add(p.getUniqueId());
             Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
+
+            if(PracticeArena.playersInArena.contains(p.getUniqueId()))
+            {
+                ArenaKills.arenaKills.remove(p.getUniqueId());
+                PracticeArena.playersInArena.remove(p.getUniqueId());
+                p.sendMessage(net.md_5.bungee.api.ChatColor.RED + "You have left the arena.");
+            }
+
+            if(Scatter.allPlayers.contains(p.getUniqueId()))
+            {
+                Scatter.allPlayers.remove(p.getUniqueId());
+            }
+
             p.teleport(loc);
             items.hostmodItemsInGame(p);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Host.");
@@ -62,12 +83,29 @@ public class HostsMods
         	}
 
             HostModsItems.vanished.add(p.getUniqueId());
-        	
+
+            p.setHealth(p.getHealth() + (20.0 - p.getHealth()));
+            p.setFoodLevel(20);
+            p.setLevel(0);
+            p.setExp(0);
         	p.setAllowFlight(true);
 			p.setFlying(true);
         	
             mods.add(p.getUniqueId());
             Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
+
+            if(PracticeArena.playersInArena.contains(p.getUniqueId()))
+            {
+                ArenaKills.arenaKills.remove(p.getUniqueId());
+                PracticeArena.playersInArena.remove(p.getUniqueId());
+                p.sendMessage(net.md_5.bungee.api.ChatColor.RED + "You have left the arena.");
+            }
+
+            if(Scatter.allPlayers.contains(p.getUniqueId()))
+            {
+                Scatter.allPlayers.remove(p.getUniqueId());
+            }
+
             p.teleport(loc);
             items.hostmodItemsInGame(p);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Mod.");
@@ -89,7 +127,6 @@ public class HostsMods
             {
                 HostModsItems.vanished.remove(p.getUniqueId());
             }
-
 
         	p.setAllowFlight(false);
 			p.setFlying(false);

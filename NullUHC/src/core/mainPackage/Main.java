@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import core.Scoreboard.ScoreboardTeams;
+import net.citizensnpcs.api.npc.NPCRegistry;
 import net.minecraft.util.org.apache.commons.io.FileUtils;
 import org.bukkit.*;
 import org.bukkit.entity.NPC;
@@ -123,6 +124,7 @@ public class Main extends JavaPlugin implements Listener
 		getCommand(command.ping).setExecutor(command);
 		getCommand(command.specchat).setExecutor(command);
 		getCommand(command.staffchat).setExecutor(command);
+		getCommand(command.kt).setExecutor(command);
 
 		World world = Bukkit.getWorld("world");
 		world.setGameRuleValue("doDaylightCycle", "false");

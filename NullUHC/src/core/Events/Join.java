@@ -223,7 +223,8 @@ public class Join implements Listener
                 }
                 else if(NPCEvent.disqualified.contains(p.getUniqueId()))
                 {
-                    p.kickPlayer(ChatColor.RED + "Sorry, you have been disqualified for being disconnected for more than 10 minutes.");
+                    Spectator spectator = new Spectator();
+                    spectator.setSpectator(p);
                 }
                 else
                 {
