@@ -1,5 +1,7 @@
 package core.Scenarios;
 
+import core.HostsMods.HostsMods;
+import core.Kills.PlayerKills;
 import core.Scatter.Scatter;
 import core.ScenariosInventory.ScenariosInventory;
 import core.mainPackage.Main;
@@ -28,7 +30,6 @@ public class SuperheroesCMD implements Listener
 
         if(superPower.equalsIgnoreCase("assign"))
         {
-            if(!(t.getSize() <= 4)) return false;
             //        String[] playerPower = {" ", " ", " ", " "};
             //        String[] superPowers = {"health", "strength", "resistance", "speed"};
 
@@ -40,9 +41,7 @@ public class SuperheroesCMD implements Listener
 
             for(Player iPlayer : Main.online.getOnlinePlayers())
             {
-                Team iT = iPlayer.getPlayer().getScoreboard().getPlayerTeam(iPlayer);
-
-                if(iT.toString().equals(t.toString()))
+                if(!HostsMods.hosts.contains(iPlayer.getUniqueId()) && !HostsMods.mods.contains(iPlayer.getUniqueId()) && !PlayerKills.spectator.contains(iPlayer.getUniqueId()))
                 {
                     String power = getSuperPower(iPlayer.getName());
 

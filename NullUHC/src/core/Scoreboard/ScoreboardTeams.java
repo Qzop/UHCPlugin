@@ -22,11 +22,18 @@ public class ScoreboardTeams implements Listener
     public void setScoreboard(Player p, Scoreboard scoreboard)
     {
         Objective objective = scoreboard.getObjective("Teams");
+        Objective below = scoreboard.getObjective(ChatColor.RED + "♥");
 
         if(objective == null)
         {
-            objective = scoreboard.registerNewObjective("Teams", "Tab");
+            objective = scoreboard.registerNewObjective("Teams", "health");
             objective.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        }
+
+        if(below == null)
+        {
+            below = scoreboard.registerNewObjective(ChatColor.RED + "♥", "health");
+            below.setDisplaySlot(DisplaySlot.BELOW_NAME);
         }
 
         if(!teams.isEmpty())

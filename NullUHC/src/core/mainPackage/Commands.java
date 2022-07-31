@@ -275,15 +275,29 @@ public class Commands implements Listener, CommandExecutor
 				{
 					if(args[0].equals("create"))
 					{
-						tm.createTeam(p);
+						if(!Scatter.started && !scatter)
+						{
+							tm.createTeam(p);
+						}
+						else
+						{
+							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You cannot use that command now!");
+						}
 					}
 					else if(args[0].equals("list"))
 					{
-						tm.teamList(p);
+						if(tm.findTeam(p))
+						{
+							tm.teamList(p);
+						}
+						else
+						{
+							p.sendMessage(ChatColor.RED + "You do not have a team!");
+						}
 					}
 					else if(args[0].equals("disband"))
 					{
-						if(!scatter && !started)
+						if(!scatter && !Scatter.started)
 						{
 							tm.disbandTeam(p);
 						}
@@ -299,6 +313,10 @@ public class Commands implements Listener, CommandExecutor
 					else if(args[0].equals("remove"))
 					{
 						p.sendMessage(ChatColor.RED + "Usage: /team remove (player)");
+					}
+					else if(args[0].equals("put"))
+					{
+						p.sendMessage(ChatColor.RED + "Usage: /team put (player)");
 					}
 					else
 					{
@@ -391,7 +409,49 @@ public class Commands implements Listener, CommandExecutor
 						}
 						else
 						{
-							tm.teamListTarg(p, t);
+							if(tm.findTeam(t))
+							{
+								tm.teamListTarg(p, t);
+							}
+							else
+							{
+								p.sendMessage(ChatColor.RED + "That player does not have a team!");
+							}
+						}
+					}
+					else if(args[0].equals("put"))
+					{
+						if(args.length == 3)
+						{
+							if(p.hasPermission("uhc.putteams"))
+							{
+								Player targ1 = Bukkit.getPlayer(args[1]);
+								Player targ2 = Bukkit.getPlayer(args[2]);
+
+								if(targ1 == null)
+								{
+									p.sendMessage(ChatColor.RED + "One of the players is not online!");
+								}
+								else if(targ2 == null)
+								{
+									p.sendMessage(ChatColor.RED + "One of the players is not online!");
+								}
+								else
+								{
+									if(tm.findTeam(targ2))
+									{
+										tm.putPlayersOnTeam(p, targ1, targ2);
+									}
+								}
+							}
+							else
+							{
+								p.sendMessage(ChatColor.RED + "No Permission.");
+							}
+						}
+						else
+						{
+							p.sendMessage(ChatColor.RED + "Usage: /team put (player) (player) \n" + ChatColor.YELLOW + "WARNING: remember the first player is the one we want to put on the second players team.");
 						}
 					}
 					else

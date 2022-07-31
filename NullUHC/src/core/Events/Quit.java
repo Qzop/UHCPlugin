@@ -55,32 +55,18 @@ public class Quit implements Listener
 
         if(Commands.scatter)
         {
-            if(ConfigInventory.teamSize == 1)
+            if(Scatter.allPlayers.contains(p.getUniqueId()) && p.getWorld().getName().equals("uhc_world"))
             {
-                if(Scatter.allPlayers.contains(p.getUniqueId()) && p.getWorld().getName().equals("uhc_world"))
-                {
-                    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ZOMBIE, "" + ChatColor.BOLD + ChatColor.RED + "[Disconnected] " + p.getDisplayName());
-                    onNPC.spawnNPC(npc, p);
-                }
-            }
-            else
-            {
-
+                NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ZOMBIE, "" + ChatColor.BOLD + ChatColor.RED + "[Disconnected] " + p.getDisplayName());
+                onNPC.spawnNPC(npc, p);
             }
         }
         else if(Scatter.started)
         {
-            if(ConfigInventory.teamSize == 1)
+            if(Scatter.allPlayers.contains(p.getUniqueId()))
             {
-                if(Scatter.allPlayers.contains(p.getUniqueId()))
-                {
-                    NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ZOMBIE, "" + ChatColor.BOLD + ChatColor.RED + "[Disconnected] " + p.getDisplayName());
-                    onNPC.spawnNPC(npc, p);
-                }
-            }
-            else
-            {
-
+                NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ZOMBIE, "" + ChatColor.BOLD + ChatColor.RED + "[Disconnected] " + p.getDisplayName());
+                onNPC.spawnNPC(npc, p);
             }
         }
         else

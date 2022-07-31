@@ -36,10 +36,10 @@ public class Chunks implements Listener
 		try
 		{
 			if(!world.getBiome(0, 0).equals(Biome.PLAINS) && !world.getBiome(0, 0).equals(Biome.DESERT) && !world.getBiome(0, 0).equals(Biome.SAVANNA)
-					&& !world.getBiome(0, 0).equals(Biome.RIVER) && !world.getBiome(0, 0).equals(Biome.SUNFLOWER_PLAINS))
+					&& !world.getBiome(0, 0).equals(Biome.RIVER) && !world.getBiome(0, 0).equals(Biome.SUNFLOWER_PLAINS) && !world.getBiome(0, 0).equals(Biome.DESERT_HILLS))
 			{
 				check = true;
-				plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + "NOT PLAINS, DESERT, SAVANNAH, OR RIVER.");
+				plugin.getServer().getConsoleSender().sendMessage(ChatColor.RED + "NOT PLAINS, DESERT, DESERT HILLS, SAVANNAH, OR RIVER.");
 				
 				new BukkitRunnable()
 				{

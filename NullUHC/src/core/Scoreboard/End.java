@@ -1,20 +1,12 @@
 package core.Scoreboard;
 
-import com.sun.deploy.security.SelectableSecurityManager;
-import core.Config.ConfigInventory;
-import core.HostsMods.HostsMods;
-import core.Scatter.Scatter;
-import core.Teams.TeamManager;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
-
-import java.util.UUID;
 
 public class End implements Listener
 {

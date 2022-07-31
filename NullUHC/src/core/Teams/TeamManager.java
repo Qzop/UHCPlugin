@@ -1,8 +1,12 @@
 package core.Teams;
 
 import core.Config.ConfigInventory;
+import core.HostsMods.HostsMods;
+import core.Kills.PlayerKills;
+import core.Kills.Spectator;
 import core.Scatter.Scatter;
 import core.Scoreboard.ScoreboardTeams;
+import core.Scoreboard.Time;
 import core.mainPackage.Main;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -10,10 +14,12 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scoreboard.Team;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +29,7 @@ public class TeamManager implements Listener
 {
     public static String Teamprefix = ChatColor.GRAY + "[" + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Team" + ChatColor.GRAY + "]";
     public static HashMap<UUID, ArrayList<UUID>> teams = new HashMap<UUID, ArrayList<UUID>>();
+    public static int aliveTeams = 0;
     public HashMap<UUID, UUID> pendingInv = new HashMap<UUID, UUID>();
     private static ScoreboardTeams scoreboardTeams = new ScoreboardTeams();
     Main plugin = Main.getPlugin(Main.class);
@@ -36,10 +43,9 @@ public class TeamManager implements Listener
             if(teams.isEmpty())
             {
                 teams.put(p.getUniqueId(), new ArrayList<UUID>());
-
                 scoreboardTeams.onTeamCreate(p);
-
                 p.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully created a team!");
+                aliveTeams++;
             }
             else
             {
@@ -58,10 +64,9 @@ public class TeamManager implements Listener
                 else
                 {
                     teams.put(p.getUniqueId(), new ArrayList<UUID>());
-
                     scoreboardTeams.onTeamCreate(p);
-
                     p.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully created a team!");
+                    aliveTeams++;
                 }
             }
         }
@@ -69,6 +74,11 @@ public class TeamManager implements Listener
         {
             p.sendMessage(Teamprefix + ChatColor.RED + " You are already on a team!");
         }
+    }
+
+    public void setUpTeamsDuringGame()
+    {
+
     }
 
     public void removePlayer(Player p, Player target)
@@ -118,6 +128,7 @@ public class TeamManager implements Listener
             teams.remove(p.getUniqueId());
             scoreboardTeams.disbandTeam(p);
             p.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully disbanded the team!");
+            aliveTeams--;
         }
         else
         {
@@ -161,7 +172,7 @@ public class TeamManager implements Listener
                             {
                                 TextComponent pref = new TextComponent(Teamprefix);
                                 TextComponent comp = new TextComponent(" " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Click Here");
-                                TextComponent comp1 = new TextComponent(" " + ChatColor.GREEN + "to join " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getName() + "'s " + ChatColor.GREEN + "team! " + ChatColor.GREEN + "\n(You have 20 seconds to accept).");
+                                TextComponent comp1 = new TextComponent(" " + ChatColor.GREEN + "to join " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getName() + "'s " + ChatColor.GREEN + "team! " + ChatColor.GREEN + "(You have " + ChatColor.GREEN + "20 seconds to accept).");
                                 comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/team accept " + p.getName()));
                                 comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Accept " + p.getDisplayName() + "'s Invite!").create()));
                                 target.spigot().sendMessage(pref, comp, comp1);
@@ -243,7 +254,7 @@ public class TeamManager implements Listener
                                 {
                                     TextComponent pref = new TextComponent(Teamprefix);
                                     TextComponent comp = new TextComponent(" " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + "Click Here");
-                                    TextComponent comp1 = new TextComponent(" " + ChatColor.GREEN + "to join " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getDisplayName() + "'s " + ChatColor.GREEN + "team! " + ChatColor.GREEN + "\n(You have 20 seconds to accept).");
+                                    TextComponent comp1 = new TextComponent(" " + ChatColor.GREEN + "to join " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getDisplayName() + "'s " + ChatColor.GREEN + "team! " + ChatColor.GREEN + "(You have " + ChatColor.GREEN + "20 seconds to accept).");
                                     comp.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/team accept " + p.getName()));
                                     comp.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new ComponentBuilder(ChatColor.GREEN + "Accept " + p.getDisplayName() + "'s Invite!").create()));
                                     target.spigot().sendMessage(pref, comp, comp1);
@@ -305,7 +316,7 @@ public class TeamManager implements Listener
         {
             teams.get(pendingInv.get(p.getUniqueId())).add(p.getUniqueId());
             p.sendMessage(Teamprefix + ChatColor.GREEN + ChatColor.BOLD + " You have successfully joined " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + Bukkit.getPlayer(pendingInv.get(p.getUniqueId())).getDisplayName() + "'s " + ChatColor.GREEN + " team!");
-            owner.sendMessage(Teamprefix + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getDisplayName() + ChatColor.GREEN + ChatColor.BOLD + " has joined your team!");
+            owner.sendMessage(Teamprefix + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " " + p.getDisplayName() + ChatColor.GREEN + ChatColor.BOLD + " has joined your team!");
             pendingInv.remove(p.getUniqueId());
             scoreboardTeams.onTeamJoin(owner, p);
         }
@@ -317,7 +328,7 @@ public class TeamManager implements Listener
                 {
                     teams.get(uuid).add(p.getUniqueId());
                     p.sendMessage(Teamprefix + ChatColor.GREEN + ChatColor.BOLD + " You have successfully joined " + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + Bukkit.getPlayer(pendingInv.get(p.getUniqueId())).getDisplayName() + "'s " + ChatColor.GREEN + " team!");
-                    owner.sendMessage(Teamprefix + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + p.getDisplayName() + ChatColor.GREEN + ChatColor.BOLD + " has joined your team!");
+                    owner.sendMessage(Teamprefix + ChatColor.LIGHT_PURPLE + ChatColor.BOLD + " " + p.getDisplayName() + ChatColor.GREEN + ChatColor.BOLD + " has joined your team!");
                     pendingInv.remove(p.getUniqueId());
                     scoreboardTeams.onTeamJoin(owner, p);
                 }
@@ -328,56 +339,115 @@ public class TeamManager implements Listener
     public void teamList(Player p)
     {
         UUID temp = p.getUniqueId();
+        String message = "" + ChatColor.GOLD + ChatColor.BOLD + "Team List: \n";
 
         if(teams.containsKey(temp))
         {
-            p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + " Team List:");
-            p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(temp).getDisplayName());
+            if(Scatter.allPlayers.contains(temp) || !Scatter.started)
+            {
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(temp).getDisplayName() + "\n";
+            }
+            else
+            {
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(temp).getDisplayName() + "\n";
+            }
 
             for(UUID uuid : teams.get(temp))
             {
-                p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName());
+                if (Scatter.allPlayers.contains(uuid) || !Scatter.started)
+                {
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
+                }
+                else
+                {
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
+                }
             }
         }
         else
         {
-            p.sendMessage(Teamprefix + ChatColor.RED + " You do not have a team!");
+            UUID cap = getCaptain(p);
+
+            if(Scatter.allPlayers.contains(cap) || !Scatter.started)
+            {
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(cap).getDisplayName() + "\n";
+            }
+            else
+            {
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(cap).getDisplayName() + "\n";
+            }
+
+            for(UUID uuid : teams.get(cap))
+            {
+                if(Scatter.allPlayers.contains(uuid) || !Scatter.started)
+                {
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
+                }
+                else
+                {
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
+                }
+            }
         }
+
+        p.sendMessage(message);
     }
 
     public void teamListTarg(Player p, Player t)
     {
         UUID temp = t.getUniqueId();
+        String message = "" + ChatColor.GOLD + ChatColor.BOLD + "Team List:" + "\n";
 
         if(teams.containsKey(temp))
         {
-            p.sendMessage(Teamprefix + ChatColor.GOLD + ChatColor.BOLD + " Team List:");
-
-            if(Scatter.allPlayers.contains(t.getUniqueId()))
+            if(Scatter.allPlayers.contains(t.getUniqueId()) || !Scatter.started)
             {
-                p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(temp).getDisplayName());
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(temp).getDisplayName() + "\n";
             }
             else
             {
-                p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(temp).getDisplayName());
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(temp).getDisplayName() + "\n";
             }
 
             for(UUID uuid : teams.get(temp))
             {
-                if(Scatter.allPlayers.contains(t.getUniqueId()))
+                if(Scatter.allPlayers.contains(uuid) || !Scatter.started)
                 {
-                    p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName());
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
                 }
                 else
                 {
-                    p.sendMessage("" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(uuid).getDisplayName());
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
                 }
             }
         }
         else
         {
-            p.sendMessage(Teamprefix + ChatColor.RED + " You do not have a team!");
+            UUID cap = getCaptain(t);
+
+            if(Scatter.allPlayers.contains(cap) || !Scatter.started)
+            {
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(cap).getDisplayName() + "\n";
+            }
+            else
+            {
+                message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(cap).getDisplayName() + "\n";
+            }
+
+            for(UUID uuid : teams.get(cap))
+            {
+                if(Scatter.allPlayers.contains(uuid) || !Scatter.started)
+                {
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.LIGHT_PURPLE + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
+                }
+                else
+                {
+                    message += "" + ChatColor.GOLD + ChatColor.BOLD + "- " + ChatColor.RED + ChatColor.STRIKETHROUGH + Bukkit.getPlayer(uuid).getDisplayName() + "\n";
+                }
+            }
         }
+
+        p.sendMessage(message);
     }
 
     public boolean findTeam(Player p)
@@ -462,8 +532,113 @@ public class TeamManager implements Listener
 
     public void lateScatterCreateTeam(Player p)
     {
+        scoreboardTeams.onTeamCreate(p);
         teams.put(p.getUniqueId(), new ArrayList<UUID>());
-
         p.sendMessage(Teamprefix + ChatColor.GREEN + " You have been put on a team.");
+        aliveTeams++;
+    }
+
+    public void putPlayersOnTeam(Player sender, Player p, Player teamOwner)
+    {
+        if(Time.minutes > ConfigInventory.latescatter)
+        {
+
+        }
+        else
+        {
+            if(!PlayerKills.spectator.contains(p.getUniqueId()) && !HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
+            {
+                if(findTeam(p))
+                {
+                    if(getCaptain(p) == p.getUniqueId())
+                    {
+                        if(teams.get(p.getUniqueId()).isEmpty())
+                        {
+                            if((teams.get(teamOwner.getUniqueId()).size() + 1) == ConfigInventory.teamSize)
+                            {
+                                UUID temp = teams.get(teamOwner.getUniqueId()).get(0);
+                                teams.get(teamOwner.getUniqueId()).remove(0);
+                                ArrayList<UUID> temparray = teams.get(teamOwner.getUniqueId());
+
+                                disbandTeam(teamOwner);
+
+                                createTeam(teamOwner);
+
+
+                            }
+                            else
+                            {
+                                disbandTeam(p);
+                                teams.get(teamOwner.getUniqueId()).add(p.getUniqueId());
+                                p.setGameMode(GameMode.SURVIVAL);
+                                p.setFlying(false);
+                                p.setAllowFlight(false);
+
+                                sender.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully put " + ChatColor.LIGHT_PURPLE + p.getDisplayName() + ChatColor.GREEN + " onto " + ChatColor.LIGHT_PURPLE + teamOwner.getDisplayName() + ChatColor.GREEN + "'s team!");
+                            }
+                        }
+                        else
+                        {
+                            if((teams.get(teamOwner.getUniqueId()).size() + 1) == ConfigInventory.teamSize)
+                            {
+                                UUID temp = teams.get(teamOwner.getUniqueId()).get(0);
+                                boolean check = false;
+
+                                for(int i = 0; i < teams.get(teamOwner.getUniqueId()).size(); i++)
+                                {
+                                    if(Bukkit.getPlayer(teams.get(teamOwner.getUniqueId()).get(i)) != null)
+                                    {
+                                        temp = teams.get(teamOwner.getUniqueId()).get(i);
+                                        check = true;
+                                        break;
+                                    }
+                                }
+
+                                if(check)
+                                {
+                                    Player t = Bukkit.getPlayer(temp);
+                                    teams.get(teamOwner.getUniqueId()).remove(t.getUniqueId());
+                                    ArrayList<UUID> temparray = teams.get(teamOwner.getUniqueId());
+                                    disbandTeam(teamOwner);
+                                    createTeam(teamOwner);
+                                    createTeam(t);
+                                    teams.put(t.getUniqueId(), temparray);
+
+                                    ArrayList<UUID> newTeam = new ArrayList<UUID>();
+                                    newTeam.add(p.getUniqueId());
+                                    teams.put(teamOwner.getUniqueId(), newTeam);
+                                }
+                                else
+                                {
+
+                                }
+                            }
+                            else
+                            {
+                                disbandTeam(p);
+                                teams.get(teamOwner.getUniqueId()).add(p.getUniqueId());
+                                p.setGameMode(GameMode.SURVIVAL);
+                                p.setFlying(false);
+                                p.setAllowFlight(false);
+
+                                sender.sendMessage(Teamprefix + ChatColor.GREEN + " You have successfully put " + ChatColor.LIGHT_PURPLE + p.getDisplayName() + ChatColor.GREEN + " onto " + ChatColor.LIGHT_PURPLE + teamOwner.getDisplayName() + ChatColor.GREEN + "'s team!");
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                    }
+                }
+                else
+                {
+                    sender.sendMessage(ChatColor.RED + "That player is not on a team!");
+                }
+            }
+            else
+            {
+                sender.sendMessage(ChatColor.RED + "That player is a host/mod/spectator!");
+            }
+        }
     }
 }

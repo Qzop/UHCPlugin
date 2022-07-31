@@ -34,12 +34,26 @@ public class Practice implements Listener
         kills.addEntry(ChatColor.AQUA + "Kills " + ChatColor.GRAY + "» ");
 
         Objective objective = scoreboard.getObjective("Practice");
+        Objective obj = scoreboard.getObjective("Arena");
+        Objective below = scoreboard.getObjective(ChatColor.RED + "♥");
 
         if(objective == null)
         {
             objective = scoreboard.registerNewObjective("Practice", "Scoreboard");
             objective.setDisplaySlot(DisplaySlot.SIDEBAR);
             objective.setDisplayName("" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC");
+        }
+
+        if(obj == null)
+        {
+            obj = scoreboard.registerNewObjective("Arena", "health");
+            obj.setDisplaySlot(DisplaySlot.PLAYER_LIST);
+        }
+
+        if(below == null)
+        {
+            below = scoreboard.registerNewObjective(ChatColor.RED + "♥", "health");
+            below.setDisplaySlot(DisplaySlot.BELOW_NAME);
         }
 
         Score score1 = objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.GRAY + "» ");
@@ -68,7 +82,6 @@ public class Practice implements Listener
                     scat.setScatter(p);
                     cancel();
                 }
-
             }
 
         }.runTaskTimer(plugin, 0, 1);

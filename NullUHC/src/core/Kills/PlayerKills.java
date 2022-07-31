@@ -270,11 +270,19 @@ public class PlayerKills implements Listener
                     }.runTaskTimer(plugin, 0, 20);
                 }
 
+                PlayerKills.deathLocations.put(p.getUniqueId(), p.getLocation());
+                Scatter.allPlayers.remove(p.getUniqueId());
+
                 if(ConfigInventory.teamSize > 1)
                 {
                     TeamManager tm = new TeamManager();
                     UUID cap = tm.getCaptain(p);
                     int count = 0;
+
+                    if(!Scatter.allPlayers.contains(cap))
+                    {
+                        count++;
+                    }
 
                     for(UUID uuid : TeamManager.teams.get(cap))
                     {
@@ -284,13 +292,11 @@ public class PlayerKills implements Listener
                         }
                     }
 
-                    if(count == ConfigInventory.teamSize)
+                    if(count == TeamManager.teams.get(cap).size() + 1)
                     {
-                        TeamManager.teams.remove(cap);
+                        TeamManager.aliveTeams--;
                     }
                 }
-
-                PlayerKills.deathLocations.put(p.getUniqueId(), p.getLocation());
 
                 if(p.getKiller() != null)
                 {

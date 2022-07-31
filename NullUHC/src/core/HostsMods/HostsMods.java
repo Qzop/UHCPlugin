@@ -65,6 +65,7 @@ public class HostsMods
 
             p.teleport(loc);
             items.hostmodItemsInGame(p);
+            p.spigot().setCollidesWithEntities(false);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Host.");
         }
     }
@@ -108,6 +109,7 @@ public class HostsMods
 
             p.teleport(loc);
             items.hostmodItemsInGame(p);
+            p.spigot().setCollidesWithEntities(false);
             p.sendMessage(Scatter.UHCprefix + ChatColor.GREEN + " You are now a Mod.");
         }
     }
@@ -140,6 +142,7 @@ public class HostsMods
             }
 
             p.teleport(Bukkit.getWorld("world").getSpawnLocation());
+            p.spigot().setCollidesWithEntities(true);
             p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You are no longer Host.");
         }
         else
@@ -175,6 +178,7 @@ public class HostsMods
         	
             mods.remove(p.getUniqueId());
             p.teleport(Bukkit.getWorld("world").getSpawnLocation());
+            p.spigot().setCollidesWithEntities(true);
             p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You are no longer Mod.");
         }
         else

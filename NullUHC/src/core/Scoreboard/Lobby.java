@@ -123,6 +123,11 @@ public class Lobby implements Listener
                 }
                 else
                 {
+                    if(p.getScoreboard().getObjective("Teams") != null)
+                    {
+
+                    }
+
                     finalTeamsize.setSuffix("" + ChatColor.YELLOW + "To" + ConfigInventory.teamSize);
                 }
 
@@ -138,7 +143,6 @@ public class Lobby implements Listener
                 	prac.setPractice(p);
                    	cancel();
                 }
-                
             }
 
         }.runTaskTimer(plugin, 0, 1);

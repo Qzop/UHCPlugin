@@ -3,12 +3,10 @@ package core.Scoreboard;
 import core.Config.ConfigInventory;
 import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
-import core.Kills.Spectator;
 import core.Kills.TeamKills;
 import core.Scatter.Scatter;
 import core.Teams.TeamManager;
 import core.mainPackage.Main;
-import net.minecraft.server.v1_7_R4.ScoreboardTeam;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -16,9 +14,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.*;
-
-import javax.persistence.Lob;
-import java.util.UUID;
 
 public class Game implements Listener
 {
@@ -186,8 +181,10 @@ public class Game implements Listener
         Team teamkills = scoreboard.getTeam("tk");
         Team kills = scoreboard.getTeam("k");
         Team teamsize = scoreboard.getTeam("ts");
+        Team numteams = scoreboard.getTeam("numteams");
+        Team alive = scoreboard.getTeam("palive");
 
-        if(host == null && time == null && teamkills == null && kills == null && teamsize == null)
+        if(host == null && time == null && teamkills == null && kills == null && teamsize == null && numteams == null && alive == null)
         {
             host = scoreboard.registerNewTeam("h");
             host.addEntry(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ");
@@ -203,6 +200,12 @@ public class Game implements Listener
 
             teamsize = scoreboard.registerNewTeam("ts");
             teamsize.addEntry(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
+
+            numteams = scoreboard.registerNewTeam("numteams");
+            numteams.addEntry(ChatColor.AQUA + "Teams " + ChatColor.GRAY + "» ");
+
+            alive = scoreboard.registerNewTeam("palive");
+            alive.addEntry(ChatColor.AQUA + "Alive " + ChatColor.GRAY + "» ");
         }
 
         Objective objective = scoreboard.getObjective("TeamGame");
@@ -217,11 +220,15 @@ public class Game implements Listener
         if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()))
         {
             Score score = objective.getScore(ChatColor.AQUA + "Time " + ChatColor.GRAY + "» ");
-            score.setScore(5);
+            score.setScore(7);
             Score score1 = objective.getScore(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ");
-            score1.setScore(4);
-            Score score3 = objective.getScore(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
-            score3.setScore(3);
+            score1.setScore(6);
+            Score score2 = objective.getScore(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
+            score2.setScore(5);
+            Score score3 = objective.getScore(ChatColor.AQUA + "Teams " + ChatColor.GRAY + "» ");
+            score3.setScore(4);
+            Score score8 = objective.getScore(ChatColor.AQUA + "Alive " + ChatColor.GRAY + "» ");
+            score8.setScore(3);
             Score score6 = objective.getScore("");
             score6.setScore(2);
             Score score7 = objective.getScore(ChatColor.YELLOW + "nulluhc.com");
@@ -230,11 +237,15 @@ public class Game implements Listener
         else
         {
             Score score = objective.getScore(ChatColor.AQUA + "Time " + ChatColor.GRAY + "» ");
-            score.setScore(7);
+            score.setScore(9);
             Score score1 = objective.getScore(ChatColor.AQUA + "Host " + ChatColor.GRAY + "» ");
-            score1.setScore(6);
-            Score score3 = objective.getScore(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
-            score3.setScore(5);
+            score1.setScore(8);
+            Score score2 = objective.getScore(ChatColor.AQUA + "TeamSize " + ChatColor.GRAY + "» ");
+            score2.setScore(7);
+            Score score3 = objective.getScore(ChatColor.AQUA + "Teams " + ChatColor.GRAY + "» ");
+            score3.setScore(6);
+            Score score8 = objective.getScore(ChatColor.AQUA + "Alive " + ChatColor.GRAY + "» ");
+            score8.setScore(5);
             Score score4 = objective.getScore(ChatColor.AQUA + "TeamKills " + ChatColor.GRAY + "» ");
             score4.setScore(4);
             Score score5 = objective.getScore(ChatColor.AQUA + "Kills " + ChatColor.GRAY + "» ");
@@ -250,6 +261,8 @@ public class Game implements Listener
         Team finalTeamkills = teamkills;
         Team finalTeamsize = teamsize;
         Team finalHost = host;
+        Team finalNumTeams = numteams;
+        Team finalAlive = alive;
 
         new BukkitRunnable()
         {
@@ -259,6 +272,8 @@ public class Game implements Listener
                 finalKills.setSuffix(ChatColor.YELLOW + "" + PlayerKills.numKills.get(p.getUniqueId()));
                 finalTeamkills.setSuffix(ChatColor.YELLOW + "" + tk.getTeamKills(p));
                 finalTeamsize.setSuffix(ChatColor.YELLOW + "To" + ConfigInventory.teamSize);
+                finalAlive.setSuffix("" + ChatColor.YELLOW + Scatter.allPlayers.size());
+                finalNumTeams.setSuffix("" + ChatColor.YELLOW + TeamManager.aliveTeams);
 
                 if(HostsMods.hosts.isEmpty())
                 {
@@ -288,12 +303,12 @@ public class Game implements Listener
                             finalHost.setSuffix("" + ChatColor.YELLOW + h.getDisplayName());
                         }
                     }
+                }
 
-                    if(Scatter.ended)
-                    {
-                        end.onWinner(p);
-                        cancel();
-                    }
+                if(Scatter.ended)
+                {
+                    end.onWinner(p);
+                    cancel();
                 }
             }
 

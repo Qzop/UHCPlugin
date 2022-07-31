@@ -46,7 +46,7 @@ public class Time implements Listener
 				}
 				else
 				{
-					if(TeamManager.teams.size() == 1)
+					if(TeamManager.aliveTeams == 1)
 					{
 						Scatter.ended = true;
 						announceWinners();
@@ -60,6 +60,11 @@ public class Time implements Listener
 				{
 					for(UUID k : NPCEvent.disconnected.keySet())
 					{
+						if(NPCEvent.disconnected.get(k) == 0)
+						{
+							Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.AQUA + Bukkit.getOfflinePlayer(k).getName() + ChatColor.RED + " has disconnected and has 10 minutes to reconnect.");
+						}
+
 						if(NPCEvent.disconnected.get(k) == 600)
 						{
 							NPCEvent npc = new NPCEvent();
@@ -78,6 +83,37 @@ public class Time implements Listener
 
 							NPCEvent.disconnected.put(k, NPCEvent.disconnected.get(k) + 1);
 						}
+					}
+				}
+
+				if(!Scatter.offlineDuringScat.isEmpty())
+				{
+					for(UUID k : Scatter.offlineDuringScat.keySet())
+					{
+						if(Scatter.offlineDuringScat.get(k) == 0)
+						{
+							Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.AQUA + Bukkit.getOfflinePlayer(k).getName() + ChatColor.RED + " has disconnected and has 10 minutes to reconnect.");
+						}
+
+						if(Scatter.offlineDuringScat.get(k) == 600)
+						{
+							NPCEvent.disqualified.add(k);
+							Scatter.offlineDuringScat.remove(k);
+							Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.GOLD + Bukkit.getOfflinePlayer(k).getName() + ChatColor.RED + " Has been disqualified for being disconnected for more than 10 minutes.");
+						}
+						else
+						{
+							if(Scatter.offlineDuringScat.get(k) % 60 == 0 && Scatter.offlineDuringScat.get(k) != 0)
+							{
+								int currtime = Scatter.offlineDuringScat.get(k) / 60;
+								OfflinePlayer offp = Bukkit.getOfflinePlayer(k);
+
+								Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.AQUA + offp.getName() + ChatColor.RED + " has "
+										+ ChatColor.AQUA + (10 - currtime) + ChatColor.RED + " minute(s) to reconnect.");
+							}
+						}
+
+						Scatter.offlineDuringScat.put(k, Scatter.offlineDuringScat.get(k) + 1);
 					}
 				}
                 
@@ -330,7 +366,7 @@ public class Time implements Listener
 				{
 					if(i == TeamManager.teams.get(winner).size() - 1)
 					{
-						winners += "and " + win.getName();
+						winners += " and " + win.getName();
 					}
 					else
 					{

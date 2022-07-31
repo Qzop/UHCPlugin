@@ -1,5 +1,6 @@
 package core.Events;
 
+import core.mainPackage.Commands;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
@@ -18,7 +19,11 @@ public class BreakEvent implements Listener
 	{
 		Player p = e.getPlayer();
 
-		if(Scatter.started)
+		if(Commands.scatter)
+		{
+			e.setCancelled(true);
+		}
+		else if(Scatter.started)
 		{
 			if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()) || p.getWorld().getName().equals("world") || p.getWorld().getName().equals("Arena"))
 			{

@@ -1,7 +1,9 @@
 package core.Kills;
 
 import core.Chat.ChatEvent;
+import core.Config.ConfigInventory;
 import core.Scatter.Scatter;
+import core.Teams.TeamManager;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -14,17 +16,13 @@ import org.bukkit.event.player.PlayerMoveEvent;
 import core.ConfigVariables.BedRockBorder;
 import core.HostsMods.HostsMods;
 
+import java.util.UUID;
+
 public class Spectator implements Listener
 {
     public void setSpectator(Player p)
     {
         Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
-
-        if(Scatter.allPlayers.contains(p.getUniqueId()))
-        {
-            Scatter.allPlayers.remove(p.getUniqueId());
-        }
-
         PlayerKills.spectator.add(p.getUniqueId());
 
         if(!ChatEvent.specchat.contains(p.getUniqueId()))

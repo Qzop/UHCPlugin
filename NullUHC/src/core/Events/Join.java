@@ -104,6 +104,7 @@ public class Join implements Listener
 
             World world = Bukkit.getWorld("world");
             removeAllPotions(p);
+            p.setMaxHealth(20);
             p.teleport(world.getSpawnLocation());
 
             for(Player players : Main.online.getOnlinePlayers())
@@ -263,6 +264,8 @@ public class Join implements Listener
                 }
             }
         }
+
+        alwaysShowPlayers(p);
     }
 
     private void removeAllPotions(Player p)
@@ -353,7 +356,23 @@ public class Join implements Listener
             }
 
         }.runTaskTimer(plugin, 0, 1);
+    }
 
+    public void alwaysShowPlayers(Player p)
+    {
+        new BukkitRunnable()
+        {
+            public void run()
+            {
+                for(Player players : Main.online.getOnlinePlayers())
+                {
+                    if(!HostsMods.hosts.contains(players.getUniqueId()) && !HostsMods.mods.contains(players.getUniqueId()) && !PlayerKills.spectator.contains(players.getUniqueId()))
+                    {
+                        p.showPlayer(players);
+                    }
+                }
+            }
 
+        }.runTaskTimer(plugin, 0, 40);
     }
 }

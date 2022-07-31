@@ -8,6 +8,7 @@ import core.Arena.ArenaKills;
 import core.Chat.ChatEvent;
 import core.ChunkLoad.Chunks;
 import core.Config.ConfigEvent;
+import core.Config.ConfigInventory;
 import core.ConfigVariables.*;
 import core.Events.*;
 import core.GoldenHead.GoldenHead;
@@ -28,12 +29,16 @@ import java.io.IOException;
 import java.util.UUID;
 
 import core.Scoreboard.ScoreboardTeams;
+import core.Scoreboard.Time;
 import net.citizensnpcs.api.npc.NPCRegistry;
 import net.minecraft.util.org.apache.commons.io.FileUtils;
 import org.bukkit.*;
 import org.bukkit.entity.NPC;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends JavaPlugin implements Listener
 {
@@ -210,6 +215,40 @@ public class Main extends JavaPlugin implements Listener
 			{
 				chunks.loadUHCWorldChunks();
 			}
+		}
+	}
+
+	@EventHandler
+	public void setMOTD(final ServerListPingEvent e)
+	{
+		if(!Scatter.started && !Commands.scatter)
+		{
+			e.setMotd(ChatColor.WHITE + "§m----------------" + ChatColor.WHITE + "[" + ChatColor.YELLOW + ChatColor.BOLD + " NullUHC " + ChatColor.WHITE + "]" + "§m----------------" + "\n"
+					+ ChatColor.AQUA + ChatColor.BOLD + "NEW UHC SERVER " + ChatColor.GRAY + "- " + ChatColor.GREEN + "Currently in " + ChatColor.RED + ChatColor.BOLD + "Beta" + ChatColor.GREEN + "!"
+			        + ChatColor.LIGHT_PURPLE + " /discord");
+		}
+		else if(Commands.scatter)
+		{
+			e.setMotd(ChatColor.WHITE + "§m----------------" + ChatColor.WHITE + "[" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC" + ChatColor.WHITE + "]" + "§m----------------" + "\n"
+					+ ChatColor.RED + ChatColor.BOLD + "Currently in Scatter." + ChatColor.LIGHT_PURPLE + " Late scatter up to " + ConfigInventory.latescatter + " min!");
+		}
+		else if(Scatter.started)
+		{
+			if(Time.minutes <= ConfigInventory.latescatter)
+			{
+				e.setMotd(ChatColor.WHITE + "§m----------------" + ChatColor.WHITE + "["  + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC" + ChatColor.WHITE + "]" + "§m----------------" + "\n"
+						+ ChatColor.AQUA + ChatColor.BOLD + "The UHC has started!" + ChatColor.LIGHT_PURPLE + " Late Scatter is open.");
+			}
+			else
+			{
+				e.setMotd(ChatColor.WHITE + "§m----------------" + ChatColor.WHITE + "[" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC" + ChatColor.WHITE + "]" + "§m----------------" + "\n"
+						+ ChatColor.AQUA + ChatColor.BOLD + "The UHC has started!" + ChatColor.RED + " Late Scatter is closed.");
+			}
+		}
+		else if(Scatter.ended)
+		{
+			e.setMotd(ChatColor.WHITE + "§m----------------" + ChatColor.WHITE + "[" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC" + "]" + "§m----------------" + "\n"
+					+ ChatColor.AQUA + ChatColor.BOLD + "The UHC has ended!" + ChatColor.RED + " Server is restarting.");
 		}
 	}
 }

@@ -8,14 +8,18 @@ import core.Config.ConfigInventory;
 import core.ConfigVariables.BedRockBorder;
 import core.ConfigVariables.Horses;
 import core.Events.Join;
+import core.Events.NPCEvent;
 import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
 import core.Scenarios.SuperheroesCMD;
 import core.ScenariosInventory.ScenariosInventory;
 import core.Scoreboard.Time;
 import core.Teams.TeamManager;
+import net.citizensnpcs.api.CitizensAPI;
+import net.citizensnpcs.api.npc.NPC;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -35,9 +39,8 @@ public class Scatter implements Listener
     private PlayerKills kills = new PlayerKills();
     private BedRockBorder bord = new BedRockBorder();
     public static ArrayList<UUID> allPlayers = new ArrayList<UUID>();
-    public static String UHCprefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + ChatColor.BOLD + "UHC" + ChatColor.GRAY + "]";
+    public static String UHCprefix = ChatColor.GRAY + "[" + ChatColor.YELLOW + ChatColor.BOLD + "NullUHC" + ChatColor.GRAY + "]";
     Main plugin = Main.getPlugin(Main.class);
-    public static ArrayList<UUID> offlineDuringScat = new ArrayList<UUID>();
     public static ArrayList<UUID> alreadyScattered = new ArrayList<UUID>();
     private static boolean scatDone = false;
     public static boolean started = false;
@@ -47,6 +50,7 @@ public class Scatter implements Listener
     public static int teamsScattered = 0;
     private static HashMap<UUID, Location> teamLocations = new HashMap<UUID, Location>();
     private static ArrayList<Location> ffaLocations = new ArrayList<Location>();
+    public static HashMap<UUID, Integer> offlineDuringScat = new HashMap<UUID, Integer>();
     public static int numShrinks = 0;
     private TeamManager tm = new TeamManager();
     private Join join = new Join();
@@ -178,11 +182,11 @@ public class Scatter implements Listener
         {
             for(Player p : Main.online.getOnlinePlayers())
             {
-                if(!HostsMods.hosts.contains(p.getUniqueId()) || !HostsMods.mods.contains(p.getUniqueId()))
+                if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()) && !PlayerKills.spectator.contains(p.getUniqueId()))
                 {
                     if(!tm.findTeam(p))
                     {
-                        tm.createTeam(p);
+                        tm.lateScatterCreateTeam(p);
                     }
                 }
             }
@@ -284,7 +288,7 @@ public class Scatter implements Listener
         ArrayList<String> allRules = new ArrayList<String>();
 
         allRules.add("\n" + ChatColor.LIGHT_PURPLE + "Rule #1: " + ChatColor.AQUA + "Hacked clients, Xray/Cavefinder, AutoClickers, or anything that gives an unfair advantage are not allowed.");
-        allRules.add(ChatColor.LIGHT_PURPLE + "Rule #2: " + ChatColor.AQUA + "F5 abuse and 'F3 + a' abuse are not allowed.");
+        allRules.add(ChatColor.LIGHT_PURPLE + "Rule #2: " + ChatColor.AQUA + "F5 abuse is allowed.");
         allRules.add(ChatColor.LIGHT_PURPLE + "Rule #3: " + ChatColor.AQUA + "Threatening players, trash talk, or any disrespectful behavior is prohibited.");
         allRules.add(ChatColor.LIGHT_PURPLE + "Rule #4: " + ChatColor.AQUA + "Intentionally dying to benefit another player is prohibited.");
         allRules.add(ChatColor.LIGHT_PURPLE + "Rule #5: " + ChatColor.AQUA + "Abusing Helpop, by sending unnecessary messages, is prohibited.");
@@ -321,7 +325,7 @@ public class Scatter implements Listener
 
                         for(Player p : Main.online.getOnlinePlayers())
                         {
-                            if(!HostsMods.hosts.contains(p.getUniqueId()) || !HostsMods.mods.contains(p.getUniqueId()) || !PlayerKills.spectator.contains(p.getUniqueId()))
+                            if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()) && !PlayerKills.spectator.contains(p.getUniqueId()))
                             {
                                 cmd.setSuperPower(p.getDisplayName(), "assign");
                             }
@@ -371,8 +375,11 @@ public class Scatter implements Listener
                 }
                 else
                 {
-                    Bukkit.broadcastMessage(allRules.get(rules));
-                    rules++;
+                    if(allRules.get(rules) != null)
+                    {
+                        Bukkit.broadcastMessage(allRules.get(rules));
+                        rules++;
+                    }
                 }
             }
 
@@ -399,11 +406,18 @@ public class Scatter implements Listener
                     }
                     else
                     {
-                    	world.getChunkAt(ffaLocations.get(index)).load(true);
-                        ffa.get(index).teleport(ffaLocations.get(index));
-                        alreadyScattered.add(ffa.get(index).getUniqueId());
-                        ffa.get(index).setVelocity(new Vector().zero());
-                        ffaScattered++;
+                        if(Bukkit.getPlayer(ffa.get(index).getUniqueId()) == null)
+                        {
+                            allPlayers.remove(ffa.get(index).getUniqueId());
+                        }
+                        else
+                        {
+                            world.getChunkAt(ffaLocations.get(index)).load(true);
+                            ffa.get(index).teleport(ffaLocations.get(index));
+                            alreadyScattered.add(ffa.get(index).getUniqueId());
+                            ffa.get(index).setVelocity(new Vector().zero());
+                            ffaScattered++;
+                        }
                     }
 
                     index++;
@@ -433,7 +447,7 @@ public class Scatter implements Listener
 
                         if(owner == null)
                         {
-                            offlineDuringScat.add(tempKeys.get(index));
+                            offlineDuringScat.put(tempKeys.get(index), 0);
                         }
                         else
                         {
@@ -447,16 +461,16 @@ public class Scatter implements Listener
 
                             if(teammate == null)
                             {
-                                offlineDuringScat.add(TeamManager.teams.get(tempKeys.get(index)).get(i));
+                                offlineDuringScat.put(TeamManager.teams.get(tempKeys.get(index)).get(i), 0);
                             }
                             else
                             {
                                 teammate.teleport(teamLocations.get(tempKeys.get(index)));
                                 world.getChunkAt(teamLocations.get(tempKeys.get(index))).load(true);
                             }
-
-                            teamsScattered++;
                         }
+
+                        teamsScattered++;
                     }
 
                     index++;
@@ -503,7 +517,7 @@ public class Scatter implements Listener
         p.setVelocity(new Vector());
 
         p.getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
-        p.sendMessage(UHCprefix + ChatColor.GREEN + "You have been late scattered! Use /helpop if you need help.");
+        p.sendMessage(UHCprefix + ChatColor.GREEN + " You have been late scattered! Use /helpop if you need help.");
     }
 
     public void lateScatterTeams(Player p)
@@ -554,7 +568,7 @@ public class Scatter implements Listener
             p.setVelocity(new Vector());
 
             p.getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
-            p.sendMessage(UHCprefix + ChatColor.GREEN + "You have been late scattered! Use /helpop if you need help.");
+            p.sendMessage(UHCprefix + ChatColor.GREEN + " You have been late scattered! Use /helpop if you need help.");
         }
     }
 }

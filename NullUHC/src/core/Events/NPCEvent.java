@@ -8,10 +8,7 @@ import net.citizensnpcs.api.event.NPCDamageByEntityEvent;
 import net.citizensnpcs.api.event.NPCDamageEvent;
 import net.citizensnpcs.api.event.NPCDeathEvent;
 import net.citizensnpcs.api.npc.NPC;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -156,11 +153,14 @@ public class NPCEvent implements Listener
         }
         else
         {
-            Scatter.allPlayers.remove(p);
-
             TeamManager tm = new TeamManager();
             UUID cap = tm.getCaptainOffline(Bukkit.getOfflinePlayer(p));
             int count = 0;
+
+            if(!Scatter.allPlayers.contains(cap))
+            {
+                count++;
+            }
 
             for(UUID uuid : TeamManager.teams.get(cap))
             {
@@ -170,9 +170,9 @@ public class NPCEvent implements Listener
                 }
             }
 
-            if(count == ConfigInventory.teamSize)
+            if(count == TeamManager.teams.get(cap).size() + 1)
             {
-                TeamManager.teams.remove(cap);
+                TeamManager.aliveTeams--;
             }
         }
 

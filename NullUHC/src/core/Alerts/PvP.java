@@ -1,6 +1,8 @@
 package core.Alerts;
 
 import core.Config.ConfigInventory;
+import core.HostsMods.HostsMods;
+import core.Kills.PlayerKills;
 import core.Scatter.Scatter;
 import core.Scoreboard.Time;
 import core.mainPackage.Main;
@@ -46,23 +48,31 @@ public class PvP implements Listener
                         Player p1 = (Player) e.getEntity();
                         Player p2 = (Player) e.getDamager();
 
-                        if(!currentlyFighting.contains(p1.getUniqueId()))
+                        if(HostsMods.hosts.contains(p1.getUniqueId()) || HostsMods.hosts.contains(p2.getUniqueId()) || HostsMods.mods.contains(p1.getUniqueId())
+                                || HostsMods.mods.contains(p2.getUniqueId()) || PlayerKills.spectator.contains(p1.getUniqueId()) || PlayerKills.spectator.contains(p2.getUniqueId()))
                         {
-                            for(Player p : Main.online.getOnlinePlayers())
+                            e.setCancelled(true);
+                        }
+                        else
+                        {
+                            if(!currentlyFighting.contains(p1.getUniqueId()))
                             {
-                                if(p.hasPermission("uhc.alerts") && !Alerts.allalerts.contains(p.getUniqueId()) && !Alerts.pvpalerts.contains(p.getUniqueId()))
+                                for(Player p : Main.online.getOnlinePlayers())
                                 {
-                                    p.sendMessage(Alerts.alertPref + ChatColor.GOLD + " " + p1.getDisplayName() + ChatColor.AQUA + " is fighting " + ChatColor.GOLD + p2.getDisplayName());
+                                    if(p.hasPermission("uhc.alerts") && !Alerts.allalerts.contains(p.getUniqueId()) && !Alerts.pvpalerts.contains(p.getUniqueId()))
+                                    {
+                                        p.sendMessage(Alerts.alertPref + ChatColor.GOLD + " " + p1.getDisplayName() + ChatColor.AQUA + " is fighting " + ChatColor.GOLD + p2.getDisplayName());
+                                    }
                                 }
-                            }
 
-                            currentlyFighting.add(p1.getUniqueId());
-                            coolDown(p1);
+                                currentlyFighting.add(p1.getUniqueId());
+                                coolDown(p1);
 
-                            if(!currentlyFighting.contains(p2.getUniqueId()))
-                            {
-                                currentlyFighting.add(p2.getUniqueId());
-                                coolDown(p2);
+                                if(!currentlyFighting.contains(p2.getUniqueId()))
+                                {
+                                    currentlyFighting.add(p2.getUniqueId());
+                                    coolDown(p2);
+                                }
                             }
                         }
                     }

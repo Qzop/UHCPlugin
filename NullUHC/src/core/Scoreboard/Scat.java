@@ -73,7 +73,7 @@ public class Scat implements Listener
 
                 if(Scatter.started)
                 {
-                    if (ConfigInventory.teamSize == 1)
+                    if(ConfigInventory.teamSize == 1)
                     {
                         game.setGameFFA(p);
                     }
