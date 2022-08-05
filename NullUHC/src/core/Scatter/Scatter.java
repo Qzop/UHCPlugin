@@ -153,7 +153,7 @@ public class Scatter implements Listener
                     }
                     else
                     {
-                        teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 6, randomZ);
+                        teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
                         checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
                         Block block = checkloc.getBlock();
 
@@ -162,7 +162,7 @@ public class Scatter implements Listener
                             randomX = new Random().nextInt(ConfigInventory.borderSize - 1) - ConfigInventory.borderSize;
                             randomZ = new Random().nextInt(ConfigInventory.borderSize - 1) - ConfigInventory.borderSize;
 
-                            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 6, randomZ);
+                            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
                             checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
                             block = checkloc.getBlock();
                         }
@@ -211,7 +211,7 @@ public class Scatter implements Listener
                     }
                     else
                     {
-                        Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 6, randomZ);
+                        Location teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
                         Location checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
                         Block block = checkloc.getBlock();
 
@@ -220,7 +220,7 @@ public class Scatter implements Listener
                             randomX = new Random().nextInt(ConfigInventory.borderSize - 1) - ConfigInventory.borderSize;
                             randomZ = new Random().nextInt(ConfigInventory.borderSize - 1) - ConfigInventory.borderSize;
 
-                            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 6, randomZ);
+                            teleloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) + 2, randomZ);
                             checkloc = new Location(world, randomX, world.getHighestBlockYAt(randomX, randomZ) - 1, randomZ);
                             block = checkloc.getBlock();
                         }
@@ -241,15 +241,45 @@ public class Scatter implements Listener
     public void potionEffects()
     {
         // Give potion effects to players during scatter
-        for(Player p : Main.online.getOnlinePlayers())
+
+        if(ConfigInventory.teamSize == 1)
         {
-            if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
+            for(Player p : Main.online.getOnlinePlayers())
             {
-                allPlayers.add(p.getUniqueId());
-                p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 200), true);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200), true);
-                p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 200), true);
-                p.setVelocity(new Vector().zero());
+                if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
+                {
+                    allPlayers.add(p.getUniqueId());
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 200), true);
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200), true);
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 200), true);
+                    p.setVelocity(new Vector().zero());
+                }
+            }
+        }
+        else
+        {
+            for(Player p : Main.online.getOnlinePlayers())
+            {
+                if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
+                {
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.BLINDNESS, Integer.MAX_VALUE, 200), true);
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Integer.MAX_VALUE, 200), true);
+                    p.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 200), true);
+                    p.setVelocity(new Vector().zero());
+                }
+            }
+
+            for(UUID k : TeamManager.teams.keySet())
+            {
+                allPlayers.add(k);
+
+                if(!TeamManager.teams.get(k).isEmpty())
+                {
+                    for(int i = 0; i < TeamManager.teams.get(k).size(); i++)
+                    {
+                        allPlayers.add(TeamManager.teams.get(k).get(i));
+                    }
+                }
             }
         }
 
@@ -356,15 +386,6 @@ public class Scatter implements Listener
                         {
                             Bukkit.getPlayer(allPlayers.get(i)).getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
                         }
-                        else
-                        {
-                            OfflinePlayer p = Bukkit.getOfflinePlayer(allPlayers.get(i));
-
-                            if(!alreadyScattered.contains(allPlayers.get(i)))
-                            {
-                                allPlayers.remove(allPlayers.get(i));
-                            }
-                        }
                     }
 
                     started = true;
@@ -452,6 +473,7 @@ public class Scatter implements Listener
                         else
                         {
                             owner.teleport(teamLocations.get(tempKeys.get(index)));
+                            alreadyScattered.add(owner.getUniqueId());
                             world.getChunkAt(teamLocations.get(tempKeys.get(index))).load(true);
                         }
 
@@ -467,6 +489,7 @@ public class Scatter implements Listener
                             {
                                 teammate.teleport(teamLocations.get(tempKeys.get(index)));
                                 world.getChunkAt(teamLocations.get(tempKeys.get(index))).load(true);
+                                alreadyScattered.add(teammate.getUniqueId());
                             }
                         }
 
@@ -522,6 +545,7 @@ public class Scatter implements Listener
 
     public void lateScatterTeams(Player p)
     {
+        SuperheroesCMD cmd = new SuperheroesCMD();
         TeamManager t = new TeamManager();
 
         if(t.findTeam(p))
@@ -569,6 +593,18 @@ public class Scatter implements Listener
 
             p.getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
             p.sendMessage(UHCprefix + ChatColor.GREEN + " You have been late scattered! Use /helpop if you need help.");
+        }
+
+        if(ScenariosInventory.superheroes)
+        {
+            if(cmd.getSuperPower(p.getDisplayName()) == null)
+            {
+                cmd.setSuperPower(p.getDisplayName(), "assign");
+            }
+            else
+            {
+                cmd.InitializeSuperPower(p.getDisplayName(), cmd.getSuperPower(p.getDisplayName()));
+            }
         }
     }
 }

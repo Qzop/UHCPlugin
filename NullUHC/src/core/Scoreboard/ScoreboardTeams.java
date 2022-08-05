@@ -77,6 +77,7 @@ public class ScoreboardTeams implements Listener
 
     public void onTeamCreate(Player owner)
     {
+        // getScoreBoard(owner) might be null for some people who late scatter.
         Team team = getScoreBoard(owner).registerNewTeam(owner.getDisplayName());
         team.addEntry(owner.getDisplayName());
         ChatColor color = getColors();

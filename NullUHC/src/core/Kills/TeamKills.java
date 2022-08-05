@@ -19,11 +19,17 @@ public class TeamKills implements Listener
         {
             UUID cap = team.getCaptain(p);
 
-            total += PlayerKills.numKills.get(cap);
+            if(PlayerKills.numKills.get(cap) != null)
+            {
+                total += PlayerKills.numKills.get(cap);
+            }
 
             for(int i = 0; i < TeamManager.teams.get(cap).size(); i++)
             {
-                total += PlayerKills.numKills.get(TeamManager.teams.get(cap).get(i));
+                if(PlayerKills.numKills.get(TeamManager.teams.get(cap).get(i)) != null)
+                {
+                    total += PlayerKills.numKills.get(TeamManager.teams.get(cap).get(i));
+                }
             }
 
             return total;

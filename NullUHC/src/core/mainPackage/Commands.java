@@ -1,6 +1,6 @@
 package core.mainPackage;
 
-import com.sun.org.apache.regexp.internal.RE;
+
 import core.Alerts.Alerts;
 import core.Alerts.BugReport;
 import core.Alerts.ReportInv;
@@ -59,6 +59,7 @@ public class Commands implements Listener, CommandExecutor
 	private KillTop killtop = new KillTop();
 
 	private ArrayList<UUID> brightness = new ArrayList<UUID>();
+	private static ArrayList<UUID> teamchat = new ArrayList<UUID>();
 	
 	String uhc = "uhc";
 	String config = "config";
@@ -304,6 +305,59 @@ public class Commands implements Listener, CommandExecutor
 						else
 						{
 							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You cannot use that command now!");
+						}
+					}
+					else if(args[0].equals("coords"))
+					{
+						if(started)
+						{
+							if(tm.findTeam(p))
+							{
+								UUID cap = tm.getCaptain(p);
+
+								if(Bukkit.getPlayer(cap) != null && cap != p.getUniqueId())
+								{
+									Bukkit.getPlayer(cap).sendMessage(TeamManager.Teamprefix + ChatColor.GREEN + " " + p.getDisplayName() + "'s coordinates:\n"
+									+ ChatColor.YELLOW + "X: " + p.getLocation().getBlockX() + " Y: " + p.getLocation().getBlockY() + " Z: " + p.getLocation().getBlockZ());
+								}
+
+								for(int i = 0; i < TeamManager.teams.get(cap).size(); i++)
+								{
+									if(Bukkit.getPlayer(TeamManager.teams.get(cap).get(i)) != null && TeamManager.teams.get(cap).get(i) != p.getUniqueId())
+									{
+										Bukkit.getPlayer(TeamManager.teams.get(cap).get(i)).sendMessage(TeamManager.Teamprefix + ChatColor.GREEN + " " + p.getDisplayName() + "'s coordinates:\n"
+												+ ChatColor.YELLOW + "X: " + p.getLocation().getBlockX() + " Y: " + p.getLocation().getBlockY() + " Z: " + p.getLocation().getBlockZ());
+									}
+								}
+
+								p.sendMessage(TeamManager.Teamprefix + ChatColor.GREEN + " Coordinates sent successfully.");
+							}
+							else
+							{
+								p.sendMessage(ChatColor.RED + "You are not on a team!");
+							}
+						}
+						else
+						{
+							p.sendMessage(ChatColor.RED + "You may not use this now!");
+						}
+					}
+					else if(args[0].equals("chat"))
+					{
+						if(started)
+						{
+							if(tm.findTeam(p))
+							{
+								p.sendMessage(ChatColor.YELLOW + "Coming soon.");
+							}
+							else
+							{
+								p.sendMessage(ChatColor.YELLOW + "Coming soon.");
+							}
+						}
+						else
+						{
+							p.sendMessage(ChatColor.RED + "You may not use this now!");
 						}
 					}
 					else if(args[0].equals("invite"))
@@ -561,7 +615,7 @@ public class Commands implements Listener, CommandExecutor
 				p.sendMessage(ChatColor.RED + "No permission.");
 			}
 		}
-		else if(label.equalsIgnoreCase(arena))
+		else if(label.equalsIgnoreCase(arena) || label.equalsIgnoreCase("a"))
 		{
 			if(args.length == 0)
 			{
@@ -571,23 +625,12 @@ public class Commands implements Listener, CommandExecutor
 				}
 				else
 				{
-					p.sendMessage(ChatColor.RED + "You are already in the arena! Use /arena leave to leave.");
+					a.onArenaLeave(p);
 				}
 			}
 			else if(args.length == 1)
 			{
-				if(args[0].equals("leave"))
-				{
-					if(!PracticeArena.playersInArena.contains(p.getUniqueId()))
-					{
-						p.sendMessage(ChatColor.RED + "You are not in the arena! Use /arena to join.");
-					}
-					else
-					{
-						a.onArenaLeave(p);
-					}
-				}
-				else if(args[0].equals("kill"))
+				if(args[0].equals("kill"))
 				{
 					if(p.hasPermission("arena.kill"))
 					{
@@ -601,7 +644,7 @@ public class Commands implements Listener, CommandExecutor
 				}
 				else
 				{
-					p.sendMessage(ChatColor.RED + "Usage: /arena (leave)");
+					p.sendMessage(ChatColor.RED + "Usage: /arena");
 				}
 			}
 		}
@@ -705,7 +748,7 @@ public class Commands implements Listener, CommandExecutor
 				p.sendMessage(ChatColor.RED + "No Permission.");
 			}
 		}
-		else if(label.equalsIgnoreCase(spawn))
+		else if(label.equalsIgnoreCase(spawn) || label.equalsIgnoreCase("lobby") || label.equalsIgnoreCase("hub"))
 		{
 			if(args.length == 0)
 			{
@@ -791,22 +834,35 @@ public class Commands implements Listener, CommandExecutor
 			{
 				if(args.length == 0)
 				{
-					p.setHealth(p.getHealth() + (20.0 - p.getHealth()));
+					p.setHealth(p.getHealth() + (p.getMaxHealth() - p.getHealth()));
 					p.sendMessage(ChatColor.GREEN + "You have been healed successfully.");
 				}
 				else if(args.length == 1)
 				{
-					Player target = Bukkit.getPlayer(args[0]);
-
-					if(target != null)
+					if(args[0].equals("all"))
 					{
-						target.setHealth(target.getHealth() + (20.0 - target.getHealth()));
-						p.sendMessage(ChatColor.GREEN + "You have healed '" + target.getDisplayName() + "' successfully.");
-						target.sendMessage(ChatColor.GREEN + "You have been healed.");
+						for(Player players : Main.online.getOnlinePlayers())
+						{
+							players.setHealth(players.getHealth() + (players.getMaxHealth() - players.getHealth()));
+							players.sendMessage(ChatColor.GREEN + "You have been healed.");
+						}
+
+						p.sendMessage(ChatColor.GREEN + "You have healed everyone successfully.");
 					}
 					else
 					{
-						p.sendMessage(ChatColor.RED + "That player is not online!");
+						Player target = Bukkit.getPlayer(args[0]);
+
+						if(target != null)
+						{
+							target.setHealth(target.getHealth() + (target.getMaxHealth() - target.getHealth()));
+							p.sendMessage(ChatColor.GREEN + "You have healed '" + target.getDisplayName() + "' successfully.");
+							target.sendMessage(ChatColor.GREEN + "You have been healed.");
+						}
+						else
+						{
+							p.sendMessage(ChatColor.RED + "That player is not online!");
+						}
 					}
 				}
 				else

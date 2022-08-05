@@ -4,62 +4,98 @@ import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
 import core.Scatter.Scatter;
 import core.ScenariosInventory.ScenariosInventory;
+import core.Teams.TeamManager;
 import core.mainPackage.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SuperheroesCMD implements Listener
 {
     private Map<String, String> playerToSuperPower = new HashMap<String, String>();
+    private TeamManager tm = new TeamManager();
     static Boolean isSuperHerosAssigned = false;
 
     public boolean setSuperPower(String playeName, String superPower)
     {
         Player p = Bukkit.getServer().getPlayer(playeName);
-        Team t = p.getPlayer().getScoreboard().getPlayerTeam(p);
 
         if(superPower.equalsIgnoreCase("assign"))
         {
             //        String[] playerPower = {" ", " ", " ", " "};
             //        String[] superPowers = {"health", "strength", "resistance", "speed"};
 
-            List<String> currentSuperPowers = new ArrayList<String>();
+            List<String> currentSuperPowers=new ArrayList<String>();
             currentSuperPowers.add("health");
             currentSuperPowers.add("strength");
             currentSuperPowers.add("resistance");
             currentSuperPowers.add("speed");
 
-            for(Player iPlayer : Main.online.getOnlinePlayers())
+            UUID cap = tm.getCaptain(p);
+            ArrayList<Player> tempteam = new ArrayList<Player>();
+
+            if(TeamManager.teams.get(cap).isEmpty())
             {
-                if(!HostsMods.hosts.contains(iPlayer.getUniqueId()) && !HostsMods.mods.contains(iPlayer.getUniqueId()) && !PlayerKills.spectator.contains(iPlayer.getUniqueId()))
+                String power = getSuperPower(p.getDisplayName());
+
+                if(power != null)
                 {
-                    String power = getSuperPower(iPlayer.getName());
+                    p.sendMessage("removing power " + power);
+                    int delIndex = 0;
+
+                    for (int i = 0; i < currentSuperPowers.size(); i++)
+                    {
+                        if (power.equalsIgnoreCase(currentSuperPowers.get(i)))
+                        {
+                            delIndex = i;
+                            break;
+                        }
+                    }
+
+                    currentSuperPowers.remove(delIndex);
+                }
+            }
+            else
+            {
+                if(Bukkit.getPlayer(cap) != null)
+                {
+                    tempteam.add(Bukkit.getPlayer(cap));
+                }
+
+                for(int i = 0; i < TeamManager.teams.get(cap).size(); i++)
+                {
+                    if(Bukkit.getPlayer(TeamManager.teams.get(cap).get(i)) != null)
+                    {
+                        tempteam.add(Bukkit.getPlayer(TeamManager.teams.get(cap).get(i)));
+                    }
+                }
+
+                for(Player player : tempteam)
+                {
+                    String power = getSuperPower(player.getDisplayName());
 
                     if(power != null)
                     {
                         p.sendMessage("removing power " + power);
                         int delIndex = 0;
-                        for(int i = 0; i < currentSuperPowers.size(); i++)
+
+                        for (int i = 0; i < currentSuperPowers.size(); i++)
                         {
-                            if(power.equalsIgnoreCase(currentSuperPowers.get(i)))
+                            if (power.equalsIgnoreCase(currentSuperPowers.get(i)))
                             {
                                 delIndex = i;
                                 break;
                             }
                         }
+
                         currentSuperPowers.remove(delIndex);
-                        //                    playerPower[index] = power;
-                        //                    index++;
                     }
                 }
             }

@@ -1,6 +1,7 @@
 package core.Events;
 
 import core.Config.ConfigInventory;
+import core.Kills.PlayerKills;
 import core.Scatter.Scatter;
 import core.Scoreboard.Time;
 import core.Teams.TeamManager;
@@ -55,6 +56,11 @@ public class NPCEvent implements Listener
 
     public void removeNPC(Player p)
     {
+        if(Scatter.offlineDuringScat.containsKey(p.getUniqueId()))
+        {
+            Scatter.offlineDuringScat.remove(p.getUniqueId());
+        }
+
         npcList.get(p.getUniqueId()).destroy();
         npcList.remove(p.getUniqueId());
         inventory.remove(p.getUniqueId());
@@ -86,29 +92,32 @@ public class NPCEvent implements Listener
         {
             if(npcList.get(keys).getUniqueId().equals(e.getNPC().getUniqueId()))
             {
-                Bukkit.broadcastMessage("TEST");
-
-                npcList.get(keys).destroy();
-
-                for (int i = 0; i < inventory.get(keys).size(); i++) {
-                    e.getNPC().getEntity().getWorld().dropItemNaturally(e.getNPC().getEntity().getLocation(), inventory.get(keys).get(i));
+                for (int i = 0; i < inventory.get(keys).size(); i++)
+                {
+                    if(inventory.get(keys).get(i).getType() != Material.AIR && inventory.get(keys).get(i) != null)
+                    {
+                        e.getNPC().getStoredLocation().getWorld().dropItemNaturally(e.getNPC().getStoredLocation(), inventory.get(keys).get(i));
+                    }
                 }
 
+                npcList.get(keys).destroy();
                 npcList.remove(keys);
                 disconnected.remove(keys);
                 inventory.remove(keys);
 
-                if(ConfigInventory.teamSize == 1)
-                {
-                    Scatter.allPlayers.remove(keys);
-                }
-                else
-                {
-                    Scatter.allPlayers.remove(keys);
+                Scatter.allPlayers.remove(keys);
+                PlayerKills.spectator.add(keys);
 
+                if(ConfigInventory.teamSize > 1)
+                {
                     TeamManager tm = new TeamManager();
                     UUID cap = tm.getCaptainOffline(Bukkit.getOfflinePlayer(keys));
                     int count = 0;
+
+                    if(!Scatter.allPlayers.contains(cap))
+                    {
+                        count++;
+                    }
 
                     for(UUID uuid : TeamManager.teams.get(cap))
                     {
@@ -118,9 +127,9 @@ public class NPCEvent implements Listener
                         }
                     }
 
-                    if(count == ConfigInventory.teamSize)
+                    if(count == TeamManager.teams.get(cap).size() + 1)
                     {
-                        TeamManager.teams.remove(cap);
+                        TeamManager.aliveTeams--;
                     }
                 }
             }
@@ -138,7 +147,7 @@ public class NPCEvent implements Listener
         {
             if(inventory.get(p).get(i).getType() != Material.AIR && inventory.get(p).get(i) != null)
             {
-                npcList.get(p).getEntity().getWorld().dropItemNaturally(npcList.get(p).getEntity().getLocation(), inventory.get(p).get(i));
+                npcList.get(p).getStoredLocation().getWorld().dropItemNaturally(npcList.get(p).getStoredLocation(), inventory.get(p).get(i));
             }
         }
 
@@ -147,11 +156,9 @@ public class NPCEvent implements Listener
         npcList.get(p).destroy();
         inventory.remove(p);
 
-        if(ConfigInventory.teamSize == 1)
-        {
-            Scatter.allPlayers.remove(p);
-        }
-        else
+        Scatter.allPlayers.remove(p);
+
+        if(ConfigInventory.teamSize > 1)
         {
             TeamManager tm = new TeamManager();
             UUID cap = tm.getCaptainOffline(Bukkit.getOfflinePlayer(p));

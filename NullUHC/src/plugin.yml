@@ -23,6 +23,7 @@ commands:
        description: For developers.
    arena:
        description: Allows Players to join the practice arena.
+       aliases: [a]
    border:
        description: Allows staff to shrink the border.
    gm: 
@@ -33,6 +34,7 @@ commands:
        description: Deletes a specfic world by name.
    spawn:
       description: Sets the spawn location of a world.
+      aliases: [lobby, hub]
    heal:
       description: Heals a player.
    feed:

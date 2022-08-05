@@ -91,8 +91,26 @@ public class ArenaKills implements Listener
 
                 }.runTaskTimer(plugin, 0, 5);
 
+                for(Player player : Main.online.getOnlinePlayers())
+                {
+                    player.hidePlayer(p);
+                }
+
                 p.spigot().respawn();
                 p.teleport(loc);
+
+                new BukkitRunnable()
+                {
+                    public void run()
+                    {
+                        for(Player player : Main.online.getOnlinePlayers())
+                        {
+                            player.showPlayer(p);
+                        }
+
+                        cancel();
+                    }
+                }.runTaskTimer(plugin, 0, 1);
             }
         }
     }

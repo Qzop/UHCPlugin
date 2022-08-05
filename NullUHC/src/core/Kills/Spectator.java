@@ -23,7 +23,11 @@ public class Spectator implements Listener
     public void setSpectator(Player p)
     {
         Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
-        PlayerKills.spectator.add(p.getUniqueId());
+
+        if(!PlayerKills.spectator.contains(p.getUniqueId()))
+        {
+            PlayerKills.spectator.add(p.getUniqueId());
+        }
 
         if(!ChatEvent.specchat.contains(p.getUniqueId()))
         {
@@ -45,7 +49,11 @@ public class Spectator implements Listener
     
     public void removeSpectator(Player p)
     {
-    	PlayerKills.spectator.remove(p.getUniqueId());
+        if(PlayerKills.spectator.contains(p.getUniqueId()))
+        {
+            PlayerKills.spectator.remove(p.getUniqueId());
+        }
+
     	PlayerKills.deathLocations.remove(p.getUniqueId());
 
         if(ChatEvent.specchat.contains(p.getUniqueId()))

@@ -772,7 +772,7 @@ public class ConfigEvent implements Listener
                 }
                 else if(click == ClickType.RIGHT)
                 {
-                	if(ConfigInventory.firstShrink != 30)
+                	if(ConfigInventory.firstShrink != 20)
                 	{
                 		ConfigInventory.firstShrink -= 5;
                 		

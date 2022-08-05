@@ -8,6 +8,8 @@ import core.HostsMods.HostsMods;
 import core.Kills.PlayerKills;
 import core.Kills.Spectator;
 import core.Scatter.Scatter;
+import core.Scenarios.SuperheroesCMD;
+import core.ScenariosInventory.ScenariosInventory;
 import core.Scoreboard.*;
 import core.mainPackage.Commands;
 import core.mainPackage.LobbyItems;
@@ -15,7 +17,6 @@ import core.mainPackage.Main;
 import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
@@ -25,6 +26,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class Join implements Listener
 {
     Main plugin = Main.getPlugin(Main.class);
+    private SuperheroesCMD cmd = new SuperheroesCMD();
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e)
@@ -102,10 +104,30 @@ public class Join implements Listener
             p.sendMessage(" ");
             p.sendMessage(ChatColor.GRAY + "§m------------------------------------");
 
-            World world = Bukkit.getWorld("world");
-            removeAllPotions(p);
-            p.setMaxHealth(20);
-            p.teleport(world.getSpawnLocation());
+            if(!HostsMods.hosts.contains(p.getUniqueId()) && !HostsMods.mods.contains(p.getUniqueId()))
+            {
+                if(p.hasPermission("uhc.mod") || p.hasPermission("uhc.host"))
+                {
+                    HostModsItems items = new HostModsItems();
+                    items.staffLobbyItems(p);
+                }
+                else
+                {
+                    LobbyItems lobbyitems = new LobbyItems();
+                    lobbyitems.lobbyItems(p);
+                }
+
+                World world = Bukkit.getWorld("world");
+                removeAllPotions(p);
+                p.setMaxHealth(20);
+                p.teleport(world.getSpawnLocation());
+            }
+            else
+            {
+                p.setAllowFlight(true);
+                p.setFlying(true);
+                p.setMaxHealth(20);
+            }
 
             for(Player players : Main.online.getOnlinePlayers())
             {
@@ -118,17 +140,6 @@ public class Join implements Listener
                 {
                     p.showPlayer(players);
                 }
-            }
-
-            if(p.hasPermission("uhc.mod") || p.hasPermission("uhc.host"))
-            {
-                HostModsItems items = new HostModsItems();
-                items.staffLobbyItems(p);
-            }
-            else
-            {
-                LobbyItems lobbyitems = new LobbyItems();
-                lobbyitems.lobbyItems(p);
             }
 
             if(Main.loading)
@@ -147,6 +158,7 @@ public class Join implements Listener
             if(PlayerKills.spectator.contains(p.getUniqueId()))
             {
                 Location loc = new Location(Bukkit.getWorld("uhc_world"), 0, 100, 0);
+                clearInventory(p);
                 p.teleport(loc);
                 p.setAllowFlight(true);
                 p.setFlying(true);
@@ -157,6 +169,11 @@ public class Join implements Listener
                 if(Scatter.allPlayers.contains(p.getUniqueId()))
                 {
                     NPCEvent npc = new NPCEvent();
+
+                    if(p.getWorld().getName().equals("world"))
+                    {
+                        clearInventoryLate(p);
+                    }
 
                     if(ConfigInventory.teamSize > 1)
                     {
@@ -180,12 +197,23 @@ public class Join implements Listener
                         if(Scatter.alreadyScattered.contains(p.getUniqueId()))
                         {
                             Scatter.alreadyScattered.remove(p.getUniqueId());
-                            Scatter temp = new Scatter();
 
                             p.removePotionEffect(PotionEffectType.BLINDNESS);
                             p.removePotionEffect(PotionEffectType.SLOW);
                             p.removePotionEffect(PotionEffectType.JUMP);
                             p.getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
+
+                            if(ScenariosInventory.superheroes)
+                            {
+                                if(cmd.getSuperPower(p.getDisplayName()) == null)
+                                {
+                                    cmd.setSuperPower(p.getDisplayName(), "assign");
+                                }
+                                else
+                                {
+                                    cmd.InitializeSuperPower(p.getDisplayName(), cmd.getSuperPower(p.getDisplayName()));
+                                }
+                            }
                         }
                     }
 
@@ -193,29 +221,33 @@ public class Join implements Listener
                     {
                         for(int i = 0; i < PlayerKills.spectator.size(); i++)
                         {
-                            p.hidePlayer(Bukkit.getPlayer(PlayerKills.spectator.get(i)));
+                            if(Bukkit.getPlayer(PlayerKills.spectator.get(i)) != null)
+                            {
+                                p.hidePlayer(Bukkit.getPlayer(PlayerKills.spectator.get(i)));
+                            }
                         }
                     }
 
                     if(!HostsMods.hosts.isEmpty())
                     {
-                        p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(0)));
+                        if(Bukkit.getPlayer(HostsMods.hosts.get(0)) != null)
+                        {
+                            p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(0)));
+                        }
                     }
 
                     if(!HostsMods.mods.isEmpty())
                     {
                         for(int i = 0; i < HostsMods.mods.size(); i++)
                         {
-                            p.hidePlayer(Bukkit.getPlayer(HostsMods.mods.get(i)));
+                            if(Bukkit.getPlayer(HostsMods.mods.get(i)) != null)
+                            {
+                                p.hidePlayer(Bukkit.getPlayer(HostsMods.mods.get(i)));
+                            }
                         }
                     }
-
-                    if(p.getWorld().getName().equals("world"))
-                    {
-                        clearInventoryLate(p);
-                    }
                 }
-                else if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()))
+                else if(HostsMods.hosts.contains(p.getUniqueId()) || HostsMods.mods.contains(p.getUniqueId()) || PlayerKills.spectator.contains(p.getUniqueId()))
                 {
                     for(Player player : Main.online.getOnlinePlayers())
                     {
@@ -225,7 +257,11 @@ public class Join implements Listener
                 else if(NPCEvent.disqualified.contains(p.getUniqueId()))
                 {
                     Spectator spectator = new Spectator();
+                    clearInventory(p);
                     spectator.setSpectator(p);
+
+                    p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " You have been disqualified for being disconnected too long.");
+                    NPCEvent.disqualified.remove(p.getUniqueId());
                 }
                 else
                 {
@@ -237,26 +273,36 @@ public class Join implements Listener
                         {
                             for(int i = 0; i < PlayerKills.spectator.size(); i++)
                             {
-                                p.hidePlayer(Bukkit.getPlayer(PlayerKills.spectator.get(i)));
+                                if(Bukkit.getPlayer(PlayerKills.spectator.get(i)) != null)
+                                {
+                                    p.hidePlayer(Bukkit.getPlayer(PlayerKills.spectator.get(i)));
+                                }
                             }
                         }
 
                         if(!HostsMods.hosts.isEmpty())
                         {
-                            p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(0)));
+                            if(Bukkit.getPlayer(HostsMods.hosts.get(0)) != null)
+                            {
+                                p.hidePlayer(Bukkit.getPlayer(HostsMods.hosts.get(0)));
+                            }
                         }
 
                         if(!HostsMods.mods.isEmpty())
                         {
                             for(int i = 0; i < HostsMods.mods.size(); i++)
                             {
-                                p.hidePlayer(Bukkit.getPlayer(HostsMods.mods.get(i)));
+                                if(Bukkit.getPlayer(HostsMods.mods.get(i)) != null)
+                                {
+                                    p.hidePlayer(Bukkit.getPlayer(HostsMods.mods.get(i)));
+                                }
                             }
                         }
                     }
                     else
                     {
                         Spectator spectator = new Spectator();
+                        clearInventory(p);
                         spectator.setSpectator(p);
 
                         p.sendMessage(Scatter.UHCprefix + ChatColor.YELLOW + " Late scatter period ended, you are now a spectator.");
@@ -264,8 +310,6 @@ public class Join implements Listener
                 }
             }
         }
-
-        alwaysShowPlayers(p);
     }
 
     private void removeAllPotions(Player p)
@@ -337,42 +381,31 @@ public class Join implements Listener
                 p.getInventory().setChestplate(null);
                 p.getInventory().setHelmet(null);
 
+                removeAllPotions(p);
+
                 if(ConfigInventory.teamSize > 1)
                 {
-                    scat.lateScatterTeams(p);
                     game.setGameTeams(p);
                     kills.latePlayer(p);
+                    scat.lateScatterTeams(p);
                 }
                 else
                 {
-                    scat.lateScatterFFA(p);
                     game.setGameFFA(p);
                     kills.latePlayer(p);
+                    scat.lateScatterFFA(p);
                 }
 
-                removeAllPotions(p);
+                if(Scatter.offlineDuringScat.containsKey(p.getUniqueId()))
+                {
+                    Scatter.offlineDuringScat.remove(p.getUniqueId());
+
+                    p.getInventory().setItem(0, new ItemStack(Material.COOKED_BEEF, ConfigInventory.sFood, (byte) 0));
+                }
 
                 cancel();
             }
 
         }.runTaskTimer(plugin, 0, 1);
-    }
-
-    public void alwaysShowPlayers(Player p)
-    {
-        new BukkitRunnable()
-        {
-            public void run()
-            {
-                for(Player players : Main.online.getOnlinePlayers())
-                {
-                    if(!HostsMods.hosts.contains(players.getUniqueId()) && !HostsMods.mods.contains(players.getUniqueId()) && !PlayerKills.spectator.contains(players.getUniqueId()))
-                    {
-                        p.showPlayer(players);
-                    }
-                }
-            }
-
-        }.runTaskTimer(plugin, 0, 40);
     }
 }

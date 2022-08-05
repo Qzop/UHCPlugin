@@ -63,7 +63,7 @@ public class Quit implements Listener
         }
         else if(Scatter.started)
         {
-            if(Scatter.allPlayers.contains(p.getUniqueId()))
+            if(Scatter.allPlayers.contains(p.getUniqueId()) && !Scatter.offlineDuringScat.containsKey(p.getUniqueId()))
             {
                 NPC npc = CitizensAPI.getNPCRegistry().createNPC(EntityType.ZOMBIE, "" + ChatColor.BOLD + ChatColor.RED + "[Disconnected] " + p.getDisplayName());
                 onNPC.spawnNPC(npc, p);

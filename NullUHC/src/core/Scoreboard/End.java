@@ -13,6 +13,7 @@ public class End implements Listener
     Main plugin = Main.getPlugin(Main.class);
     private Lobby lob;
     private ScoreboardTeams teams;
+    public static int seconds = 30;
 
     public void onWinner(Player p)
     {
@@ -57,12 +58,22 @@ public class End implements Listener
 
         new BukkitRunnable()
         {
-            int seconds = 30;
-
             public void run()
             {
                 finalRestart.setSuffix(ChatColor.RED + "" + seconds);
+            }
 
+        }.runTaskTimer(plugin, 0 , 1);
+
+        teams.setScoreboard(p, scoreboard);
+    }
+
+    public void restart()
+    {
+        new BukkitRunnable()
+        {
+            public void run()
+            {
                 if(seconds == 0)
                 {
                     Bukkit.broadcastMessage(net.md_5.bungee.api.ChatColor.RED + "Restarting the server.");
@@ -73,8 +84,6 @@ public class End implements Listener
                 seconds--;
             }
 
-        }.runTaskTimer(plugin, 0 , 20);
-
-        teams.setScoreboard(p, scoreboard);
+        }.runTaskTimer(plugin, 0, 20);
     }
 }

@@ -23,7 +23,7 @@ import java.util.*;
 public class BedRockBorder implements Listener
 {
     Main plugin = Main.getPlugin(Main.class);
-	public static HashMap<UUID, Location> teleLocationsFFA = new HashMap<UUID, Location>();
+	public static HashMap<UUID, Location> teleLocations = new HashMap<UUID, Location>();
 	public static HashMap<UUID, Location> offlineDuringTele = new HashMap<UUID, Location>();
     public static int currentBorderSize = ConfigInventory.borderSize;
     public void setUpBorder(int border, World world)
@@ -290,17 +290,10 @@ public class BedRockBorder implements Listener
 				break;
 		}
 
-		if(ConfigInventory.teamSize == 1)
-		{
-			getTeleportLocationsFFA();
-		}
-		else
-		{
-			getTeleportLocationsTeams();
-		}
+		getTeleportLocations();
 	}
 
-	public void getTeleportLocationsFFA()
+	public void getTeleportLocations()
 	{
 		World world = Bukkit.getWorld("uhc_world");
 
@@ -385,7 +378,7 @@ public class BedRockBorder implements Listener
 					if(x != 0 && z != 0)
 					{
 						Location loc = new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
-						teleLocationsFFA.put(p.getUniqueId(), loc);
+						teleLocations.put(p.getUniqueId(), loc);
 					}
 				}
 				else
@@ -488,7 +481,7 @@ public class BedRockBorder implements Listener
 
 						Location loc = new Location(world, x, world.getHighestBlockYAt(x, z) + 1, z);
 						loc.getChunk().load(true);
-						teleLocationsFFA.put(p.getUniqueId(), loc);
+						teleLocations.put(p.getUniqueId(), loc);
 					}
 				}
 				else
@@ -512,38 +505,12 @@ public class BedRockBorder implements Listener
 			}
 		}
 
-		teleportPlayersFFA();
+		teleportPlayers();
 	}
 
-	public void getTeleportLocationsTeams()
+	public void teleportPlayers()
 	{
-		if(currentBorderSize > 500)
-		{
-			new BukkitRunnable()
-			{
-				public void run()
-				{
-
-				}
-
-			}.runTaskTimer(plugin, 0, 10);
-		}
-		else
-		{
-			new BukkitRunnable()
-			{
-				public void run()
-				{
-
-				}
-
-			}.runTaskTimer(plugin, 0, 10);
-		}
-	}
-
-	public void teleportPlayersFFA()
-	{
-		if(!teleLocationsFFA.isEmpty())
+		if(!teleLocations.isEmpty())
 		{
 			new BukkitRunnable()
 			{
@@ -562,13 +529,24 @@ public class BedRockBorder implements Listener
 
 						if(p != null)
 						{
-							if(teleLocationsFFA.containsKey(p.getUniqueId()))
+							if(teleLocations.containsKey(p.getUniqueId()))
 							{
-								teleLocationsFFA.get(p.getUniqueId()).setPitch(p.getLocation().getPitch());
-								teleLocationsFFA.get(p.getUniqueId()).setYaw(p.getLocation().getYaw());
-								p.teleport(teleLocationsFFA.get(p.getUniqueId()));
-								teleLocationsFFA.get(p.getUniqueId()).getChunk().load(true);
-								teleLocationsFFA.remove(p.getUniqueId());
+								teleLocations.get(p.getUniqueId()).setPitch(p.getLocation().getPitch());
+								teleLocations.get(p.getUniqueId()).setYaw(p.getLocation().getYaw());
+								p.teleport(teleLocations.get(p.getUniqueId()));
+
+								for(Player player : Main.online.getOnlinePlayers())
+								{
+									player.hidePlayer(p);
+								}
+
+								for(Player player : Main.online.getOnlinePlayers())
+								{
+									player.showPlayer(p);
+								}
+
+								teleLocations.get(p.getUniqueId()).getChunk().load(true);
+								teleLocations.remove(p.getUniqueId());
 							}
 						}
 

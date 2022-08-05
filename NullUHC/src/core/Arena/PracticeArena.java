@@ -69,6 +69,17 @@ public class PracticeArena implements Listener
                         playersInArena.add(p.getUniqueId());
                         kit.setArenaKit(p);
                         p.teleport(loc);
+
+                        for(Player player : Main.online.getOnlinePlayers())
+                        {
+                            player.hidePlayer(p);
+                        }
+
+                        for(Player player : Main.online.getOnlinePlayers())
+                        {
+                            player.showPlayer(p);
+                        }
+
                         p.sendMessage(ChatColor.GREEN + "You are now in the arena.");
                         cancel();
                     }

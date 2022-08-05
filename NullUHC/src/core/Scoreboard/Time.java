@@ -21,6 +21,7 @@ import java.util.UUID;
 public class Time implements Listener
 {
 	private BedRockBorder bord = new BedRockBorder();
+	private End end = new End();
     private static int time = 0;
     public static int minutes = 0;
     public static int hours = 0;
@@ -40,6 +41,7 @@ public class Time implements Listener
 					if(Scatter.allPlayers.size() == 1)
 					{
 						Scatter.ended = true;
+						end.restart();
 						announceWinners();
 						cancel();
 					}
@@ -49,12 +51,27 @@ public class Time implements Listener
 					if(TeamManager.aliveTeams == 1)
 					{
 						Scatter.ended = true;
+						end.restart();
 						announceWinners();
 						cancel();
 					}
 				}
                 
                 time++;
+                
+                if(time % 60 == 0 && time != 0)
+                {
+                    time = 0;
+                    minutes++;
+                }
+
+                if(minutes % 60 == 0 && minutes != 0)
+                {
+                    minutes = 0;
+                    hours++;
+                }
+                
+            	check();
 
 				if(!NPCEvent.disconnected.isEmpty())
 				{
@@ -99,6 +116,12 @@ public class Time implements Listener
 						{
 							NPCEvent.disqualified.add(k);
 							Scatter.offlineDuringScat.remove(k);
+
+							if(Scatter.allPlayers.contains(k))
+							{
+								Scatter.allPlayers.remove(k);
+							}
+
 							Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.GOLD + Bukkit.getOfflinePlayer(k).getName() + ChatColor.RED + " Has been disqualified for being disconnected for more than 10 minutes.");
 						}
 						else
@@ -111,25 +134,11 @@ public class Time implements Listener
 								Bukkit.broadcastMessage(Scatter.UHCprefix + " " + ChatColor.AQUA + offp.getName() + ChatColor.RED + " has "
 										+ ChatColor.AQUA + (10 - currtime) + ChatColor.RED + " minute(s) to reconnect.");
 							}
-						}
 
-						Scatter.offlineDuringScat.put(k, Scatter.offlineDuringScat.get(k) + 1);
+							Scatter.offlineDuringScat.put(k, Scatter.offlineDuringScat.get(k) + 1);
+						}
 					}
 				}
-                
-                if(time % 60 == 0 && time != 0)
-                {
-                    time = 0;
-                    minutes++;
-                }
-
-                if(minutes % 60 == 0 && minutes != 0)
-                {
-                    minutes = 0;
-                    hours++;
-                }
-                
-            	check();
             }
 
         }.runTaskTimer(plugin, 0, 20);
@@ -146,98 +155,98 @@ public class Time implements Listener
     
     public void check()
     {
-    	if(minutes == 5 && time == 0)
+    	if(minutes == 5 && time == 0 && hours == 0)
         {
         	Commands.chat = false;
         	Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GREEN + " Chat is now enabled.");
         }
         
-        if(minutes == ConfigInventory.finalHeal && time == 0)
+        if(minutes == ConfigInventory.finalHeal && time == 0 && hours == 0)
         {
         	for(Player player : Main.online.getOnlinePlayers())
         	{
-        		player.setHealth(player.getHealth() + (20.0 - player.getHealth()));
+        		player.setHealth(player.getHealth() + (player.getMaxHealth() - player.getHealth()));
         	}
         	
         	Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.GREEN + " Final heal has been given." + ChatColor.RED + " DO NOT " + ChatColor.GREEN + "ask for another.");
         }
 
-		if(minutes == ConfigInventory.gracePeriod && time == 0)
+		if(minutes == ConfigInventory.gracePeriod && time == 0 && hours == 0)
 		{
 			Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.YELLOW + " Grace Period has ended. Good luck.");
 		}
         
         if(Scatter.numShrinks != 0)
         {
-        	if(minutes == ConfigInventory.firstShrink - 5 && time == 0)
+        	if(minutes == ConfigInventory.firstShrink - 5 && time == 0 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 5 minutes.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 4 && time == 0)
+        	else if(minutes == ConfigInventory.firstShrink - 4 && time == 0 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 4 minutes.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 3 && time == 0)
+        	else if(minutes == ConfigInventory.firstShrink - 3 && time == 0 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 3 minutes.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 2 && time == 0)
+        	else if(minutes == ConfigInventory.firstShrink - 2 && time == 0 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 2 minutes.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 0)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 0 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 1 minute.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 30)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 30 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 30 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 45)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 45 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 15 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 50)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 50 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 10 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 51)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 51 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 9 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 52)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 52 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 8 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 53)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 53 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 7 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 54)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 54 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 6 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 55)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 55 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 5 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 56)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 56 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 4 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 57)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 57 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 3 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 58)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 58 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 2 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 59)
+        	else if(minutes == ConfigInventory.firstShrink - 1 && time == 59 && hours == 0)
         	{
         		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " First Shrink will occur in 1 seconds.");
         	}
-        	else if(minutes == ConfigInventory.firstShrink && time == 0)
+        	else if(minutes == ConfigInventory.firstShrink && time == 0 && hours == 0)
         	{
 				bord.setUpShrink();
         		lastShrink = minutes;
@@ -247,71 +256,71 @@ public class Time implements Listener
         	
         	if(first)
         	{
-        		if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 4 && time == 0)
+        		if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 4 && time == 0 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 4 minutes.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 3 && time == 0)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 3 && time == 0 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 3 minutes.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 2 && time == 0)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 2 && time == 0 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 2 minutes.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 0)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 0 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 1 minute.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 30)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 30 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 30 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 45)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 45 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 15 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 50)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 50 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 10 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 51)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 51 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 9 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 52)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 52 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 8 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 53)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 53 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 7 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 54)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 54 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 6 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 55)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 55 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 5 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 56)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 56 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 4 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 57)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 57 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 3 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 58)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 58 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 2 seconds.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 59)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) - 1 && time == 59 && hours == 0)
             	{
             		Bukkit.broadcastMessage(Scatter.UHCprefix + ChatColor.AQUA + " Next Shrink will occur in 1 second.");
             	}
-            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) && time == 0)
+            	else if(minutes == (lastShrink + ConfigInventory.shrinkInterval) && time == 0 && hours == 0)
             	{
 					bord.setUpShrink();
             		lastShrink = minutes;
