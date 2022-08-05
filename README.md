@@ -7,7 +7,7 @@ DO NOT take this code. It is for NullUHC and NullUHC only.
 - PCP PUSHER (Fair)
 - TheenComputers
 
-#Permissions/Commands
+# Permissions/Commands
 
 NOTE: In parenthesis is the permission. If it says "No permissions" then there is no specific permission for that command. 
 
