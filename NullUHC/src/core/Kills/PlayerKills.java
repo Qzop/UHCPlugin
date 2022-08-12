@@ -155,7 +155,15 @@ public class PlayerKills implements Listener
                         p.getWorld().dropItemNaturally(p.getLocation(), e.getDrops().get(i));
                     }
 
-                    setUpPlayerHead(p);
+                    if(ScenariosInventory.goldenretriever)
+                    {
+                        p.getWorld().dropItemNaturally(p.getLocation(), GoldenHead.head);
+                    }
+                    else
+                    {
+                        setUpPlayerHead(p);
+                    }
+
                     e.getDrops().clear();
                 }
                 else

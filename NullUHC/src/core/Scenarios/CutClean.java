@@ -48,14 +48,18 @@ public class CutClean implements Listener
 
             if(canEnterInv)
             {
-                p.playSound(p.getLocation(), Sound.ITEM_PICKUP, 1.0F, 1.0F);
-                p.playSound(p.getLocation(), Sound.ORB_PICKUP, 1.0F, 1.0F);
-                p.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, dropsNum));
+                if(!ScenariosInventory.goldless)
+                {
+                    p.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, dropsNum));
+                }
             }
             else
             {
-                Location adLoc = new Location(block.getWorld(), block.getX() + .5, block.getY() + .5, block.getZ() + .5);
-                block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.GOLD_INGOT, dropsNum));
+                if(!ScenariosInventory.goldless)
+                {
+                    Location adLoc = new Location(block.getWorld(), block.getX() + .5, block.getY() + .5, block.getZ() + .5);
+                    block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.GOLD_INGOT, dropsNum));
+                }
             }
             p.giveExp(1);
         }

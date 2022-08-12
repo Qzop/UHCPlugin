@@ -563,8 +563,6 @@ public class TeamManager implements Listener
                                 disbandTeam(teamOwner);
 
                                 createTeam(teamOwner);
-
-
                             }
                             else
                             {

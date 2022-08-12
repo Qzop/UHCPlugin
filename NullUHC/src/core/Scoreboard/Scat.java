@@ -68,6 +68,7 @@ public class Scat implements Listener
                 }
                 else
                 {
+                    teams.updateTeams(p);
                     finalScattered.setSuffix("" + ChatColor.YELLOW + Scatter.teamsScattered);
                 }
 

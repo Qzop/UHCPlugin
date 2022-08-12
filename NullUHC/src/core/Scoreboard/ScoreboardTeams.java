@@ -1,5 +1,6 @@
 package core.Scoreboard;
 
+import core.Teams.TeamManager;
 import core.mainPackage.Main;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -188,5 +189,16 @@ public class ScoreboardTeams implements Listener
         Random rn = new Random();
         int num = rn.nextInt((colors.size()));
         return colors.get(num);
+    }
+
+    public void updateTeams(Player p)
+    {
+        for(Team team : teams)
+        {
+            if(p.getScoreboard().getTeam(team.getName()) == null)
+            {
+                p.getScoreboard().registerNewTeam(team.getName());
+            }
+        }
     }
 }

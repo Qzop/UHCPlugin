@@ -78,6 +78,11 @@ public class Lobby implements Listener
         {
             public void run()
             {
+                if(ConfigInventory.teamSize > 1)
+                {
+                    teams.updateTeams(p);
+                }
+
                 finalPlayercount.setSuffix("" + ChatColor.YELLOW + "" + Main.online.getOnlinePlayers().size());
 
                 if(HostsMods.hosts.isEmpty())

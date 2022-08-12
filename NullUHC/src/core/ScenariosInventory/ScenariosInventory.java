@@ -25,6 +25,14 @@ public class ScenariosInventory implements Listener
     public static boolean superheroes = false;
     public static boolean timber = false;
     public static boolean timebomb = false;
+    public static boolean nofall = false;
+    public static boolean fireless = false;
+    public static boolean bloodgold = false;
+    public static boolean blooddiamond = false;
+    public static boolean goldenretriever = false;
+    public static boolean diamondless = false;
+    public static boolean goldless = false;
+    public static boolean veinminer = false;
 
     public static ArrayList<ItemStack> enabledScenarios = new ArrayList<ItemStack>();
 

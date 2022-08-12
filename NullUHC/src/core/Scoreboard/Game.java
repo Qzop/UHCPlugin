@@ -268,6 +268,8 @@ public class Game implements Listener
         {
             public void run()
             {
+                teams.updateTeams(p);
+
                 finalTime.setSuffix(ChatColor.YELLOW + t.getTime());
                 finalKills.setSuffix(ChatColor.YELLOW + "" + PlayerKills.numKills.get(p.getUniqueId()));
                 finalTeamkills.setSuffix(ChatColor.YELLOW + "" + tk.getTeamKills(p));

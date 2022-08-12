@@ -1,7 +1,6 @@
 package core.mainPackage;
 
 import core.Alerts.PvP;
-import core.Alerts.ReportInv;
 import core.Alerts.ReportInvEvent;
 import core.Alerts.Xray;
 import core.Arena.ArenaKills;
@@ -20,7 +19,6 @@ import core.Scatter.ChatEventScatter;
 import core.Scatter.Scatter;
 import core.Scenarios.*;
 import core.ScenariosInventory.ScenInvEvent;
-import core.ScenariosInventory.ScenariosInventory;
 import core.Scoreboard.Game;
 import core.Scoreboard.Lobby;
 
@@ -30,15 +28,12 @@ import java.util.UUID;
 
 import core.Scoreboard.ScoreboardTeams;
 import core.Scoreboard.Time;
-import net.citizensnpcs.api.npc.NPCRegistry;
 import net.minecraft.util.org.apache.commons.io.FileUtils;
 import org.bukkit.*;
-import org.bukkit.entity.NPC;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class Main extends JavaPlugin implements Listener
 {
@@ -101,6 +96,9 @@ public class Main extends JavaPlugin implements Listener
 		this.getServer().getPluginManager().registerEvents(new Timebomb(), this);
 		this.getServer().getPluginManager().registerEvents(new Superheroes(), this);
 		this.getServer().getPluginManager().registerEvents(new ReportInvEvent(), this);
+		this.getServer().getPluginManager().registerEvents(new FirelessNoFall(), this);
+		this.getServer().getPluginManager().registerEvents(new BloodGoldBloodDiamond(), this);
+		this.getServer().getPluginManager().registerEvents(new DiamondlessGoldless(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
 		getCommand(command.config).setExecutor(command);
