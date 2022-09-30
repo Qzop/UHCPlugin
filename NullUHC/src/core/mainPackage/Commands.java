@@ -177,42 +177,40 @@ public class Commands implements Listener, CommandExecutor
 		{
 			if(p.hasPermission("uhc.mod"))
 			{
-				if(args.length == 2)
+				if(args.length == 0)
 				{
-					if(args[0].equals("add"))
+					if(HostsMods.mods.contains(p.getUniqueId()))
 					{
-						Player target = Bukkit.getPlayer(args[1]);
-
-						if(target != null)
-						{
-							hosts.setMod(target);
-						}
-						else
-						{
-							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
-						}
+						hosts.removeMod(p);
 					}
-					else if(args[0].equals("remove"))
+					else
 					{
-						Player target = Bukkit.getPlayer(args[1]);
+						hosts.setMod(p);
+					}
+				}
+				else if(args.length == 1)
+				{
+					Player target = Bukkit.getPlayer(args[0]);
 
-						if(target != null)
+					if(target != null)
+					{
+						if(HostsMods.mods.contains(target.getUniqueId()))
 						{
 							hosts.removeMod(target);
 						}
 						else
 						{
-							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
+							hosts.setMod(target);
 						}
 					}
 					else
 					{
-						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Invalid argument '" + args[0] + "'.");
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
 					}
 				}
 				else
 				{
-					p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Usage: /mod (add/remove) (player)");
+					p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Usage: /mod (player)");
 				}
 			}
 			else
@@ -224,43 +222,40 @@ public class Commands implements Listener, CommandExecutor
 		{
 			if(p.hasPermission("uhc.host"))
 			{
-				if(args.length == 2)
+				if(args.length == 0)
 				{
-					if(args[0].equals("add"))
+					if(HostsMods.hosts.contains(p.getUniqueId()))
 					{
-						Player target = Bukkit.getPlayer(args[1]);
-
-						if(target != null)
-						{
-							hosts.setHost(target);
-						}
-						else
-						{
-							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
-						}
+						hosts.removeHost(p);
 					}
-					else if(args[0].equals("remove"))
+					else
 					{
-						Player target = Bukkit.getPlayer(args[1]);
+						hosts.setHost(p);
+					}
+				}
+				else if(args.length == 1)
+				{
+					Player target = Bukkit.getPlayer(args[0]);
 
-						if(target != null)
+					if(target != null)
+					{
+						if(HostsMods.hosts.contains(target.getUniqueId()))
 						{
 							hosts.removeHost(target);
 						}
 						else
 						{
-							p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
+							hosts.setHost(target);
 						}
 					}
 					else
 					{
-						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Invalid argument '" + args[0] + "'.");
+						p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " That player is not online!");
 					}
-
 				}
 				else
 				{
-					p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Usage: /host (add/remove) (player)");
+					p.sendMessage(Scatter.UHCprefix + ChatColor.RED + " Usage: /host (player)");
 				}
 			}
 			else

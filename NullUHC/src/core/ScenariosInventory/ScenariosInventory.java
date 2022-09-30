@@ -33,6 +33,8 @@ public class ScenariosInventory implements Listener
     public static boolean diamondless = false;
     public static boolean goldless = false;
     public static boolean veinminer = false;
+    public static boolean tripleores = false;
+    public static boolean doubleores = false;
 
     public static ArrayList<ItemStack> enabledScenarios = new ArrayList<ItemStack>();
 
@@ -179,6 +181,104 @@ public class ScenariosInventory implements Listener
 
                 time.setItemMeta(timemeta);
 
+                ItemStack triple = new ItemStack(Material.DIAMOND);
+                ItemMeta triplemeta = triple.getItemMeta();
+
+                if(tripleores)
+                {
+                    triplemeta.setDisplayName(ChatColor.YELLOW + "TripleOres: " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    triplemeta.setDisplayName(ChatColor.YELLOW + "TripleOres: " + ChatColor.RED + ChatColor.BOLD + "Off");
+                }
+
+                triple.setItemMeta(triplemeta);
+
+                ItemStack doubl = new ItemStack(Material.GOLD_INGOT);
+                ItemMeta doublemeta = doubl.getItemMeta();
+
+                if(doubleores)
+                {
+                    doublemeta.setDisplayName(ChatColor.YELLOW + "DoubleOres: " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    doublemeta.setDisplayName(ChatColor.YELLOW + "DoubleOres: " + ChatColor.RED + ChatColor.BOLD + "Off");
+                }
+
+                doubl.setItemMeta(doublemeta);
+
+                ItemStack nogold = new ItemStack(Material.GOLD_ORE);
+                ItemMeta nogoldmeta = nogold.getItemMeta();
+
+                if(goldless)
+                {
+                    nogoldmeta.setDisplayName(ChatColor.YELLOW + "Goldless: " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    nogoldmeta.setDisplayName(ChatColor.YELLOW + "Goldless: " + ChatColor.RED + ChatColor.BOLD + "Off");
+                }
+
+                nogold.setItemMeta(nogoldmeta);
+
+                ItemStack nodiamond = new ItemStack(Material.DIAMOND_ORE);
+                ItemMeta nodiamondmeta = nodiamond.getItemMeta();
+
+                if(diamondless)
+                {
+                    nodiamondmeta.setDisplayName(ChatColor.YELLOW + "Diamondless: " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    nodiamondmeta.setDisplayName(ChatColor.YELLOW + "Diamondless: " + ChatColor.RED + ChatColor.BOLD + "Off");
+                }
+
+                nodiamond.setItemMeta(nodiamondmeta);
+
+                ItemStack vein = new ItemStack(Material.IRON_ORE);
+                ItemMeta veinmeta = vein.getItemMeta();
+
+                if(veinminer)
+                {
+                    veinmeta.setDisplayName(ChatColor.YELLOW + "VeinMiner: " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    veinmeta.setDisplayName(ChatColor.YELLOW + "VeinMiner: " + ChatColor.RED + ChatColor.BOLD + "Off");
+                }
+
+                vein.setItemMeta(veinmeta);
+
+                ItemStack nofalldmg = new ItemStack(Material.FEATHER);
+                ItemMeta nofallmeta = nofalldmg.getItemMeta();
+
+                if(nofall)
+                {
+                    nofallmeta.setDisplayName(ChatColor.YELLOW + "NoFall: " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    nofallmeta.setDisplayName(ChatColor.YELLOW + "NoFall: " + ChatColor.RED + ChatColor.BOLD + "Off");
+                }
+
+                nofalldmg.setItemMeta(nofallmeta);
+
+                ItemStack nofire = new ItemStack(Material.FLINT_AND_STEEL);
+                ItemMeta nofiremeta = nofire.getItemMeta();
+
+                if(fireless)
+                {
+                    nofiremeta.setDisplayName(ChatColor.YELLOW + "Fireless: " + ChatColor.GREEN + ChatColor.BOLD + "On");
+                }
+                else
+                {
+                    nofiremeta.setDisplayName(ChatColor.YELLOW + "Fireless: " + ChatColor.RED + ChatColor.BOLD + "Off");
+                }
+
+                nofire.setItemMeta(nofiremeta);
+
                 i.setItem(0, filler);
                 i.setItem(1, filler);
                 i.setItem(2, filler);
@@ -196,9 +296,17 @@ public class ScenariosInventory implements Listener
                 i.setItem(13, cut);
                 i.setItem(14, luck);
                 i.setItem(15, superh);
+                i.setItem(16, nofalldmg);
 
                 i.setItem(17, filler);
                 i.setItem(18, filler);
+
+                i.setItem(19, nodiamond);
+                i.setItem(20, nogold);
+                i.setItem(21, triple);
+                i.setItem(22, doubl);
+                i.setItem(23, vein);
+                i.setItem(24, nofire);
 
                 i.setItem(26, filler);
                 i.setItem(27, filler);
@@ -216,6 +324,7 @@ public class ScenariosInventory implements Listener
                 i.setItem(51, filler);
                 i.setItem(52, filler);
                 i.setItem(53, filler);
+
             }
 
         }.runTaskTimer(plugin, 0,  1);

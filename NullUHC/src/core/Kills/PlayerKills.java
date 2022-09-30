@@ -208,7 +208,6 @@ public class PlayerKills implements Listener
                     }
 
                     chest.getInventory().addItem(GoldenHead.head);
-
                     e.getDrops().clear();
                     double xAdder = 0.5;
 

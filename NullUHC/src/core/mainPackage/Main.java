@@ -99,6 +99,8 @@ public class Main extends JavaPlugin implements Listener
 		this.getServer().getPluginManager().registerEvents(new FirelessNoFall(), this);
 		this.getServer().getPluginManager().registerEvents(new BloodGoldBloodDiamond(), this);
 		this.getServer().getPluginManager().registerEvents(new DiamondlessGoldless(), this);
+		this.getServer().getPluginManager().registerEvents(new TripleOresDoubleOres(), this);
+		this.getServer().getPluginManager().registerEvents(new VeinMiner(), this);
 	
 		getCommand(command.uhc).setExecutor(command);
 		getCommand(command.config).setExecutor(command);

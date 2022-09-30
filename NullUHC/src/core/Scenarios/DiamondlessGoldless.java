@@ -5,6 +5,9 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.Random;
 
 public class DiamondlessGoldless implements Listener
 {
@@ -15,7 +18,8 @@ public class DiamondlessGoldless implements Listener
         {
             if(ScenariosInventory.goldless)
             {
-                e.getBlock().getDrops().clear();
+                e.getBlock().setType(Material.AIR);
+                e.getPlayer().giveExp(1);
             }
         }
 
@@ -23,7 +27,8 @@ public class DiamondlessGoldless implements Listener
         {
             if(ScenariosInventory.diamondless)
             {
-                e.getBlock().getDrops().clear();
+                e.getBlock().setType(Material.AIR);
+                e.getPlayer().giveExp(new Random().nextInt(7) + 3);
             }
         }
     }

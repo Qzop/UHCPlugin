@@ -366,11 +366,11 @@ public class HostModsItems implements Listener
 						}
 						else if(p.getItemInHand().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "UHC Mod") && p.getItemInHand().getType() == Material.ENDER_PEARL)
 						{
-							p.performCommand("mod add " + p.getDisplayName());
+							p.performCommand("mod " + p.getDisplayName());
 						}
 						else if(p.getItemInHand().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "UHC Host") && p.getItemInHand().getType() == Material.ENDER_CHEST)
 						{
-							p.performCommand("host add " + p.getDisplayName());
+							p.performCommand("host " + p.getDisplayName());
 						}
 						else if(p.getItemInHand().getItemMeta().getDisplayName().equals(ChatColor.YELLOW + "Pass through/Teleport") && p.getItemInHand().getType() == Material.COMPASS)
 						{

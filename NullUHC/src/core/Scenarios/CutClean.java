@@ -50,7 +50,18 @@ public class CutClean implements Listener
             {
                 if(!ScenariosInventory.goldless)
                 {
-                    p.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, dropsNum));
+                    if(ScenariosInventory.tripleores)
+                    {
+                        p.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, dropsNum * 3));
+                    }
+                    else if(ScenariosInventory.doubleores)
+                    {
+                        p.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, dropsNum * 2));
+                    }
+                    else
+                    {
+                        p.getInventory().addItem(new ItemStack(Material.GOLD_INGOT, dropsNum));
+                    }
                 }
             }
             else
@@ -58,9 +69,22 @@ public class CutClean implements Listener
                 if(!ScenariosInventory.goldless)
                 {
                     Location adLoc = new Location(block.getWorld(), block.getX() + .5, block.getY() + .5, block.getZ() + .5);
-                    block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.GOLD_INGOT, dropsNum));
+
+                    if(ScenariosInventory.tripleores)
+                    {
+                        block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.GOLD_INGOT, dropsNum * 3));
+                    }
+                    else if(ScenariosInventory.doubleores)
+                    {
+                        block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.GOLD_INGOT, dropsNum * 2));
+                    }
+                    else
+                    {
+                        block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.GOLD_INGOT, dropsNum));
+                    }
                 }
             }
+
             p.giveExp(1);
         }
 
@@ -83,12 +107,35 @@ public class CutClean implements Listener
 
             if(canEnterInv)
             {
-                p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, dropsNum));
+                if(ScenariosInventory.tripleores)
+                {
+                    p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, dropsNum * 3));
+                }
+                else if(ScenariosInventory.doubleores)
+                {
+                    p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, dropsNum * 2));
+                }
+                else
+                {
+                    p.getInventory().addItem(new ItemStack(Material.IRON_INGOT, dropsNum));
+                }
             }
             else
             {
                 Location adLoc = new Location(block.getWorld(), block.getX() + .5, block.getY() + .5, block.getZ() + .5);
-                block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.IRON_INGOT, dropsNum));
+
+                if(ScenariosInventory.tripleores)
+                {
+                    block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.IRON_INGOT, dropsNum * 3));
+                }
+                else if(ScenariosInventory.doubleores)
+                {
+                    block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.IRON_INGOT, dropsNum * 2));
+                }
+                else
+                {
+                    block.getWorld().dropItemNaturally(adLoc, new ItemStack(Material.IRON_INGOT, dropsNum));
+                }
             }
 
             p.giveExp(1);
